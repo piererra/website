@@ -1,11 +1,4 @@
 {
   "games": [],
-  "posts": [
-    {
-      "game": "Test Post Game",
-      "title": "Test Post Title",
-      "date": "2026-05-02",
-      "url": "idk.html"
-    }
-  ]
+  "posts": []
 }
