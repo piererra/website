@@ -777,7 +777,7 @@
     const grid = document.getElementById('games-grid');
     const counter = document.getElementById('games-count');
     try {
-      const res = await fetch('games.json');
+      const res = await fetch('json/games.json');
       if (!res.ok) throw new Error();
       const games = await res.json();
 
@@ -823,7 +823,7 @@
   async function loadPosts() {
     const container = document.getElementById('posts-list');
     try {
-      const res = await fetch('posts.json');
+      const res = await fetch('json/posts.json');
       if (!res.ok) throw new Error();
       const posts = await res.json();
 
