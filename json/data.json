@@ -1,0 +1,64 @@
+{
+  "games": [
+    {
+      "name": "Mobile Legends",
+      "tag": "MOBA",
+      "emoji": "⚔️",
+      "desc": "All heroes unlocked, custom diamond top-up, lag-free gameplay.",
+      "status": "online",
+      "players": "2.4k players",
+      "popular": true,
+      "url": "#"
+    },
+    {
+      "name": "Free Fire",
+      "tag": "Battle Royale",
+      "emoji": "🔥",
+      "desc": "Unlimited diamonds, exclusive skins, updated weekly.",
+      "status": "online",
+      "players": "3.1k players",
+      "popular": true,
+      "url": "#"
+    },
+    {
+      "name": "Arena of Valor",
+      "tag": "MOBA",
+      "emoji": "🌀",
+      "desc": "Full hero roster, no pay-to-win, active community.",
+      "status": "online",
+      "players": "980 players",
+      "popular": false,
+      "url": "#"
+    },
+    {
+      "name": "Call of Duty Mobile",
+      "tag": "FPS",
+      "emoji": "🎯",
+      "desc": "Unlocked operators, custom blueprints, private lobbies.",
+      "status": "offline",
+      "statusLabel": "Maintenance",
+      "popular": false,
+      "url": "#"
+    }
+  ],
+  "posts": [
+    {
+      "game": "Mobile Legends",
+      "title": "How to Install ML Private Server on Android 14",
+      "date": "2026-05-01",
+      "url": "posts/ml-android-14.html"
+    },
+    {
+      "game": "Free Fire",
+      "title": "Free Fire Private Server v1.104.1 — Download & Setup Guide",
+      "date": "2026-04-28",
+      "url": "posts/free-fire-v1104.html"
+    },
+    {
+      "game": "General",
+      "title": "Top 5 Android Private Server Games Worth Playing in 2026",
+      "date": "2026-04-25",
+      "url": "posts/top-5-games-2026.html"
+    }
+  ]
+}
