@@ -1,0 +1,43 @@
+[
+  {
+    "name": "Mobile Legends",
+    "tag": "MOBA",
+    "emoji": "⚔️",
+    "desc": "Latest ML private server with all heroes unlocked, custom diamond top-up, and lag-free gameplay.",
+    "status": "online",
+    "players": "2.4k players",
+    "popular": true,
+    "url": "#"
+  },
+  {
+    "name": "Free Fire",
+    "tag": "Battle Royale",
+    "emoji": "🔥",
+    "desc": "Private server with unlimited diamonds, exclusive skins, and no ban risk. Updated weekly.",
+    "status": "online",
+    "players": "3.1k players",
+    "popular": true,
+    "url": "#"
+  },
+  {
+    "name": "Arena of Valor",
+    "tag": "MOBA",
+    "emoji": "🌀",
+    "desc": "Full hero roster unlocked. No pay-to-win, balanced for competitive play with active community.",
+    "status": "online",
+    "players": "980 players",
+    "popular": false,
+    "url": "#"
+  },
+  {
+    "name": "Call of Duty Mobile",
+    "tag": "FPS",
+    "emoji": "🎯",
+    "desc": "Private lobby server with unlocked operators, custom weapon blueprints and anti-cheat disabled.",
+    "status": "offline",
+    "statusLabel": "Maintenance",
+    "players": "Back soon",
+    "popular": false,
+    "url": "#"
+  }
+]
