@@ -4,66 +4,83 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Piererra — Android Private Server Games</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #080C0A;
-      --surface:  #0D1410;
-      --surface2: #111A14;
-      --border:   #1A2E1F;
-      --accent:   #00FF7F;
-      --accent2:  #39FF6A;
-      --accent-dim: rgba(0,255,127,0.12);
-      --text:     #E0FFE8;
-      --muted:    #3A5040;
-      --muted2:   #5A7060;
+      --bg:         #020634;
+      --bg2:        #050A4A;
+      --surface:    rgba(73, 117, 254, 0.07);
+      --surface2:   rgba(73, 117, 254, 0.13);
+      --border:     rgba(73, 117, 254, 0.18);
+      --border2:    rgba(73, 117, 254, 0.32);
+      --accent:     #4975FE;
+      --accent-soft:#6B90FF;
+      --purple:     #8C3572;
+      --purple2:    #49067C;
+      --pink:       #DB7EE4;
+      --cyan:       #B2E0EB;
+      --blue-soft:  #568DE8;
+      --text:       #E8EEFF;
+      --text2:      #8FA4D4;
+      --text3:      #4A5C8A;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Exo 2', sans-serif;
+      font-family: 'DM Sans', sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* ── SCANLINE OVERLAY ── */
-    body::before {
-      content: '';
+    /* ── BACKGROUND ── */
+    .bg-layer {
       position: fixed;
       inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,255,127,0.015) 2px,
-        rgba(0,255,127,0.015) 4px
-      );
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    /* ── GRID BG ── */
-    .grid-bg {
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(0,255,127,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,127,0.04) 1px, transparent 1px);
-      background-size: 48px 48px;
       z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
     }
 
-    .grid-bg::after {
+    .bg-layer::before {
       content: '';
       position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(0,255,127,0.08) 0%, transparent 60%);
+      top: -20%;
+      left: -10%;
+      width: 60%;
+      height: 70%;
+      background: radial-gradient(ellipse, rgba(73,117,254,0.18) 0%, transparent 70%);
+      animation: drift1 18s ease-in-out infinite alternate;
     }
+
+    .bg-layer::after {
+      content: '';
+      position: absolute;
+      bottom: -10%;
+      right: -10%;
+      width: 50%;
+      height: 60%;
+      background: radial-gradient(ellipse, rgba(140,53,114,0.14) 0%, transparent 70%);
+      animation: drift2 22s ease-in-out infinite alternate;
+    }
+
+    .bg-orb {
+      position: absolute;
+      top: 30%;
+      right: 15%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(86,141,232,0.1) 0%, transparent 70%);
+      animation: drift3 15s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift1 { from { transform: translate(0,0); } to { transform: translate(4%,6%); } }
+    @keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-5%,-4%); } }
+    @keyframes drift3 { from { transform: translate(0,0); } to { transform: translate(-3%,5%); } }
 
     /* ── NAVBAR ── */
     nav {
@@ -73,63 +90,70 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 32px;
-      background: rgba(8,12,10,0.85);
-      backdrop-filter: blur(12px);
+      padding: 16px 40px;
+      background: rgba(2, 6, 52, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
     }
 
     .nav-logo {
-      font-family: 'Orbitron', monospace;
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--accent);
-      text-shadow: 0 0 20px rgba(0,255,127,0.6);
-      letter-spacing: 2px;
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
       text-decoration: none;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .nav-logo span { color: var(--text); }
+    .nav-logo .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent);
+      flex-shrink: 0;
+    }
 
     .nav-links {
       display: flex;
-      gap: 28px;
+      gap: 32px;
       list-style: none;
     }
 
     .nav-links a {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 12px;
-      color: var(--muted2);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text2);
       text-decoration: none;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      transition: color 0.2s, text-shadow 0.2s;
+      transition: color 0.2s;
     }
 
-    .nav-links a:hover {
-      color: var(--accent);
-      text-shadow: 0 0 10px rgba(0,255,127,0.5);
-    }
+    .nav-links a:hover { color: var(--text); }
 
     .nav-btn {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: transparent;
-      border: 1px solid var(--accent);
-      border-radius: 4px;
-      padding: 8px 18px;
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      padding: 9px 22px;
       cursor: pointer;
-      transition: background 0.2s, box-shadow 0.2s;
       text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(73,117,254,0.35);
     }
 
     .nav-btn:hover {
-      background: var(--accent-dim);
-      box-shadow: 0 0 16px rgba(0,255,127,0.3);
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(73,117,254,0.45);
     }
 
     /* ── HERO ── */
@@ -145,412 +169,423 @@
       padding: 120px 24px 80px;
     }
 
-    .hero-tag {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 3px;
-      color: var(--accent);
-      background: var(--accent-dim);
-      border: 1px solid rgba(0,255,127,0.2);
-      border-radius: 2px;
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent-soft);
+      background: rgba(73,117,254,0.1);
+      border: 1px solid rgba(73,117,254,0.25);
+      border-radius: 100px;
       padding: 6px 16px;
-      margin-bottom: 32px;
-      animation: fadeUp 0.6s ease both;
+      margin-bottom: 36px;
+      animation: fadeUp 0.7s ease both;
+    }
+
+    .hero-badge .pulse {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s ease infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
     }
 
     .hero-title {
-      font-family: 'Orbitron', monospace;
-      font-size: clamp(42px, 9vw, 96px);
-      font-weight: 900;
-      line-height: 0.95;
-      letter-spacing: -2px;
-      margin-bottom: 8px;
-      animation: fadeUp 0.6s 0.1s ease both;
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(52px, 12vw, 110px);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -4px;
+      margin-bottom: 10px;
+      animation: fadeUp 0.7s 0.1s ease both;
     }
 
-    .hero-title .green {
-      color: var(--accent);
-      text-shadow: 0 0 40px rgba(0,255,127,0.5), 0 0 80px rgba(0,255,127,0.2);
+    .hero-title .glow {
+      background: linear-gradient(135deg, #fff 0%, var(--accent-soft) 40%, var(--pink) 70%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-
-    .hero-title .dim { color: var(--muted2); }
 
     .hero-sub {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 13px;
-      color: var(--muted2);
-      max-width: 480px;
-      line-height: 1.8;
-      margin: 24px auto 40px;
-      letter-spacing: 0.5px;
-      animation: fadeUp 0.6s 0.2s ease both;
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--text2);
+      max-width: 400px;
+      line-height: 1.7;
+      margin: 20px auto 36px;
+      animation: fadeUp 0.7s 0.2s ease both;
     }
 
     .hero-btns {
       display: flex;
-      gap: 16px;
+      gap: 12px;
       justify-content: center;
       flex-wrap: wrap;
-      animation: fadeUp 0.6s 0.3s ease both;
+      animation: fadeUp 0.7s 0.3s ease both;
     }
 
     .btn-primary {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--bg);
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
       background: var(--accent);
       border: none;
-      border-radius: 4px;
-      padding: 14px 32px;
+      border-radius: 12px;
+      padding: 14px 30px;
       cursor: pointer;
       text-decoration: none;
-      transition: box-shadow 0.2s, transform 0.15s;
-      font-weight: bold;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px rgba(73,117,254,0.4);
     }
 
     .btn-primary:hover {
-      box-shadow: 0 0 30px rgba(0,255,127,0.5), 0 0 60px rgba(0,255,127,0.2);
+      opacity: 0.9;
       transform: translateY(-2px);
+      box-shadow: 0 10px 32px rgba(73,117,254,0.5);
     }
 
     .btn-ghost {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 14px 32px;
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 14px 30px;
       cursor: pointer;
       text-decoration: none;
-      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      transition: background 0.2s, transform 0.15s;
     }
 
     .btn-ghost:hover {
-      border-color: var(--accent);
-      box-shadow: 0 0 16px rgba(0,255,127,0.15);
+      background: var(--surface2);
       transform: translateY(-2px);
     }
 
     .hero-stats {
       display: flex;
-      gap: 48px;
+      gap: 0;
       justify-content: center;
-      margin-top: 72px;
-      animation: fadeUp 0.6s 0.4s ease both;
+      margin-top: 64px;
+      animation: fadeUp 0.7s 0.4s ease both;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px 40px;
+      backdrop-filter: blur(10px);
     }
 
-    .stat { text-align: center; }
+    .stat { text-align: center; padding: 0 32px; }
+    .stat + .stat { border-left: 1px solid var(--border); }
 
     .stat-num {
-      font-family: 'Orbitron', monospace;
+      font-family: 'Sora', sans-serif;
       font-size: 28px;
       font-weight: 700;
-      color: var(--accent);
-      text-shadow: 0 0 20px rgba(0,255,127,0.4);
+      color: var(--text);
+      letter-spacing: -1px;
     }
 
     .stat-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      color: var(--muted2);
-      letter-spacing: 2px;
+      font-size: 12px;
+      color: var(--text2);
       margin-top: 4px;
     }
 
-    /* ── SECTION SHARED ── */
-    section {
+    /* ── SECTION ── */
+    .section-wrap {
       position: relative;
       z-index: 1;
       padding: 96px 24px;
-      max-width: 1100px;
+      max-width: 1080px;
       margin: 0 auto;
     }
 
-    .section-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 3px;
-      color: var(--accent);
+    .section-eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-soft);
+      letter-spacing: 2px;
       text-transform: uppercase;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .section-title {
-      font-family: 'Orbitron', monospace;
-      font-size: clamp(24px, 4vw, 40px);
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(26px, 4vw, 40px);
       font-weight: 700;
       letter-spacing: -1px;
-      margin-bottom: 48px;
-      line-height: 1.1;
+      margin-bottom: 10px;
+      color: var(--text);
+      line-height: 1.15;
     }
 
-    .section-title span { color: var(--accent); }
+    .section-title span {
+      background: linear-gradient(135deg, var(--accent-soft), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-    /* ── FEATURED GAMES ── */
+    .section-desc {
+      font-size: 14px;
+      color: var(--text2);
+      margin-bottom: 44px;
+      max-width: 440px;
+      line-height: 1.6;
+    }
+
+    /* ── GAMES GRID ── */
     .games-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
+      gap: 16px;
     }
 
     .game-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 20px;
       overflow: hidden;
-      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
       cursor: pointer;
       text-decoration: none;
       display: block;
+      position: relative;
     }
 
     .game-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(0,255,127,0.3);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(0,255,127,0.08);
+      transform: translateY(-5px);
+      border-color: var(--border2);
+      box-shadow: 0 16px 48px rgba(2,6,52,0.6), 0 0 0 1px rgba(73,117,254,0.12);
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-family: 'Sora', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--blue-soft));
+      border-radius: 100px;
+      padding: 4px 10px;
+      z-index: 2;
+      box-shadow: 0 2px 10px rgba(73,117,254,0.4);
     }
 
     .game-banner {
-      height: 140px;
+      height: 110px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 48px;
+      font-size: 42px;
       position: relative;
-      overflow: hidden;
     }
 
     .game-banner::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(to bottom, transparent 40%, var(--surface));
+      background: linear-gradient(to bottom, transparent 20%, rgba(5,10,74,0.95));
     }
 
-    .banner-ml  { background: linear-gradient(135deg, #0a1a2e, #0d2b4a); }
-    .banner-ff  { background: linear-gradient(135deg, #1a0a0a, #3a1010); }
-    .banner-aov { background: linear-gradient(135deg, #0f0a1a, #1e1040); }
-    .banner-cod { background: linear-gradient(135deg, #0f1a0a, #1a3010); }
+    .banner-0 { background: linear-gradient(135deg, #0a0520, #1e1060); }
+    .banner-1 { background: linear-gradient(135deg, #1a0520, #3a0a30); }
+    .banner-2 { background: linear-gradient(135deg, #020a20, #0a2050); }
+    .banner-3 { background: linear-gradient(135deg, #0f0520, #2a0060); }
+    .banner-4 { background: linear-gradient(135deg, #051520, #0a2040); }
 
-    .game-body { padding: 18px 20px 20px; }
+    .game-body { padding: 14px 18px 18px; }
 
     .game-tag {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 2px;
-      color: var(--accent);
-      background: var(--accent-dim);
-      border-radius: 2px;
-      padding: 3px 8px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent-soft);
+      background: rgba(73,117,254,0.12);
+      border-radius: 6px;
+      padding: 3px 9px;
       display: inline-block;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .game-name {
-      font-family: 'Orbitron', monospace;
-      font-size: 16px;
+      font-family: 'Sora', sans-serif;
+      font-size: 15px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       color: var(--text);
     }
 
     .game-desc {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      color: var(--muted2);
-      line-height: 1.7;
-      margin-bottom: 16px;
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.6;
+      margin-bottom: 14px;
     }
 
-    .game-meta {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
+    .game-meta { display: flex; gap: 12px; align-items: center; }
 
     .game-status {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 1px;
+      font-size: 11px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
-    .status-online { color: var(--accent); }
-    .status-offline { color: #ff4444; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .status-online .status-dot  { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+    .status-offline .status-dot { background: #f87171; }
+    .status-online  { color: #4ade80; }
+    .status-offline { color: var(--text3); }
 
-    .game-players {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      color: var(--muted2);
+    .game-players { font-size: 11px; color: var(--text3); }
+
+    .games-empty {
+      font-size: 14px;
+      color: var(--text2);
+      text-align: center;
+      padding: 60px 0;
+      grid-column: 1 / -1;
     }
 
-    /* ── LATEST POSTS ── */
-    .posts-list { display: flex; flex-direction: column; gap: 2px; }
+    /* ── POSTS ── */
+    .posts-list { display: flex; flex-direction: column; gap: 8px; }
 
     .post-item {
       display: flex;
       align-items: center;
-      gap: 20px;
-      padding: 20px 24px;
+      gap: 18px;
+      padding: 18px 22px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 16px;
       text-decoration: none;
-      transition: border-color 0.2s, background 0.2s;
-      margin-bottom: 2px;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
     }
 
     .post-item:hover {
-      border-color: rgba(0,255,127,0.25);
+      border-color: var(--border2);
       background: var(--surface2);
+      transform: translateX(4px);
     }
 
     .post-num {
-      font-family: 'Orbitron', monospace;
-      font-size: 11px;
-      color: var(--muted);
-      min-width: 28px;
+      font-family: 'Sora', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text3);
+      min-width: 24px;
     }
 
     .post-content { flex: 1; }
 
     .post-game {
-      font-family: 'Share Tech Mono', monospace;
       font-size: 10px;
-      color: var(--accent);
-      letter-spacing: 1px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent-soft);
       margin-bottom: 4px;
     }
 
     .post-title {
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 500;
       color: var(--text);
       margin-bottom: 4px;
+      line-height: 1.4;
     }
 
-    .post-date {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      color: var(--muted2);
-    }
+    .post-date { font-size: 11px; color: var(--text3); }
 
     .post-arrow {
-      color: var(--muted);
-      font-size: 16px;
+      color: var(--text3);
+      font-size: 18px;
       transition: color 0.2s, transform 0.2s;
     }
 
     .post-item:hover .post-arrow {
-      color: var(--accent);
-      transform: translateX(4px);
+      color: var(--accent-soft);
+      transform: translateX(3px);
+    }
+
+    .posts-empty, .posts-loading {
+      font-size: 14px;
+      color: var(--text2);
+      text-align: center;
+      padding: 60px 0;
     }
 
     /* ── HOW IT WORKS ── */
     .steps {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
+      gap: 16px;
     }
 
     .step {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 20px;
       padding: 28px 24px;
-      position: relative;
-      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
     }
 
-    .step::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 3px;
-      height: 100%;
-      background: var(--accent);
-      opacity: 0.5;
+    .step:hover {
+      border-color: var(--border2);
+      transform: translateY(-3px);
+    }
+
+    .step-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(73,117,254,0.13);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 18px;
     }
 
     .step-num {
-      font-family: 'Orbitron', monospace;
-      font-size: 36px;
-      font-weight: 900;
-      color: var(--border);
-      line-height: 1;
-      margin-bottom: 16px;
+      font-family: 'Sora', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-soft);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
     }
 
     .step-title {
-      font-family: 'Orbitron', monospace;
-      font-size: 13px;
+      font-family: 'Sora', sans-serif;
+      font-size: 15px;
       font-weight: 700;
-      color: var(--accent);
+      color: var(--text);
       margin-bottom: 8px;
-      letter-spacing: 0.5px;
     }
 
     .step-desc {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      color: var(--muted2);
-      line-height: 1.7;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      position: relative;
-      z-index: 1;
-      border-top: 1px solid var(--border);
-      padding: 40px 24px;
-      text-align: center;
-    }
-
-    .footer-logo {
-      font-family: 'Orbitron', monospace;
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--accent);
-      letter-spacing: 2px;
-      margin-bottom: 12px;
-    }
-
-    .footer-desc {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      color: var(--muted2);
-      margin-bottom: 24px;
-      letter-spacing: 0.5px;
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 24px;
-      justify-content: center;
-      list-style: none;
-      margin-bottom: 32px;
-    }
-
-    .footer-links a {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      color: var(--muted2);
-      text-decoration: none;
-      letter-spacing: 1px;
-      transition: color 0.2s;
-    }
-
-    .footer-links a:hover { color: var(--accent); }
-
-    .footer-copy {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      color: var(--muted);
-      letter-spacing: 1px;
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.65;
     }
 
     /* ── DIVIDER ── */
@@ -559,62 +594,91 @@
       z-index: 1;
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--border), transparent);
-      margin: 0 24px;
+      margin: 0 40px;
     }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 48px 40px;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-family: 'Sora', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+
+    .footer-desc { font-size: 13px; color: var(--text2); margin-bottom: 28px; }
+
+    .footer-links {
+      display: flex;
+      gap: 28px;
+      justify-content: center;
+      list-style: none;
+      margin-bottom: 28px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--text2);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: 12px; color: var(--text3); }
 
     /* ── ANIMATIONS ── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(24px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
     /* ── MOBILE ── */
-    @media (max-width: 600px) {
+    @media (max-width: 680px) {
       nav { padding: 14px 20px; }
       .nav-links { display: none; }
-      .hero-stats { gap: 28px; }
-      .stat-num { font-size: 22px; }
-      section { padding: 64px 20px; }
-      .post-item { padding: 16px; }
-    }
-
-    /* ── TERMINAL CURSOR BLINK ── */
-    .blink {
-      animation: blink 1s step-end infinite;
-      color: var(--accent);
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0; }
+      .hero-stats { flex-direction: column; padding: 20px 28px; }
+      .stat { padding: 14px 0; }
+      .stat + .stat { border-left: none; border-top: 1px solid var(--border); }
+      .section-wrap { padding: 60px 20px; }
+      footer { padding: 40px 20px; }
+      .divider { margin: 0 20px; }
+      .hero-title { letter-spacing: -2px; }
     }
   </style>
 </head>
 <body>
 
-<div class="grid-bg"></div>
+<div class="bg-layer"><div class="bg-orb"></div></div>
 
 <!-- ── NAVBAR ── -->
 <nav>
-  <a href="#" class="nav-logo">PIERR<span>ERRA</span></a>
+  <a href="#" class="nav-logo">Piererra <span class="dot"></span></a>
   <ul class="nav-links">
     <li><a href="#games">Games</a></li>
     <li><a href="#posts">Posts</a></li>
     <li><a href="#about">About</a></li>
   </ul>
-  <a href="#games" class="nav-btn">Explore →</a>
+  <a href="#games" class="nav-btn">Browse Games</a>
 </nav>
 
 <!-- ── HERO ── -->
 <div class="hero">
-  <div class="hero-tag">▶ ANDROID PRIVATE SERVER DATABASE</div>
-  <h1 class="hero-title">
-    <span class="green">PIERR</span><br>
-    <span class="dim">ERRA</span>
-  </h1>
+  <div class="hero-badge">
+    <span class="pulse"></span>
+    Android Private Server Database
+  </div>
+  <h1 class="hero-title"><span class="glow">Piererra</span></h1>
   <p class="hero-sub">
-    Your go-to source for Android private server game info.<br>
-    Servers, guides, updates — all in one place.<span class="blink">_</span>
+    Your go-to source for Android private server game info. Servers, guides, and updates — all in one place.
   </p>
   <div class="hero-btns">
     <a href="#games" class="btn-primary">Browse Games</a>
@@ -622,7 +686,7 @@
   </div>
   <div class="hero-stats">
     <div class="stat">
-      <div class="stat-num">24+</div>
+      <div class="stat-num" id="games-count">—</div>
       <div class="stat-label">Games Listed</div>
     </div>
     <div class="stat">
@@ -639,168 +703,155 @@
 <div class="divider"></div>
 
 <!-- ── FEATURED GAMES ── -->
-<section id="games">
-  <div class="section-label">// FEATURED</div>
+<div class="section-wrap" id="games">
+  <div class="section-eyebrow">Featured</div>
   <h2 class="section-title">Popular <span>Private Servers</span></h2>
-  <div class="games-grid">
-
-    <a href="#" class="game-card">
-      <div class="game-banner banner-ml">⚔️</div>
-      <div class="game-body">
-        <span class="game-tag">MOBA</span>
-        <div class="game-name">Mobile Legends</div>
-        <div class="game-desc">Latest ML private server with all heroes unlocked, custom diamond top-up, and lag-free gameplay.</div>
-        <div class="game-meta">
-          <span class="game-status status-online">● ONLINE</span>
-          <span class="game-players">2.4k players</span>
-        </div>
-      </div>
-    </a>
-
-    <a href="#" class="game-card">
-      <div class="game-banner banner-ff">🔥</div>
-      <div class="game-body">
-        <span class="game-tag">BATTLE ROYALE</span>
-        <div class="game-name">Free Fire</div>
-        <div class="game-desc">Private server with unlimited diamonds, exclusive skins, and no ban risk. Updated weekly.</div>
-        <div class="game-meta">
-          <span class="game-status status-online">● ONLINE</span>
-          <span class="game-players">3.1k players</span>
-        </div>
-      </div>
-    </a>
-
-    <a href="#" class="game-card">
-      <div class="game-banner banner-aov">🌀</div>
-      <div class="game-body">
-        <span class="game-tag">MOBA</span>
-        <div class="game-name">Arena of Valor</div>
-        <div class="game-desc">Full hero roster unlocked. No pay-to-win, balanced for competitive play with active community.</div>
-        <div class="game-meta">
-          <span class="game-status status-online">● ONLINE</span>
-          <span class="game-players">980 players</span>
-        </div>
-      </div>
-    </a>
-
-    <a href="#" class="game-card">
-      <div class="game-banner banner-cod">🎯</div>
-      <div class="game-body">
-        <span class="game-tag">FPS</span>
-        <div class="game-name">Call of Duty Mobile</div>
-        <div class="game-desc">Private lobby server with unlocked operators, custom weapon blueprints and anti-cheat disabled.</div>
-        <div class="game-meta">
-          <span class="game-status status-offline">● MAINTENANCE</span>
-          <span class="game-players">Back soon</span>
-        </div>
-      </div>
-    </a>
-
+  <p class="section-desc">Browse our curated list of the best Android private server games, updated regularly.</p>
+  <div class="games-grid" id="games-grid">
+    <div style="grid-column:1/-1; padding:60px 0; text-align:center; color:var(--text2); font-size:14px;">Loading games...</div>
   </div>
-</section>
+</div>
 
 <div class="divider"></div>
 
 <!-- ── LATEST POSTS ── -->
-<section id="posts">
-  <div class="section-label">// UPDATES</div>
+<div class="section-wrap" id="posts">
+  <div class="section-eyebrow">Updates</div>
   <h2 class="section-title">Latest <span>Posts</span></h2>
-  <div class="posts-list">
-
-    <a href="#" class="post-item">
-      <div class="post-num">01</div>
-      <div class="post-content">
-        <div class="post-game">MOBILE LEGENDS</div>
-        <div class="post-title">How to Install ML Private Server on Android 14</div>
-        <div class="post-date">May 1, 2026</div>
-      </div>
-      <div class="post-arrow">→</div>
-    </a>
-
-    <a href="#" class="post-item">
-      <div class="post-num">02</div>
-      <div class="post-content">
-        <div class="post-game">FREE FIRE</div>
-        <div class="post-title">Free Fire Private Server v1.104.1 — Download & Setup Guide</div>
-        <div class="post-date">Apr 28, 2026</div>
-      </div>
-      <div class="post-arrow">→</div>
-    </a>
-
-    <a href="#" class="post-item">
-      <div class="post-num">03</div>
-      <div class="post-content">
-        <div class="post-game">GENERAL</div>
-        <div class="post-title">Top 5 Android Private Server Games Worth Playing in 2026</div>
-        <div class="post-date">Apr 25, 2026</div>
-      </div>
-      <div class="post-arrow">→</div>
-    </a>
-
-    <a href="#" class="post-item">
-      <div class="post-num">04</div>
-      <div class="post-content">
-        <div class="post-game">ARENA OF VALOR</div>
-        <div class="post-title">AoV Private Server — Full Hero List & Download Links</div>
-        <div class="post-date">Apr 20, 2026</div>
-      </div>
-      <div class="post-arrow">→</div>
-    </a>
-
-    <a href="#" class="post-item">
-      <div class="post-num">05</div>
-      <div class="post-content">
-        <div class="post-game">TIPS</div>
-        <div class="post-title">How to Stay Safe When Playing Private Servers on Android</div>
-        <div class="post-date">Apr 15, 2026</div>
-      </div>
-      <div class="post-arrow">→</div>
-    </a>
-
+  <p class="section-desc">Guides, changelogs, and news for private server players.</p>
+  <div class="posts-list" id="posts-list">
+    <div class="posts-loading">Loading posts...</div>
   </div>
-</section>
+</div>
 
 <div class="divider"></div>
 
 <!-- ── HOW IT WORKS ── -->
-<section id="about">
-  <div class="section-label">// HOW IT WORKS</div>
-  <h2 class="section-title">Find Your <span>Server</span></h2>
+<div class="section-wrap" id="about">
+  <div class="section-eyebrow">How it works</div>
+  <h2 class="section-title">Get Started <span>in Minutes</span></h2>
+  <p class="section-desc">Finding and playing private servers on Android has never been easier.</p>
   <div class="steps">
     <div class="step">
-      <div class="step-num">01</div>
+      <div class="step-icon">🎮</div>
+      <div class="step-num">STEP 01</div>
       <div class="step-title">Browse Games</div>
       <div class="step-desc">Pick from our list of Android private server games. Updated regularly with new additions.</div>
     </div>
     <div class="step">
-      <div class="step-num">02</div>
+      <div class="step-icon">📖</div>
+      <div class="step-num">STEP 02</div>
       <div class="step-title">Read the Guide</div>
       <div class="step-desc">Each game has a full setup guide — download links, installation steps, and tips.</div>
     </div>
     <div class="step">
-      <div class="step-num">03</div>
+      <div class="step-icon">⬇️</div>
+      <div class="step-num">STEP 03</div>
       <div class="step-title">Download & Play</div>
       <div class="step-desc">Install the APK on your Android and jump straight into the private server.</div>
     </div>
     <div class="step">
-      <div class="step-num">04</div>
+      <div class="step-icon">🔔</div>
+      <div class="step-num">STEP 04</div>
       <div class="step-title">Stay Updated</div>
       <div class="step-desc">Bookmark Piererra and check back for server news, patches, and new game drops.</div>
     </div>
   </div>
-</section>
+</div>
 
 <!-- ── FOOTER ── -->
 <footer>
-  <div class="footer-logo">PIERERRA</div>
+  <div class="footer-logo">Piererra</div>
   <div class="footer-desc">Android Private Server Games Information Hub</div>
   <ul class="footer-links">
     <li><a href="#games">Games</a></li>
     <li><a href="#posts">Posts</a></li>
     <li><a href="#about">About</a></li>
   </ul>
-  <div class="footer-copy">© 2026 PIERERRA — FOR INFORMATIONAL PURPOSES ONLY</div>
+  <div class="footer-copy">© 2026 Piererra — For informational purposes only</div>
 </footer>
+
+<script>
+  // ── LOAD GAMES FROM games.json ──
+  async function loadGames() {
+    const grid = document.getElementById('games-grid');
+    const counter = document.getElementById('games-count');
+    try {
+      const res = await fetch('games.json');
+      if (!res.ok) throw new Error();
+      const games = await res.json();
+
+      counter.textContent = games.length + '+';
+
+      // Only show games marked popular: true
+      const featured = games.filter(g => g.popular === true || g.popular === 'true');
+
+      if (featured.length === 0) {
+        grid.innerHTML = '<div class="games-empty">No featured games yet. Check back soon.</div>';
+        return;
+      }
+
+      grid.innerHTML = featured.map((g, i) => {
+        const isOnline = g.status === 'online';
+        return `
+          <a href="${g.url || '#'}" class="game-card">
+            ${g.popular === true || g.popular === 'true' ? '<span class="popular-badge">Popular</span>' : ''}
+            <div class="game-banner banner-${i % 5}">${g.emoji || '🎮'}</div>
+            <div class="game-body">
+              <span class="game-tag">${g.tag || 'GAME'}</span>
+              <div class="game-name">${g.name}</div>
+              <div class="game-desc">${g.desc || ''}</div>
+              <div class="game-meta">
+                <span class="game-status ${isOnline ? 'status-online' : 'status-offline'}">
+                  <span class="status-dot"></span>
+                  ${isOnline ? 'Online' : (g.statusLabel || 'Offline')}
+                </span>
+                ${g.players ? `<span class="game-players">${g.players}</span>` : ''}
+              </div>
+            </div>
+          </a>
+        `;
+      }).join('');
+
+    } catch (e) {
+      grid.innerHTML = '<div class="games-empty">No games available yet. Check back soon.</div>';
+      counter.textContent = '0';
+    }
+  }
+
+  // ── LOAD POSTS FROM posts.json ──
+  async function loadPosts() {
+    const container = document.getElementById('posts-list');
+    try {
+      const res = await fetch('posts.json');
+      if (!res.ok) throw new Error();
+      const posts = await res.json();
+
+      if (!posts || posts.length === 0) {
+        container.innerHTML = '<div class="posts-empty">No posts yet. Check back soon.</div>';
+        return;
+      }
+
+      container.innerHTML = posts.map((post, i) => `
+        <a href="${post.url || '#'}" class="post-item">
+          <div class="post-num">${String(i + 1).padStart(2, '0')}</div>
+          <div class="post-content">
+            <div class="post-game">${post.game || ''}</div>
+            <div class="post-title">${post.title}</div>
+            <div class="post-date">${post.date || ''}</div>
+          </div>
+          <div class="post-arrow">→</div>
+        </a>
+      `).join('');
+
+    } catch (e) {
+      container.innerHTML = '<div class="posts-empty">No posts yet. Check back soon.</div>';
+    }
+  }
+
+  loadGames();
+  loadPosts();
+</script>
 
 </body>
 </html>
