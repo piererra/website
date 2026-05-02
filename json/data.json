@@ -1,4 +1,20 @@
 {
-  "games": [],
-  "posts": []
+  "games": [
+    {
+      "name": "Example Game",
+      "emoji": "🎮",
+      "tag": "MMORPG",
+      "status": "online",
+      "url": "#",
+      "popular": true
+    }
+  ],
+  "posts": [
+    {
+      "title": "Welcome to Piererra!",
+      "game": "General",
+      "date": "2026-05-03",
+      "url": "#"
+    }
+  ]
 }
