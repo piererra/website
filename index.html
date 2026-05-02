@@ -18,479 +18,152 @@
       --accent-soft: #6B90FF;
       --pink:        #DB7EE4;
       --cyan:        #B2E0EB;
-      --blue-soft:   #568DE8;
       --text:        #E8EEFF;
       --text2:       #8FA4D4;
       --text3:       #4A5C8A;
     }
 
     html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+    /* BG GLOWS */
+    .bg-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .bg-layer::before { content:''; position:absolute; top:-20%; left:-10%; width:60%; height:70%; background:radial-gradient(ellipse,rgba(73,117,254,.16) 0%,transparent 70%); animation:drift1 18s ease-in-out infinite alternate; }
+    .bg-layer::after  { content:''; position:absolute; bottom:-10%; right:-10%; width:50%; height:60%; background:radial-gradient(ellipse,rgba(140,53,114,.12) 0%,transparent 70%); animation:drift2 22s ease-in-out infinite alternate; }
+    @keyframes drift1 { to { transform:translate(4%,6%); } }
+    @keyframes drift2 { to { transform:translate(-5%,-4%); } }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 
-    /* ── BACKGROUND GLOWS ── */
-    .bg-layer {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .bg-layer::before {
-      content: '';
-      position: absolute;
-      top: -20%; left: -10%;
-      width: 60%; height: 70%;
-      background: radial-gradient(ellipse, rgba(73,117,254,0.16) 0%, transparent 70%);
-      animation: drift1 18s ease-in-out infinite alternate;
-    }
-    .bg-layer::after {
-      content: '';
-      position: absolute;
-      bottom: -10%; right: -10%;
-      width: 50%; height: 60%;
-      background: radial-gradient(ellipse, rgba(140,53,114,0.12) 0%, transparent 70%);
-      animation: drift2 22s ease-in-out infinite alternate;
-    }
-    @keyframes drift1 { to { transform: translate(4%, 6%); } }
-    @keyframes drift2 { to { transform: translate(-5%, -4%); } }
+    /* NAVBAR */
+    nav { position:fixed; top:0; left:0; right:0; z-index:200; display:flex; align-items:center; justify-content:space-between; padding:16px 40px; background:rgba(2,6,52,.75); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:'Sora',sans-serif; font-size:22px; font-weight:800; color:var(--text); text-decoration:none; letter-spacing:-.5px; display:flex; align-items:center; gap:7px; cursor:pointer; }
+    .nav-logo .dot { width:8px; height:8px; background:var(--accent); border-radius:50%; box-shadow:0 0 10px var(--accent); flex-shrink:0; }
+    .nav-links { display:flex; gap:32px; list-style:none; }
+    .nav-links a { font-size:14px; font-weight:500; color:var(--text2); text-decoration:none; transition:color .2s; cursor:pointer; }
+    .nav-links a:hover { color:var(--text); }
 
-    /* ── NAVBAR ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 200;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 40px;
-      background: rgba(2,6,52,0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-    }
+    /* FEATURED STRIP */
+    .featured-strip-wrap { position:fixed; top:57px; left:0; right:0; z-index:150; background:rgba(2,6,52,.6); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); padding:10px 40px; }
+    .featured-strip-inner { display:flex; align-items:center; gap:10px; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none; scroll-snap-type:x mandatory; }
+    .featured-strip-inner::-webkit-scrollbar { display:none; }
+    .strip-label { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:600; color:var(--text3); letter-spacing:1px; text-transform:uppercase; white-space:nowrap; flex-shrink:0; padding-right:6px; border-right:1px solid var(--border); margin-right:4px; }
+    .strip-card { display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:7px 14px; text-decoration:none; white-space:nowrap; flex-shrink:0; scroll-snap-align:start; transition:border-color .2s,background .2s; cursor:pointer; }
+    .strip-card:hover { border-color:var(--border2); background:var(--surface2); }
+    .strip-emoji { font-size:16px; }
+    .strip-info { display:flex; flex-direction:column; gap:1px; }
+    .strip-name { font-family:'Sora',sans-serif; font-size:12px; font-weight:700; color:var(--text); }
+    .strip-tag { font-size:10px; color:var(--text3); }
+    .strip-dot { width:5px; height:5px; border-radius:50%; background:#4ade80; box-shadow:0 0 5px #4ade80; flex-shrink:0; }
+    .strip-dot.offline { background:var(--text3); box-shadow:none; }
 
-    .nav-logo {
-      font-family: 'Sora', sans-serif;
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--text);
-      text-decoration: none;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-    .nav-logo .dot {
-      width: 8px; height: 8px;
-      background: var(--accent);
-      border-radius: 50%;
-      box-shadow: 0 0 10px var(--accent);
-      flex-shrink: 0;
-    }
+    /* ======= HOME PAGE ======= */
+    #home-page { display:block; }
 
-    .nav-links {
-      display: flex;
-      gap: 32px;
-      list-style: none;
-    }
-    .nav-links a {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text2);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text); }
+    /* HERO */
+    .hero { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:160px 24px 80px; }
+    .hero-badge { display:inline-flex; align-items:center; gap:8px; font-size:12px; font-weight:500; color:var(--accent-soft); background:rgba(73,117,254,.1); border:1px solid rgba(73,117,254,.25); border-radius:100px; padding:6px 16px; margin-bottom:32px; animation:fadeUp .7s ease both; }
+    .hero-badge .pulse { width:6px; height:6px; background:var(--accent); border-radius:50%; box-shadow:0 0 8px var(--accent); animation:pulse 2s ease infinite; flex-shrink:0; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)} }
+    .hero-title { font-family:'Sora',sans-serif; font-size:clamp(52px,12vw,110px); font-weight:800; line-height:1; letter-spacing:-4px; margin-bottom:16px; animation:fadeUp .7s .1s ease both; }
+    .hero-title .glow { background:linear-gradient(135deg,#fff 0%,var(--accent-soft) 40%,var(--pink) 70%,var(--cyan) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero-sub { font-size:16px; font-weight:300; color:var(--text2); max-width:380px; line-height:1.7; margin:0 auto 36px; animation:fadeUp .7s .2s ease both; }
+    .hero-btn { font-family:'Sora',sans-serif; font-size:14px; font-weight:600; color:#fff; background:var(--accent); border:none; border-radius:12px; padding:14px 32px; cursor:pointer; text-decoration:none; transition:opacity .2s,transform .15s,box-shadow .2s; box-shadow:0 4px 24px rgba(73,117,254,.4); animation:fadeUp .7s .3s ease both; display:inline-block; }
+    .hero-btn:hover { opacity:.9; transform:translateY(-2px); box-shadow:0 10px 32px rgba(73,117,254,.5); }
 
-    /* ── FEATURED STRIP (horizontal scroll) ── */
-    .featured-strip-wrap {
-      position: fixed;
-      top: 57px; left: 0; right: 0;
-      z-index: 150;
-      background: rgba(2,6,52,0.6);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 40px;
-    }
+    /* SECTIONS */
+    .section-wrap { position:relative; z-index:1; padding:80px 40px; }
+    .section-eyebrow { font-size:11px; font-weight:700; color:var(--accent-soft); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; }
+    .section-title { font-family:'Sora',sans-serif; font-size:clamp(28px,5vw,40px); font-weight:800; color:var(--text); letter-spacing:-1px; margin-bottom:12px; }
+    .section-title span { background:linear-gradient(135deg,var(--accent-soft),var(--pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .section-desc { font-size:14px; color:var(--text2); line-height:1.7; max-width:480px; margin-bottom:36px; }
 
-    .featured-strip-inner {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      scroll-snap-type: x mandatory;
-    }
-    .featured-strip-inner::-webkit-scrollbar { display: none; }
+    /* POSTS LIST */
+    .posts-list { display:flex; flex-direction:column; gap:2px; }
+    .post-item { display:flex; align-items:center; gap:20px; padding:20px; background:var(--surface); border:1px solid var(--border); border-radius:16px; text-decoration:none; transition:border-color .2s,background .2s,transform .15s; cursor:pointer; }
+    .post-item:hover { border-color:var(--border2); background:var(--surface2); transform:translateX(4px); }
+    .post-num { font-family:'Sora',sans-serif; font-size:13px; font-weight:700; color:var(--text3); flex-shrink:0; width:28px; }
+    .post-content { flex:1; min-width:0; }
+    .post-game { font-size:11px; font-weight:600; color:var(--accent-soft); letter-spacing:.5px; margin-bottom:4px; }
+    .post-title { font-family:'Sora',sans-serif; font-size:16px; font-weight:700; color:var(--text); margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .post-date { font-size:12px; color:var(--text3); }
+    .post-arrow { font-size:18px; color:var(--text3); flex-shrink:0; transition:transform .2s,color .2s; }
+    .post-item:hover .post-arrow { transform:translateX(4px); color:var(--accent-soft); }
+    .posts-empty, .posts-loading { font-size:14px; color:var(--text2); text-align:center; padding:60px 0; }
 
-    .strip-label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text3);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      white-space: nowrap;
-      flex-shrink: 0;
-      padding-right: 6px;
-      border-right: 1px solid var(--border);
-      margin-right: 4px;
-    }
+    /* HOW IT WORKS */
+    .steps { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; }
+    .step { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:24px 20px; transition:border-color .2s,transform .2s; }
+    .step:hover { border-color:var(--border2); transform:translateY(-3px); }
+    .step-icon { font-size:24px; margin-bottom:14px; }
+    .step-num { font-family:'Sora',sans-serif; font-size:10px; font-weight:700; color:var(--accent-soft); letter-spacing:1px; margin-bottom:6px; }
+    .step-title { font-family:'Sora',sans-serif; font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px; }
+    .step-desc { font-size:12px; color:var(--text2); line-height:1.6; }
 
-    .strip-card {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 7px 14px;
-      text-decoration: none;
-      white-space: nowrap;
-      flex-shrink: 0;
-      scroll-snap-align: start;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .strip-card:hover {
-      border-color: var(--border2);
-      background: var(--surface2);
-    }
-    .strip-emoji { font-size: 16px; }
-    .strip-info { display: flex; flex-direction: column; gap: 1px; }
-    .strip-name {
-      font-family: 'Sora', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .strip-tag {
-      font-size: 10px;
-      color: var(--text3);
-    }
-    .strip-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: #4ade80;
-      box-shadow: 0 0 5px #4ade80;
-      flex-shrink: 0;
-    }
-    .strip-dot.offline { background: var(--text3); box-shadow: none; }
+    /* DIVIDER */
+    .divider { position:relative; z-index:1; height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:0 40px; }
 
-    /* ── HERO ── */
-    .hero {
-      position: relative;
-      z-index: 1;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 160px 24px 80px;
-    }
+    /* ======= POST PAGE ======= */
+    #post-page { display:none; position:relative; z-index:1; padding-top:120px; min-height:100vh; }
 
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--accent-soft);
-      background: rgba(73,117,254,0.1);
-      border: 1px solid rgba(73,117,254,0.25);
-      border-radius: 100px;
-      padding: 6px 16px;
-      margin-bottom: 32px;
-      animation: fadeUp 0.7s ease both;
-    }
-    .hero-badge .pulse {
-      width: 6px; height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--accent);
-      animation: pulse 2s ease infinite;
-      flex-shrink: 0;
-    }
-    @keyframes pulse {
-      0%,100% { opacity:1; transform:scale(1); }
-      50%      { opacity:0.5; transform:scale(0.8); }
-    }
+    .post-page-inner { max-width:740px; margin:0 auto; padding:0 40px 120px; }
 
-    .hero-title {
-      font-family: 'Sora', sans-serif;
-      font-size: clamp(52px, 12vw, 110px);
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -4px;
-      margin-bottom: 16px;
-      animation: fadeUp 0.7s 0.1s ease both;
-    }
-    .hero-title .glow {
-      background: linear-gradient(135deg, #fff 0%, var(--accent-soft) 40%, var(--pink) 70%, var(--cyan) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+    .post-back { display:inline-flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); background:none; border:none; cursor:pointer; margin-bottom:32px; transition:color .2s; padding:0; }
+    .post-back:hover { color:var(--text); }
 
-    .hero-sub {
-      font-size: 16px;
-      font-weight: 300;
-      color: var(--text2);
-      max-width: 380px;
-      line-height: 1.7;
-      margin: 0 auto 36px;
-      animation: fadeUp 0.7s 0.2s ease both;
-    }
+    .post-cover { width:100%; aspect-ratio:16/7; object-fit:cover; border-radius:20px; margin-bottom:36px; border:1px solid var(--border); }
 
-    .hero-btn {
-      font-family: 'Sora', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-      background: var(--accent);
-      border: none;
-      border-radius: 12px;
-      padding: 14px 32px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 24px rgba(73,117,254,0.4);
-      animation: fadeUp 0.7s 0.3s ease both;
-      display: inline-block;
-    }
-    .hero-btn:hover {
-      opacity: 0.9;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 32px rgba(73,117,254,0.5);
-    }
+    .post-meta { display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+    .post-meta-game { font-size:11px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--accent-soft); background:rgba(73,117,254,.12); border:1px solid var(--border); border-radius:100px; padding:4px 12px; }
+    .post-meta-date { font-size:12px; color:var(--text3); }
 
-    /* ── SECTION ── */
-    .section-wrap {
-      position: relative;
-      z-index: 1;
-      padding: 80px 24px;
-      max-width: 860px;
-      margin: 0 auto;
-    }
+    .post-page-title { font-family:'Sora',sans-serif; font-size:clamp(26px,5vw,40px); font-weight:800; color:var(--text); letter-spacing:-1.5px; line-height:1.2; margin-bottom:40px; }
 
-    .section-eyebrow {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--accent-soft);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
+    /* Post body content styles */
+    .post-page-body { font-size:15px; color:var(--text2); line-height:1.85; }
+    .post-page-body h2 { font-family:'Sora',sans-serif; font-size:22px; font-weight:700; color:var(--text); margin:40px 0 14px; letter-spacing:-.5px; }
+    .post-page-body h3 { font-family:'Sora',sans-serif; font-size:17px; font-weight:600; color:var(--accent-soft); margin:28px 0 10px; }
+    .post-page-body p { margin:0 0 16px; }
+    .post-page-body strong { color:#fff; font-weight:700; }
+    .post-page-body em { color:var(--accent-soft); font-style:italic; }
+    .post-page-body a { color:var(--accent-soft); text-decoration:underline; transition:color .2s; }
+    .post-page-body a:hover { color:#fff; }
+    .post-page-body ul, .post-page-body ol { padding-left:24px; margin:0 0 16px; }
+    .post-page-body li { margin:6px 0; }
+    .post-page-body blockquote { border-left:3px solid var(--accent); padding:4px 0 4px 20px; margin:24px 0; color:var(--text2); font-style:italic; background:rgba(73,117,254,.04); border-radius:0 10px 10px 0; }
+    .post-page-body code { background:rgba(73,117,254,.15); border:1px solid var(--border); border-radius:6px; padding:2px 8px; font-size:13px; font-family:'Courier New',monospace; color:var(--cyan); }
+    .post-page-body pre { background:rgba(0,0,0,.5); border:1px solid var(--border); border-radius:14px; padding:20px; overflow-x:auto; margin:20px 0; }
+    .post-page-body pre code { background:none; border:none; padding:0; font-size:13px; }
+    .post-page-body img { max-width:100%; border-radius:14px; margin:16px 0; border:1px solid var(--border); }
+    .post-page-body hr { border:none; height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:36px 0; }
 
-    .section-title {
-      font-family: 'Sora', sans-serif;
-      font-size: clamp(24px, 4vw, 36px);
-      font-weight: 700;
-      letter-spacing: -1px;
-      color: var(--text);
-      line-height: 1.15;
-      margin-bottom: 8px;
-    }
-    .section-title span {
-      background: linear-gradient(135deg, var(--accent-soft), var(--pink));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+    .post-nav { margin-top:60px; padding-top:40px; border-top:1px solid var(--border); }
+    .post-nav-label { font-size:11px; font-weight:600; color:var(--text3); letter-spacing:1px; text-transform:uppercase; margin-bottom:16px; }
+    .post-nav-links { display:flex; gap:12px; flex-wrap:wrap; }
+    .post-nav-link { flex:1; min-width:200px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 20px; cursor:pointer; transition:border-color .2s,background .2s; text-decoration:none; }
+    .post-nav-link:hover { border-color:var(--border2); background:var(--surface2); }
+    .post-nav-dir { font-size:11px; color:var(--text3); margin-bottom:6px; }
+    .post-nav-title { font-family:'Sora',sans-serif; font-size:14px; font-weight:700; color:var(--text); }
 
-    .section-desc {
-      font-size: 14px;
-      color: var(--text2);
-      margin-bottom: 40px;
-      line-height: 1.6;
-    }
+    /* FOOTER */
+    footer { position:relative; z-index:1; border-top:1px solid var(--border); padding:48px 40px; text-align:center; }
+    .footer-logo { font-family:'Sora',sans-serif; font-size:20px; font-weight:800; color:var(--text); letter-spacing:-.5px; margin-bottom:8px; }
+    .footer-desc { font-size:13px; color:var(--text2); margin-bottom:24px; }
+    .footer-links { display:flex; gap:24px; justify-content:center; list-style:none; margin-bottom:24px; }
+    .footer-links a { font-size:13px; color:var(--text2); text-decoration:none; cursor:pointer; transition:color .2s; }
+    .footer-links a:hover { color:var(--text); }
+    .footer-copy { font-size:12px; color:var(--text3); }
 
-    /* ── POSTS LIST ── */
-    .posts-list { display: flex; flex-direction: column; gap: 10px; }
-
-    .post-item {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      padding: 20px 24px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      text-decoration: none;
-      transition: border-color 0.2s, background 0.2s, transform 0.2s;
-    }
-    .post-item:hover {
-      border-color: var(--border2);
-      background: var(--surface2);
-      transform: translateX(5px);
-    }
-
-    .post-num {
-      font-family: 'Sora', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text3);
-      min-width: 24px;
-    }
-
-    .post-content { flex: 1; min-width: 0; }
-
-    .post-game {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--accent-soft);
-      margin-bottom: 5px;
-    }
-
-    .post-title {
-      font-family: 'Sora', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 6px;
-      line-height: 1.35;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .post-date {
-      font-size: 11px;
-      color: var(--text3);
-    }
-
-    .post-arrow {
-      color: var(--text3);
-      font-size: 18px;
-      flex-shrink: 0;
-      transition: color 0.2s, transform 0.2s;
-    }
-    .post-item:hover .post-arrow {
-      color: var(--accent-soft);
-      transform: translateX(3px);
-    }
-
-    .posts-empty, .posts-loading {
-      font-size: 14px;
-      color: var(--text2);
-      text-align: center;
-      padding: 60px 0;
-    }
-
-    /* ── DIVIDER ── */
-    .divider {
-      position: relative;
-      z-index: 1;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border), transparent);
-      margin: 0 40px;
-    }
-
-    /* ── HOW IT WORKS ── */
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 14px;
-    }
-    .step {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 24px 20px;
-      transition: border-color 0.2s, transform 0.2s;
-    }
-    .step:hover {
-      border-color: var(--border2);
-      transform: translateY(-3px);
-    }
-    .step-icon {
-      font-size: 24px;
-      margin-bottom: 14px;
-    }
-    .step-num {
-      font-family: 'Sora', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--accent-soft);
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-    }
-    .step-title {
-      font-family: 'Sora', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-    .step-desc {
-      font-size: 12px;
-      color: var(--text2);
-      line-height: 1.6;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      position: relative;
-      z-index: 1;
-      border-top: 1px solid var(--border);
-      padding: 48px 40px;
-      text-align: center;
-    }
-    .footer-logo {
-      font-family: 'Sora', sans-serif;
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-    }
-    .footer-desc { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
-    .footer-links {
-      display: flex;
-      gap: 24px;
-      justify-content: center;
-      list-style: none;
-      margin-bottom: 24px;
-    }
-    .footer-links a {
-      font-size: 13px;
-      color: var(--text2);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .footer-links a:hover { color: var(--text); }
-    .footer-copy { font-size: 12px; color: var(--text3); }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── MOBILE ── */
-    @media (max-width: 680px) {
-      nav { padding: 14px 20px; }
-      .nav-links { display: none; }
-      .featured-strip-wrap { padding: 10px 20px; top: 53px; }
-      .hero { padding: 180px 20px 60px; }
-      .hero-title { letter-spacing: -2px; }
-      .section-wrap { padding: 60px 20px; }
-      .post-title { font-size: 14px; }
-      footer { padding: 40px 20px; }
-      .divider { margin: 0 20px; }
+    /* MOBILE */
+    @media (max-width:680px) {
+      nav { padding:14px 20px; }
+      .nav-links { display:none; }
+      .featured-strip-wrap { padding:10px 20px; top:53px; }
+      .hero { padding:180px 20px 60px; }
+      .hero-title { letter-spacing:-2px; }
+      .section-wrap { padding:60px 20px; }
+      .post-page-inner { padding:0 20px 80px; }
+      .divider { margin:0 20px; }
+      footer { padding:40px 20px; }
     }
   </style>
 </head>
@@ -498,161 +171,243 @@
 
 <div class="bg-layer"></div>
 
-<!-- ── NAVBAR ── -->
+<!-- NAVBAR -->
 <nav>
-  <a href="#" class="nav-logo">Piererra <span class="dot"></span></a>
+  <div class="nav-logo" onclick="goHome()">Piererra <span class="dot"></span></div>
   <ul class="nav-links">
-    <li><a href="#posts">Posts</a></li>
-    <li><a href="#about">About</a></li>
+    <li><a onclick="goHome()">Home</a></li>
+    <li><a onclick="goHome(); setTimeout(()=>document.getElementById('posts').scrollIntoView({behavior:'smooth'}),100)">Posts</a></li>
+    <li><a onclick="goHome(); setTimeout(()=>document.getElementById('about').scrollIntoView({behavior:'smooth'}),100)">About</a></li>
   </ul>
 </nav>
 
-<!-- ── FEATURED STRIP ── -->
+<!-- FEATURED STRIP -->
 <div class="featured-strip-wrap">
   <div class="featured-strip-inner" id="featured-strip">
     <div class="strip-label">🎮 Featured</div>
-    <div style="font-size:12px; color:var(--text3);">Loading...</div>
+    <div style="font-size:12px;color:var(--text3)">Loading...</div>
   </div>
 </div>
 
-<!-- ── HERO ── -->
-<div class="hero">
-  <div class="hero-badge">
-    <span class="pulse"></span>
-    Android Private Server Database
+<!-- ======= HOME PAGE ======= -->
+<div id="home-page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge"><span class="pulse"></span> Android Private Server Database</div>
+    <h1 class="hero-title"><span class="glow">Piererra</span></h1>
+    <p class="hero-sub">Your go-to source for Android private server game info. Guides and updates — all in one place.</p>
+    <a class="hero-btn" onclick="document.getElementById('posts').scrollIntoView({behavior:'smooth'})">Read Posts ↓</a>
   </div>
-  <h1 class="hero-title"><span class="glow">Piererra</span></h1>
-  <p class="hero-sub">
-    Your go-to source for Android private server game info. Guides and updates — all in one place.
-  </p>
-  <a href="#posts" class="hero-btn">Read Posts ↓</a>
-</div>
 
-<div class="divider"></div>
+  <div class="divider"></div>
 
-<!-- ── POSTS ── -->
-<div class="section-wrap" id="posts">
-  <div class="section-eyebrow">Updates</div>
-  <h2 class="section-title">Latest <span>Posts</span></h2>
-  <p class="section-desc">Guides, changelogs, and news — sorted by newest first.</p>
-  <div class="posts-list" id="posts-list">
-    <div class="posts-loading">Loading posts...</div>
-  </div>
-</div>
-
-<div class="divider"></div>
-
-<!-- ── HOW IT WORKS ── -->
-<div class="section-wrap" id="about">
-  <div class="section-eyebrow">How it works</div>
-  <h2 class="section-title">Get Started <span>in Minutes</span></h2>
-  <p class="section-desc">Finding and playing private servers on Android has never been easier.</p>
-  <div class="steps">
-    <div class="step">
-      <div class="step-icon">🎮</div>
-      <div class="step-num">STEP 01</div>
-      <div class="step-title">Browse Posts</div>
-      <div class="step-desc">Find the game you want and open its guide post.</div>
-    </div>
-    <div class="step">
-      <div class="step-icon">📖</div>
-      <div class="step-num">STEP 02</div>
-      <div class="step-title">Read the Guide</div>
-      <div class="step-desc">Follow the full setup guide — download links, install steps, and tips.</div>
-    </div>
-    <div class="step">
-      <div class="step-icon">⬇️</div>
-      <div class="step-num">STEP 03</div>
-      <div class="step-title">Download & Play</div>
-      <div class="step-desc">Install the APK on your Android and jump into the private server.</div>
-    </div>
-    <div class="step">
-      <div class="step-icon">🔔</div>
-      <div class="step-num">STEP 04</div>
-      <div class="step-title">Stay Updated</div>
-      <div class="step-desc">Bookmark Piererra and check back for new guides and server news.</div>
+  <!-- POSTS -->
+  <div class="section-wrap" id="posts">
+    <div class="section-eyebrow">Updates</div>
+    <h2 class="section-title">Latest <span>Posts</span></h2>
+    <p class="section-desc">Guides, changelogs, and news — sorted by newest first.</p>
+    <div class="posts-list" id="posts-list">
+      <div class="posts-loading">Loading posts...</div>
     </div>
   </div>
-</div>
 
-<!-- ── FOOTER ── -->
-<footer>
-  <div class="footer-logo">Piererra</div>
-  <div class="footer-desc">Android Private Server Games Information Hub</div>
-  <ul class="footer-links">
-    <li><a href="#posts">Posts</a></li>
-    <li><a href="#about">About</a></li>
-  </ul>
-  <div class="footer-copy">© 2026 Piererra — For informational purposes only</div>
-</footer>
+  <div class="divider"></div>
+
+  <!-- HOW IT WORKS -->
+  <div class="section-wrap" id="about">
+    <div class="section-eyebrow">How it works</div>
+    <h2 class="section-title">Get Started <span>in Minutes</span></h2>
+    <p class="section-desc">Finding and playing private servers on Android has never been easier.</p>
+    <div class="steps">
+      <div class="step"><div class="step-icon">🎮</div><div class="step-num">STEP 01</div><div class="step-title">Browse Posts</div><div class="step-desc">Find the game you want and open its guide post.</div></div>
+      <div class="step"><div class="step-icon">📖</div><div class="step-num">STEP 02</div><div class="step-title">Read the Guide</div><div class="step-desc">Follow the full setup guide — download links, install steps, and tips.</div></div>
+      <div class="step"><div class="step-icon">⬇️</div><div class="step-num">STEP 03</div><div class="step-title">Download & Play</div><div class="step-desc">Install the APK on your Android and jump into the private server.</div></div>
+      <div class="step"><div class="step-icon">🔔</div><div class="step-num">STEP 04</div><div class="step-title">Stay Updated</div><div class="step-desc">Bookmark Piererra and check back for new guides and server news.</div></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Piererra</div>
+    <div class="footer-desc">Android Private Server Games Information Hub</div>
+    <ul class="footer-links">
+      <li><a onclick="document.getElementById('posts').scrollIntoView({behavior:'smooth'})">Posts</a></li>
+      <li><a onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">About</a></li>
+    </ul>
+    <div class="footer-copy">© 2026 Piererra — For informational purposes only</div>
+  </footer>
+
+</div><!-- end home-page -->
+
+<!-- ======= POST PAGE ======= -->
+<div id="post-page">
+  <div class="post-page-inner">
+    <button class="post-back" onclick="goHome()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back to all posts
+    </button>
+
+    <img id="pp-cover" class="post-cover" src="" alt="" style="display:none"/>
+
+    <div class="post-meta">
+      <span class="post-meta-game" id="pp-game"></span>
+      <span class="post-meta-date" id="pp-date"></span>
+    </div>
+
+    <h1 class="post-page-title" id="pp-title"></h1>
+
+    <div class="post-page-body" id="pp-body"></div>
+
+    <div class="post-nav" id="pp-nav"></div>
+  </div>
+</div>
 
 <script>
-  // Format date: "2026-05-01" → "May 1, 2026"
+  let allData = { posts: [], games: [] };
+  let sortedPosts = [];
+
+  // ── FORMAT DATE ──
   function formatDate(str) {
     if (!str) return '';
-    const d = new Date(str + 'T00:00:00');
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    return new Date(str + 'T00:00:00').toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
   }
 
+  // ── LOAD DATA ──
   async function loadData() {
     try {
-      const res = await fetch('json/data.json');
+      // Cache-bust so Vercel always fetches fresh JSON after GitHub push
+      const res = await fetch('json/data.json?v=' + Date.now());
       if (!res.ok) throw new Error();
-      const data = await res.json();
-      renderFeatured(data.games || []);
-      renderPosts(data.posts || []);
+      allData = await res.json();
+      if (!allData.posts) allData.posts = [];
+      if (!allData.games) allData.games = [];
     } catch (e) {
-      document.getElementById('featured-strip').innerHTML =
-        '<div class="strip-label">🎮 Featured</div><span style="font-size:12px;color:var(--text3)">No games yet</span>';
-      document.getElementById('posts-list').innerHTML =
-        '<div class="posts-empty">No posts yet. Check back soon.</div>';
+      allData = { posts: [], games: [] };
     }
+    renderFeatured(allData.games);
+    renderPosts(allData.posts);
+    handleDeepLink();
   }
 
+  // ── FEATURED STRIP ──
   function renderFeatured(games) {
     const strip = document.getElementById('featured-strip');
     const popular = games.filter(g => g.popular === true || g.popular === 'true');
-
-    if (popular.length === 0) {
+    if (!popular.length) {
       strip.innerHTML = '<div class="strip-label">🎮 Featured</div><span style="font-size:12px;color:var(--text3)">No featured games yet</span>';
       return;
     }
-
-    strip.innerHTML = '<div class="strip-label">🎮 Featured</div>' +
-      popular.map(g => `
-        <a href="${g.url || '#'}" class="strip-card">
-          <span class="strip-emoji">${g.emoji || '🎮'}</span>
-          <div class="strip-info">
-            <span class="strip-name">${g.name}</span>
-            <span class="strip-tag">${g.tag || ''}</span>
-          </div>
-          <span class="strip-dot ${g.status === 'online' ? '' : 'offline'}"></span>
-        </a>
-      `).join('');
+    strip.innerHTML = '<div class="strip-label">🎮 Featured</div>' + popular.map(g => `
+      <div class="strip-card" onclick="handleGameClick(${JSON.stringify(g).replace(/"/g,'&quot;')})">
+        <span class="strip-emoji">${g.emoji||'🎮'}</span>
+        <div class="strip-info">
+          <span class="strip-name">${esc(g.name)}</span>
+          <span class="strip-tag">${esc(g.tag||'')}</span>
+        </div>
+        <span class="strip-dot ${g.status==='online'?'':'offline'}"></span>
+      </div>
+    `).join('');
   }
 
+  function handleGameClick(g) {
+    if (g.url && g.url !== '#') { window.open(g.url, '_blank'); return; }
+    // Find a post matching this game name
+    const match = allData.posts.find(p => p.game && p.game.toLowerCase() === g.name.toLowerCase() && !p.draft);
+    if (match) openPost(match);
+  }
+
+  // ── POSTS LIST ──
   function renderPosts(posts) {
     const container = document.getElementById('posts-list');
-
-    if (!posts || posts.length === 0) {
+    const visible = posts.filter(p => !p.draft);
+    if (!visible.length) {
       container.innerHTML = '<div class="posts-empty">No posts yet. Check back soon.</div>';
       return;
     }
-
-    // Sort by date, newest first
-    const sorted = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    container.innerHTML = sorted.map((post, i) => `
-      <a href="${post.url || '#'}" class="post-item">
+    sortedPosts = [...visible].sort((a, b) => new Date(b.date) - new Date(a.date));
+    container.innerHTML = sortedPosts.map((post, i) => `
+      <div class="post-item" onclick="openPost(allData.posts.find(p=>p.id===${post.id})||sortedPosts[${i}])">
         <div class="post-num">${String(i + 1).padStart(2, '0')}</div>
         <div class="post-content">
-          <div class="post-game">${post.game || ''}</div>
-          <div class="post-title">${post.title}</div>
+          <div class="post-game">${esc(post.game||'')}</div>
+          <div class="post-title">${esc(post.title)}</div>
           <div class="post-date">${formatDate(post.date)}</div>
         </div>
         <div class="post-arrow">→</div>
-      </a>
+      </div>
     `).join('');
+  }
+
+  // ── OPEN POST ──
+  function openPost(post) {
+    if (!post) return;
+
+    // Update URL hash for deep linking / sharing
+    const slug = post.slug || String(post.id);
+    history.pushState({ postId: post.id }, '', '#post/' + slug);
+
+    // Fill post page
+    document.getElementById('pp-title').textContent = post.title || '';
+    document.getElementById('pp-game').textContent  = post.game  || '';
+    document.getElementById('pp-date').textContent  = formatDate(post.date);
+    document.getElementById('pp-body').innerHTML    = post.content || '<p>No content yet.</p>';
+
+    const cover = document.getElementById('pp-cover');
+    if (post.cover) { cover.src = post.cover; cover.style.display = 'block'; }
+    else { cover.style.display = 'none'; }
+
+    // Prev / Next navigation
+    const idx = sortedPosts.findIndex(p => p.id === post.id);
+    const prev = idx > 0 ? sortedPosts[idx - 1] : null;
+    const next = idx < sortedPosts.length - 1 ? sortedPosts[idx + 1] : null;
+    const nav = document.getElementById('pp-nav');
+    if (prev || next) {
+      nav.innerHTML = `
+        <div class="post-nav-label">More Posts</div>
+        <div class="post-nav-links">
+          ${prev ? `<div class="post-nav-link" onclick="openPost(sortedPosts[${idx-1}])"><div class="post-nav-dir">← Previous</div><div class="post-nav-title">${esc(prev.title)}</div></div>` : ''}
+          ${next ? `<div class="post-nav-link" onclick="openPost(sortedPosts[${idx+1}])"><div class="post-nav-dir">Next →</div><div class="post-nav-title">${esc(next.title)}</div></div>` : ''}
+        </div>`;
+    } else { nav.innerHTML = ''; }
+
+    // Switch view
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('post-page').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Update page title
+    document.title = (post.title || 'Post') + ' — Piererra';
+  }
+
+  // ── GO HOME ──
+  function goHome() {
+    document.getElementById('post-page').style.display = 'none';
+    document.getElementById('home-page').style.display = 'block';
+    history.pushState({}, '', location.pathname);
+    document.title = 'Piererra — Android Private Server Games';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── DEEP LINK (e.g. piererra.vercel.app/#post/my-slug) ──
+  function handleDeepLink() {
+    const hash = location.hash;
+    if (hash.startsWith('#post/')) {
+      const slug = hash.replace('#post/', '');
+      const post = allData.posts.find(p => (p.slug === slug || String(p.id) === slug) && !p.draft);
+      if (post) openPost(post);
+    }
+  }
+
+  // Browser back button support
+  window.addEventListener('popstate', () => {
+    if (!location.hash.startsWith('#post/')) goHome();
+    else handleDeepLink();
+  });
+
+  // ── HELPER ──
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   loadData();
