@@ -1,20 +1,15 @@
 {
-  "games": [
-    {
-      "name": "Example Game",
-      "emoji": "🎮",
-      "tag": "MMORPG",
-      "status": "online",
-      "url": "#",
-      "popular": true
-    }
-  ],
+  "games": [],
   "posts": [
     {
-      "title": "Welcome to Piererra!",
-      "game": "General",
-      "date": "2026-05-03",
-      "url": "#"
+      "title": "Post Title",
+      "game": "Game / Tag",
+      "date": "2026-05-02",
+      "cover": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAHzFjWxg66vIR2LIRlGKkN5Gmf0n44LfYRTtMJS1t2A&s=10",
+      "content": "hahaha<div>this is test</div><div>of the&nbsp;</div><h2><ul><li>post Content</li></ul></h2>",
+      "draft": false,
+      "slug": "post-title",
+      "id": 1777743037473
     }
   ]
 }
