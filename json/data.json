@@ -1,21 +1,11 @@
 {
-  "games": [
-    {
-      "name": "Mobile Legends",
-      "tag": "MOBA",
-      "emoji": "⚔️",
-      "desc": "All heroes unlocked, custom diamond top-up, lag-free gameplay.",
-      "status": "online",
-      "players": "2.4k players",
-      "popular": true,
-      "url": "#"
-    }
-  ],
+  "games": [],
   "posts": [
     {
-      "game": "Mobile Legends",
-      "title": "How to Install ML Private Server on Android 14",
-      "date": "2026-05-01",
-      "url": "posts/ml-android-14.html"
+      "game": "Test Post Game",
+      "title": "Test Post Title",
+      "date": "2026-05-02",
+      "url": "idk.html"
     }
   ]
+}
