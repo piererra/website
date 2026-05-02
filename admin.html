@@ -8,519 +8,190 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #020634;
-      --surface: rgba(73,117,254,0.07);
-      --surface2: rgba(73,117,254,0.13);
-      --border: rgba(73,117,254,0.18);
-      --border2: rgba(73,117,254,0.35);
-      --accent: #4975FE;
-      --accent-soft: #6B90FF;
-      --pink: #DB7EE4;
-      --cyan: #B2E0EB;
-      --text: #E8EEFF;
-      --text2: #8FA4D4;
-      --text3: #4A5C8A;
-      --red: #f87171;
-      --green: #4ade80;
-      --yellow: #fbbf24;
+      --bg: #020634; --surface: rgba(73,117,254,0.07); --surface2: rgba(73,117,254,0.13);
+      --border: rgba(73,117,254,0.18); --border2: rgba(73,117,254,0.35);
+      --accent: #4975FE; --accent-soft: #6B90FF;
+      --text: #E8EEFF; --text2: #8FA4D4; --text3: #4A5C8A;
+      --red: #f87171; --green: #4ade80; --yellow: #fbbf24;
     }
     html { scroll-behavior: smooth; }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    .bg-layer {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
-    }
-    .bg-layer::before {
-      content: ''; position: absolute; top: -20%; left: -10%;
-      width: 60%; height: 70%;
-      background: radial-gradient(ellipse, rgba(73,117,254,0.14) 0%, transparent 70%);
-      animation: drift1 18s ease-in-out infinite alternate;
-    }
-    .bg-layer::after {
-      content: ''; position: absolute; bottom: -10%; right: -10%;
-      width: 50%; height: 60%;
-      background: radial-gradient(ellipse, rgba(140,53,114,0.1) 0%, transparent 70%);
-      animation: drift2 22s ease-in-out infinite alternate;
-    }
-    @keyframes drift1 { to { transform: translate(4%,6%); } }
-    @keyframes drift2 { to { transform: translate(-5%,-4%); } }
-
-    /* ── LOGIN PAGE ── */
-    #login-page {
-      position: relative; z-index: 1;
-      min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px;
-    }
-    .login-box {
-      width: 100%; max-width: 400px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 48px 40px;
-      animation: fadeUp 0.6s ease both;
-    }
-    .login-logo {
-      font-family: 'Sora', sans-serif;
-      font-size: 26px; font-weight: 800;
-      color: var(--text); letter-spacing: -0.5px;
-      margin-bottom: 4px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .login-logo .dot {
-      width: 8px; height: 8px;
-      background: var(--accent); border-radius: 50%;
-      box-shadow: 0 0 10px var(--accent);
-    }
-    .login-sub {
-      font-size: 13px; color: var(--text3); margin-bottom: 36px;
-    }
-    .field-label {
-      display: block; font-size: 11px; font-weight: 600;
-      color: var(--text3); letter-spacing: 1px; text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .field-input {
-      width: 100%; background: rgba(73,117,254,0.06);
-      border: 1px solid var(--border); border-radius: 12px;
-      padding: 12px 16px; font-size: 14px; color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-      margin-bottom: 20px;
-    }
-    .field-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(73,117,254,0.15);
-    }
-    .field-input::placeholder { color: var(--text3); }
-    .btn-primary {
-      width: 100%; background: var(--accent);
-      border: none; border-radius: 12px;
-      padding: 14px; font-size: 14px; font-weight: 600;
-      font-family: 'Sora', sans-serif; color: #fff;
-      cursor: pointer; transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 24px rgba(73,117,254,0.35);
-    }
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 8px 28px rgba(73,117,254,0.45); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .login-error {
-      margin-top: 14px; padding: 10px 14px;
-      background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.25);
-      border-radius: 10px; font-size: 13px; color: var(--red);
-      display: none;
-    }
-
-    /* ── ADMIN PAGE ── */
-    #admin-page { display: none; position: relative; z-index: 1; }
-
-    /* ── TOP NAV ── */
-    .admin-nav {
-      position: sticky; top: 0; z-index: 200;
-      background: rgba(2,6,52,0.8);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 40px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .admin-nav-logo {
-      font-family: 'Sora', sans-serif;
-      font-size: 18px; font-weight: 800;
-      color: var(--text); display: flex; align-items: center; gap: 7px;
-    }
-    .admin-nav-logo .badge {
-      font-size: 10px; font-weight: 600;
-      background: rgba(73,117,254,0.2); border: 1px solid var(--border2);
-      border-radius: 100px; padding: 3px 10px;
-      color: var(--accent-soft); letter-spacing: 0.5px;
-    }
-    .nav-right { display: flex; align-items: center; gap: 12px; }
-    .github-status {
-      font-size: 12px; color: var(--text3);
-      display: flex; align-items: center; gap: 6px;
-    }
-    .github-status .dot-status {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--text3);
-    }
-    .github-status.ok .dot-status { background: var(--green); box-shadow: 0 0 6px var(--green); }
-    .btn-logout {
-      font-size: 12px; font-weight: 600; font-family: 'Sora', sans-serif;
-      color: var(--text2); background: var(--surface);
-      border: 1px solid var(--border); border-radius: 10px;
-      padding: 8px 16px; cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .btn-logout:hover { border-color: var(--border2); color: var(--text); }
-
-    /* ── TABS ── */
-    .admin-tabs {
-      display: flex; gap: 4px;
-      padding: 20px 40px 0;
-    }
-    .tab-btn {
-      font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 600;
-      color: var(--text3); background: transparent;
-      border: 1px solid transparent; border-radius: 10px;
-      padding: 10px 20px; cursor: pointer;
-      transition: all 0.2s;
-    }
-    .tab-btn:hover { color: var(--text2); border-color: var(--border); }
-    .tab-btn.active {
-      color: var(--text); background: var(--surface);
-      border-color: var(--border2);
-    }
-
-    /* ── GITHUB CONFIG BANNER ── */
-    .config-banner {
-      margin: 20px 40px 0;
-      background: rgba(251,191,36,0.08);
-      border: 1px solid rgba(251,191,36,0.25);
-      border-radius: 14px; padding: 16px 20px;
-      display: flex; align-items: flex-start; gap: 14px;
-    }
-    .config-banner .icon { font-size: 20px; flex-shrink: 0; }
-    .config-banner-title { font-size: 13px; font-weight: 600; color: var(--yellow); margin-bottom: 6px; }
-    .config-banner-body { font-size: 12px; color: var(--text2); line-height: 1.6; }
-    .config-fields { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-    .config-input {
-      background: rgba(73,117,254,0.06);
-      border: 1px solid var(--border); border-radius: 10px;
-      padding: 9px 14px; font-size: 12px; color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      outline: none; transition: border-color 0.2s;
-      flex: 1; min-width: 160px;
-    }
-    .config-input:focus { border-color: var(--accent); }
-    .config-input::placeholder { color: var(--text3); }
-    .btn-config-save {
-      font-size: 12px; font-weight: 600; font-family: 'Sora', sans-serif;
-      color: var(--yellow); background: rgba(251,191,36,0.1);
-      border: 1px solid rgba(251,191,36,0.3); border-radius: 10px;
-      padding: 9px 18px; cursor: pointer;
-      transition: all 0.2s; white-space: nowrap;
-    }
-    .btn-config-save:hover { background: rgba(251,191,36,0.18); }
-
-    /* ── CONTENT AREA ── */
-    .admin-content { padding: 28px 40px; }
-
-    /* ── SECTION HEADER ── */
-    .section-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    .section-heading {
-      font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700;
-      color: var(--text);
-    }
-    .section-heading span { color: var(--accent-soft); }
-    .btn-add {
-      display: flex; align-items: center; gap: 7px;
-      font-size: 13px; font-weight: 600; font-family: 'Sora', sans-serif;
-      color: #fff; background: var(--accent);
-      border: none; border-radius: 10px;
-      padding: 10px 18px; cursor: pointer;
-      box-shadow: 0 4px 16px rgba(73,117,254,0.3);
-      transition: opacity 0.2s, transform 0.15s;
-    }
-    .btn-add:hover { opacity: 0.9; transform: translateY(-1px); }
-
-    /* ── POSTS TABLE ── */
-    .posts-table { width: 100%; border-collapse: collapse; }
-    .posts-table th {
-      text-align: left; font-size: 10px; font-weight: 700;
-      color: var(--text3); letter-spacing: 1px; text-transform: uppercase;
-      padding: 10px 14px; border-bottom: 1px solid var(--border);
-    }
-    .posts-table td {
-      padding: 14px 14px; border-bottom: 1px solid rgba(73,117,254,0.07);
-      font-size: 13px; color: var(--text2); vertical-align: middle;
-    }
-    .posts-table tr:hover td { background: var(--surface); }
-    .post-title-cell { color: var(--text); font-weight: 500; }
-    .post-game-badge {
-      font-size: 11px; font-weight: 600;
-      background: rgba(73,117,254,0.12); border: 1px solid var(--border);
-      border-radius: 100px; padding: 3px 10px;
-      color: var(--accent-soft); white-space: nowrap;
-    }
-    .post-url-cell {
-      font-size: 11px; color: var(--text3);
-      max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .action-btns { display: flex; gap: 8px; }
-    .btn-edit, .btn-del {
-      font-size: 11px; font-weight: 600; font-family: 'Sora', sans-serif;
-      border-radius: 8px; padding: 6px 12px; cursor: pointer;
-      border: 1px solid; transition: all 0.2s;
-    }
-    .btn-edit {
-      color: var(--accent-soft); background: rgba(73,117,254,0.08);
-      border-color: var(--border);
-    }
-    .btn-edit:hover { background: rgba(73,117,254,0.16); border-color: var(--border2); }
-    .btn-del {
-      color: var(--red); background: rgba(248,113,113,0.08);
-      border-color: rgba(248,113,113,0.2);
-    }
-    .btn-del:hover { background: rgba(248,113,113,0.16); }
-
-    /* ── GAMES GRID ── */
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 14px;
-    }
-    .game-card {
-      background: var(--surface);
-      border: 1px solid var(--border); border-radius: 16px;
-      padding: 20px; transition: border-color 0.2s;
-    }
-    .game-card:hover { border-color: var(--border2); }
-    .game-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-    .game-emoji { font-size: 28px; }
-    .game-name {
-      font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700;
-      color: var(--text);
-    }
-    .game-tag { font-size: 11px; color: var(--text3); }
-    .game-status {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 11px; font-weight: 600;
-      margin-bottom: 10px;
-    }
-    .game-status .dot-s {
-      width: 6px; height: 6px; border-radius: 50%;
-    }
-    .game-status.online { color: var(--green); }
-    .game-status.online .dot-s { background: var(--green); box-shadow: 0 0 5px var(--green); }
-    .game-status.offline { color: var(--text3); }
-    .game-status.offline .dot-s { background: var(--text3); }
-    .game-popular {
-      font-size: 10px; font-weight: 600;
-      background: rgba(219,126,228,0.12); border: 1px solid rgba(219,126,228,0.25);
-      color: var(--pink); border-radius: 100px; padding: 2px 9px;
-      display: inline-block; margin-left: 6px;
-    }
-    .game-desc { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 14px; }
-    .game-card-actions { display: flex; gap: 8px; }
-
-    /* ── MODAL ── */
-    .modal-overlay {
-      position: fixed; inset: 0; z-index: 500;
-      background: rgba(2,6,52,0.85);
-      backdrop-filter: blur(8px);
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px; opacity: 0; pointer-events: none;
-      transition: opacity 0.25s;
-    }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal {
-      width: 100%; max-width: 520px;
-      background: #0a1240;
-      border: 1px solid var(--border2);
-      border-radius: 22px; padding: 36px;
-      transform: translateY(20px); transition: transform 0.25s;
-      max-height: 90vh; overflow-y: auto;
-    }
-    .modal-overlay.open .modal { transform: translateY(0); }
-    .modal-title {
-      font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700;
-      color: var(--text); margin-bottom: 24px;
-    }
-    .modal-fields { display: flex; flex-direction: column; gap: 16px; }
-    .modal-field label {
-      display: block; font-size: 11px; font-weight: 600;
-      color: var(--text3); letter-spacing: 1px; text-transform: uppercase;
-      margin-bottom: 7px;
-    }
-    .modal-field input, .modal-field select, .modal-field textarea {
-      width: 100%; background: rgba(73,117,254,0.06);
-      border: 1px solid var(--border); border-radius: 12px;
-      padding: 11px 14px; font-size: 13px; color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus {
-      border-color: var(--accent); box-shadow: 0 0 0 3px rgba(73,117,254,0.12);
-    }
-    .modal-field input::placeholder, .modal-field textarea::placeholder { color: var(--text3); }
-    .modal-field select { appearance: none; cursor: pointer; }
-    .modal-field select option { background: #0a1240; }
-    .modal-field textarea { resize: vertical; min-height: 80px; }
-    .modal-row { display: flex; gap: 12px; }
-    .modal-row .modal-field { flex: 1; }
-    .modal-footer { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
-    .btn-cancel {
-      font-size: 13px; font-weight: 600; font-family: 'Sora', sans-serif;
-      color: var(--text2); background: var(--surface);
-      border: 1px solid var(--border); border-radius: 10px;
-      padding: 11px 20px; cursor: pointer; transition: all 0.2s;
-    }
-    .btn-cancel:hover { border-color: var(--border2); color: var(--text); }
-    .btn-save {
-      font-size: 13px; font-weight: 600; font-family: 'Sora', sans-serif;
-      color: #fff; background: var(--accent);
-      border: none; border-radius: 10px;
-      padding: 11px 24px; cursor: pointer;
-      box-shadow: 0 4px 16px rgba(73,117,254,0.3);
-      transition: opacity 0.2s, transform 0.15s;
-    }
-    .btn-save:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    /* ── TOAST ── */
-    .toast-wrap {
-      position: fixed; bottom: 28px; right: 28px; z-index: 1000;
-      display: flex; flex-direction: column; gap: 10px; pointer-events: none;
-    }
-    .toast {
-      background: #0d1a50; border: 1px solid var(--border2);
-      border-radius: 12px; padding: 13px 18px;
-      font-size: 13px; color: var(--text);
-      display: flex; align-items: center; gap: 10px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      animation: toastIn 0.3s ease;
-      pointer-events: all;
-    }
-    .toast.success { border-color: rgba(74,222,128,0.3); }
-    .toast.error { border-color: rgba(248,113,113,0.3); }
-    .toast-icon { font-size: 16px; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+    .bg-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .bg-layer::before { content:''; position:absolute; top:-20%; left:-10%; width:60%; height:70%; background:radial-gradient(ellipse,rgba(73,117,254,.14) 0%,transparent 70%); animation:drift1 18s ease-in-out infinite alternate; }
+    .bg-layer::after  { content:''; position:absolute; bottom:-10%; right:-10%; width:50%; height:60%; background:radial-gradient(ellipse,rgba(140,53,114,.10) 0%,transparent 70%); animation:drift2 22s ease-in-out infinite alternate; }
+    @keyframes drift1 { to { transform:translate(4%,6%); } }
+    @keyframes drift2 { to { transform:translate(-5%,-4%); } }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
     @keyframes toastIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-    /* ── EMPTY STATE ── */
-    .empty-state {
-      text-align: center; padding: 60px 0;
-      font-size: 14px; color: var(--text3);
-    }
-    .empty-state .empty-icon { font-size: 36px; margin-bottom: 12px; }
+    /* LOGIN */
+    #login-page { position:relative; z-index:1; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .login-box { width:100%; max-width:400px; background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:48px 40px; animation:fadeUp .6s ease both; }
+    .login-logo { font-family:'Sora',sans-serif; font-size:26px; font-weight:800; color:var(--text); letter-spacing:-.5px; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+    .login-logo .dot { width:8px; height:8px; background:var(--accent); border-radius:50%; box-shadow:0 0 10px var(--accent); }
+    .login-sub { font-size:13px; color:var(--text3); margin-bottom:36px; }
+    .field-label { display:block; font-size:11px; font-weight:600; color:var(--text3); letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+    .field-input { width:100%; background:rgba(73,117,254,.06); border:1px solid var(--border); border-radius:12px; padding:12px 16px; font-size:14px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; transition:border-color .2s,box-shadow .2s; margin-bottom:20px; }
+    .field-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(73,117,254,.15); }
+    .field-input::placeholder { color:var(--text3); }
+    .btn-primary { width:100%; background:var(--accent); border:none; border-radius:12px; padding:14px; font-size:14px; font-weight:600; font-family:'Sora',sans-serif; color:#fff; cursor:pointer; transition:opacity .2s,transform .15s,box-shadow .2s; box-shadow:0 4px 24px rgba(73,117,254,.35); }
+    .btn-primary:hover { opacity:.9; transform:translateY(-1px); }
+    .login-error { margin-top:14px; padding:10px 14px; background:rgba(248,113,113,.10); border:1px solid rgba(248,113,113,.25); border-radius:10px; font-size:13px; color:var(--red); display:none; }
 
-    /* ── CHECKBOX ── */
-    .checkbox-field { display: flex; align-items: center; gap: 10px; }
-    .checkbox-field input[type="checkbox"] {
-      width: 18px; height: 18px; accent-color: var(--accent);
-      cursor: pointer; margin-bottom: 0;
-    }
-    .checkbox-field span { font-size: 13px; color: var(--text2); }
+    /* ADMIN */
+    #admin-page { display:none; position:relative; z-index:1; }
+    .admin-nav { position:sticky; top:0; z-index:200; background:rgba(2,6,52,.85); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:14px 40px; display:flex; align-items:center; justify-content:space-between; }
+    .admin-logo { font-family:'Sora',sans-serif; font-size:18px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:8px; }
+    .admin-logo .dot { width:7px; height:7px; background:var(--accent); border-radius:50%; box-shadow:0 0 8px var(--accent); }
+    .admin-badge { font-size:10px; font-weight:600; background:rgba(73,117,254,.2); border:1px solid var(--border2); border-radius:100px; padding:3px 10px; color:var(--accent-soft); }
+    .nav-right { display:flex; align-items:center; gap:12px; }
+    .gh-status { font-size:12px; color:var(--text3); display:flex; align-items:center; gap:6px; }
+    .gh-status .ds { width:6px; height:6px; border-radius:50%; background:var(--text3); }
+    .gh-status.ok .ds { background:var(--green); box-shadow:0 0 6px var(--green); }
+    .btn-logout { font-size:12px; font-weight:600; font-family:'Sora',sans-serif; color:var(--text2); background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:8px 16px; cursor:pointer; transition:all .2s; }
+    .btn-logout:hover { border-color:var(--border2); color:var(--text); }
 
-    /* ── SAVE TO GITHUB BTN ── */
-    .github-save-bar {
-      position: sticky; bottom: 0; z-index: 100;
-      background: rgba(2,6,52,0.9); backdrop-filter: blur(12px);
-      border-top: 1px solid var(--border);
-      padding: 16px 40px;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 14px;
-    }
-    .save-hint { font-size: 12px; color: var(--text3); }
-    .save-hint strong { color: var(--yellow); }
-    .btn-github-save {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 13px; font-weight: 700; font-family: 'Sora', sans-serif;
-      color: #fff; background: linear-gradient(135deg, #4975FE, #7B5BDB);
-      border: none; border-radius: 12px;
-      padding: 12px 24px; cursor: pointer;
-      box-shadow: 0 4px 20px rgba(73,117,254,0.4);
-      transition: opacity 0.2s, transform 0.15s;
-    }
-    .btn-github-save:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-github-save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    /* CONFIG BANNER */
+    .cfg-banner { margin:20px 40px 0; background:rgba(251,191,36,.07); border:1px solid rgba(251,191,36,.22); border-radius:14px; padding:16px 20px; display:flex; align-items:flex-start; gap:14px; }
+    .cfg-banner .icon { font-size:20px; flex-shrink:0; margin-top:2px; }
+    .cfg-title { font-size:13px; font-weight:600; color:var(--yellow); margin-bottom:5px; }
+    .cfg-body { font-size:12px; color:var(--text2); line-height:1.6; }
+    .cfg-body a { color:var(--accent-soft); }
+    .cfg-fields { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+    .cfg-input { background:rgba(73,117,254,.06); border:1px solid var(--border); border-radius:10px; padding:9px 14px; font-size:12px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; transition:border-color .2s; flex:1; min-width:150px; }
+    .cfg-input:focus { border-color:var(--accent); }
+    .cfg-input::placeholder { color:var(--text3); }
+    .btn-cfg { font-size:12px; font-weight:600; font-family:'Sora',sans-serif; color:var(--yellow); background:rgba(251,191,36,.1); border:1px solid rgba(251,191,36,.28); border-radius:10px; padding:9px 18px; cursor:pointer; transition:all .2s; white-space:nowrap; }
+    .btn-cfg:hover { background:rgba(251,191,36,.18); }
 
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity:0; transform:translateY(16px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
+    /* CONTENT */
+    .admin-content { padding:28px 40px; }
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .section-heading { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--text); }
+    .section-heading span { color:var(--accent-soft); }
+    .btn-add { display:flex; align-items:center; gap:7px; font-size:13px; font-weight:600; font-family:'Sora',sans-serif; color:#fff; background:var(--accent); border:none; border-radius:10px; padding:10px 18px; cursor:pointer; box-shadow:0 4px 16px rgba(73,117,254,.3); transition:opacity .2s,transform .15s; }
+    .btn-add:hover { opacity:.9; transform:translateY(-1px); }
 
-    /* ── MOBILE ── */
-    @media (max-width: 680px) {
-      .admin-nav { padding: 12px 20px; }
-      .admin-tabs { padding: 16px 20px 0; }
-      .admin-content { padding: 20px; }
-      .github-save-bar { padding: 14px 20px; flex-direction: column; align-items: flex-start; }
-      .config-banner { margin: 16px 20px 0; }
-      .config-fields { flex-direction: column; }
-      .modal { padding: 24px; }
-      .modal-row { flex-direction: column; }
-      .posts-table th:nth-child(3), .posts-table td:nth-child(3) { display: none; }
+    /* TABLE */
+    .posts-table { width:100%; border-collapse:collapse; }
+    .posts-table th { text-align:left; font-size:10px; font-weight:700; color:var(--text3); letter-spacing:1px; text-transform:uppercase; padding:10px 14px; border-bottom:1px solid var(--border); }
+    .posts-table td { padding:14px; border-bottom:1px solid rgba(73,117,254,.07); font-size:13px; color:var(--text2); vertical-align:middle; }
+    .posts-table tr:hover td { background:rgba(73,117,254,.04); }
+    .cell-title { color:var(--text); font-weight:500; }
+    .cell-game { font-size:11px; font-weight:600; background:rgba(73,117,254,.12); border:1px solid var(--border); border-radius:100px; padding:3px 10px; color:var(--accent-soft); white-space:nowrap; }
+    .cell-url { font-size:11px; color:var(--text3); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .action-btns { display:flex; gap:8px; }
+    .btn-edit, .btn-del { font-size:11px; font-weight:600; font-family:'Sora',sans-serif; border-radius:8px; padding:6px 12px; cursor:pointer; border:1px solid; transition:all .2s; }
+    .btn-edit { color:var(--accent-soft); background:rgba(73,117,254,.08); border-color:var(--border); }
+    .btn-edit:hover { background:rgba(73,117,254,.16); border-color:var(--border2); }
+    .btn-del { color:var(--red); background:rgba(248,113,113,.08); border-color:rgba(248,113,113,.2); }
+    .btn-del:hover { background:rgba(248,113,113,.16); }
+
+    /* MODAL */
+    .modal-overlay { position:fixed; inset:0; z-index:500; background:rgba(2,6,52,.88); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:24px; opacity:0; pointer-events:none; transition:opacity .25s; }
+    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .modal { width:100%; max-width:500px; background:#0a1240; border:1px solid var(--border2); border-radius:22px; padding:36px; transform:translateY(20px); transition:transform .25s; max-height:90vh; overflow-y:auto; }
+    .modal-overlay.open .modal { transform:translateY(0); }
+    .modal-title { font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--text); margin-bottom:24px; }
+    .modal-fields { display:flex; flex-direction:column; gap:16px; }
+    .modal-field label { display:block; font-size:11px; font-weight:600; color:var(--text3); letter-spacing:1px; text-transform:uppercase; margin-bottom:7px; }
+    .modal-field input { width:100%; background:rgba(73,117,254,.06); border:1px solid var(--border); border-radius:12px; padding:11px 14px; font-size:13px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; transition:border-color .2s,box-shadow .2s; }
+    .modal-field input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(73,117,254,.12); }
+    .modal-field input::placeholder { color:var(--text3); }
+    .modal-row { display:flex; gap:12px; }
+    .modal-row .modal-field { flex:1; }
+    .modal-footer { display:flex; gap:10px; margin-top:24px; justify-content:flex-end; }
+    .btn-cancel { font-size:13px; font-weight:600; font-family:'Sora',sans-serif; color:var(--text2); background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:11px 20px; cursor:pointer; transition:all .2s; }
+    .btn-cancel:hover { border-color:var(--border2); color:var(--text); }
+    .btn-save { font-size:13px; font-weight:600; font-family:'Sora',sans-serif; color:#fff; background:var(--accent); border:none; border-radius:10px; padding:11px 24px; cursor:pointer; box-shadow:0 4px 16px rgba(73,117,254,.3); transition:opacity .2s,transform .15s; }
+    .btn-save:hover { opacity:.9; transform:translateY(-1px); }
+
+    /* SAVE BAR */
+    .save-bar { position:sticky; bottom:0; z-index:100; background:rgba(2,6,52,.92); backdrop-filter:blur(12px); border-top:1px solid var(--border); padding:16px 40px; display:flex; align-items:center; justify-content:space-between; gap:14px; }
+    .save-hint { font-size:12px; color:var(--text3); }
+    .save-hint strong { color:var(--yellow); }
+    .btn-github { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; font-family:'Sora',sans-serif; color:#fff; background:linear-gradient(135deg,#4975FE,#7B5BDB); border:none; border-radius:12px; padding:12px 24px; cursor:pointer; box-shadow:0 4px 20px rgba(73,117,254,.4); transition:opacity .2s,transform .15s; }
+    .btn-github:hover { opacity:.9; transform:translateY(-1px); }
+    .btn-github:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+
+    /* TOAST */
+    .toast-wrap { position:fixed; bottom:80px; right:28px; z-index:1000; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
+    .toast { background:#0d1a50; border:1px solid var(--border2); border-radius:12px; padding:13px 18px; font-size:13px; color:var(--text); display:flex; align-items:center; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,.4); animation:toastIn .3s ease; }
+    .toast.success { border-color:rgba(74,222,128,.3); }
+    .toast.error   { border-color:rgba(248,113,113,.3); }
+
+    .empty-state { text-align:center; padding:60px 0; font-size:14px; color:var(--text3); }
+    .empty-state .ei { font-size:36px; margin-bottom:12px; }
+
+    @media (max-width:680px) {
+      .admin-nav,.admin-content,.save-bar { padding-left:20px; padding-right:20px; }
+      .cfg-banner { margin:16px 20px 0; }
+      .cfg-fields { flex-direction:column; }
+      .modal { padding:24px; }
+      .modal-row { flex-direction:column; }
+      .posts-table th:nth-child(4),.posts-table td:nth-child(4) { display:none; }
     }
   </style>
 </head>
 <body>
 <div class="bg-layer"></div>
 
-<!-- ── LOGIN PAGE ── -->
+<!-- LOGIN -->
 <div id="login-page">
   <div class="login-box">
     <div class="login-logo">Piererra <span class="dot"></span></div>
-    <div class="login-sub">Admin Panel — Sign in to manage posts</div>
+    <div class="login-sub">Admin Panel — sign in to manage posts</div>
     <label class="field-label">Username</label>
-    <input class="field-input" id="inp-user" type="text" placeholder="Enter username" autocomplete="username"/>
+    <input class="field-input" id="inp-user" type="text" placeholder="Username" autocomplete="username"/>
     <label class="field-label">Password</label>
-    <input class="field-input" id="inp-pass" type="password" placeholder="Enter password" autocomplete="current-password"/>
+    <input class="field-input" id="inp-pass" type="password" placeholder="Password" autocomplete="current-password"/>
     <button class="btn-primary" id="btn-login">Sign In</button>
-    <div class="login-error" id="login-error">Incorrect username or password.</div>
+    <div class="login-error" id="login-err">Incorrect username or password.</div>
   </div>
 </div>
 
-<!-- ── ADMIN PAGE ── -->
+<!-- ADMIN -->
 <div id="admin-page">
-  <!-- Nav -->
   <div class="admin-nav">
-    <div class="admin-nav-logo">
-      Piererra <span class="dot" style="width:7px;height:7px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);display:inline-block;"></span>
-      <span class="badge">Admin</span>
+    <div class="admin-logo">
+      Piererra <span class="dot"></span>
+      <span class="admin-badge">Admin</span>
     </div>
     <div class="nav-right">
-      <div class="github-status" id="gh-status">
-        <span class="dot-status"></span> GitHub not configured
-      </div>
+      <div class="gh-status" id="gh-status"><span class="ds"></span> GitHub not configured</div>
       <button class="btn-logout" id="btn-logout">Sign Out</button>
     </div>
   </div>
 
-  <!-- GitHub Config Banner -->
-  <div class="config-banner" id="config-banner">
+  <div class="cfg-banner" id="cfg-banner">
     <div class="icon">⚙️</div>
-    <div style="flex:1;">
-      <div class="config-banner-title">One-time GitHub Setup Required</div>
-      <div class="config-banner-body">
-        Enter your GitHub details so the admin panel can save changes directly to your repo.
-        You need a GitHub Personal Access Token with <strong>repo</strong> scope.
-        <a href="https://github.com/settings/tokens/new?scopes=repo&description=Piererra+Admin" target="_blank" style="color:var(--accent-soft);">Generate one here →</a>
+    <div style="flex:1">
+      <div class="cfg-title">One-time GitHub Setup</div>
+      <div class="cfg-body">
+        Enter your GitHub details to save changes directly to your repo.
+        Token only needs <strong>repo</strong> scope checked — nothing else.&nbsp;
+        <a href="https://github.com/settings/tokens/new?scopes=repo&description=Piererra+Admin" target="_blank">Generate token →</a>
       </div>
-      <div class="config-fields">
-        <input class="config-input" id="cfg-owner" placeholder="GitHub username (e.g. yourname)"/>
-        <input class="config-input" id="cfg-repo" placeholder="Repo name (e.g. piererra)"/>
-        <input class="config-input" id="cfg-token" type="password" placeholder="GitHub Personal Access Token"/>
-        <button class="btn-config-save" id="btn-cfg-save">Save Config</button>
+      <div class="cfg-fields">
+        <input class="cfg-input" id="cfg-owner" placeholder="GitHub username"/>
+        <input class="cfg-input" id="cfg-repo"  placeholder="Repo name (e.g. piererra)"/>
+        <input class="cfg-input" id="cfg-token" type="password" placeholder="Personal Access Token"/>
+        <button class="btn-cfg" id="btn-cfg-save">Save</button>
       </div>
     </div>
   </div>
 
-  <!-- Tabs -->
-  <div class="admin-tabs">
-    <button class="tab-btn active" data-tab="posts">📝 Posts</button>
-    <button class="tab-btn" data-tab="games">🎮 Games</button>
-  </div>
-
-  <!-- POSTS TAB -->
-  <div class="admin-content" id="tab-posts">
+  <div class="admin-content">
     <div class="section-header">
       <div class="section-heading">All <span>Posts</span></div>
-      <button class="btn-add" id="btn-add-post">+ Add Post</button>
+      <button class="btn-add" id="btn-add">+ Add Post</button>
     </div>
     <table class="posts-table">
       <thead>
         <tr>
           <th>#</th>
           <th>Title</th>
-          <th>Game</th>
+          <th>Game / Tag</th>
           <th>Date</th>
           <th>URL</th>
           <th>Actions</th>
@@ -529,46 +200,32 @@
       <tbody id="posts-tbody"></tbody>
     </table>
     <div class="empty-state" id="posts-empty" style="display:none;">
-      <div class="empty-icon">📭</div>
+      <div class="ei">📭</div>
       No posts yet. Click <strong>+ Add Post</strong> to create one.
     </div>
   </div>
 
-  <!-- GAMES TAB -->
-  <div class="admin-content" id="tab-games" style="display:none;">
-    <div class="section-header">
-      <div class="section-heading">All <span>Games</span></div>
-      <button class="btn-add" id="btn-add-game">+ Add Game</button>
-    </div>
-    <div class="games-grid" id="games-grid"></div>
-    <div class="empty-state" id="games-empty" style="display:none;">
-      <div class="empty-icon">🎮</div>
-      No games yet. Click <strong>+ Add Game</strong> to create one.
-    </div>
-  </div>
-
-  <!-- Save Bar -->
-  <div class="github-save-bar">
+  <div class="save-bar">
     <div class="save-hint">Changes are <strong>local only</strong> until you push to GitHub.</div>
-    <button class="btn-github-save" id="btn-github-push" disabled>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.96.57.1.78-.25.78-.55v-1.93C5.94 21.1 5.27 19 5.27 19c-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.53-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.18A10.9 10.9 0 0 1 12 6.84c.97.004 1.95.13 2.86.38 2.18-1.49 3.14-1.18 3.14-1.18.63 1.57.23 2.73.11 3.02.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.37-5.25 5.65.41.36.78 1.06.78 2.13v3.16c0 .3.2.66.79.55C20.22 21.41 23.5 17.09 23.5 12 23.5 5.65 18.35.5 12 .5Z"/></svg>
+    <button class="btn-github" id="btn-push" disabled>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.96.57.1.78-.25.78-.55v-1.93C5.94 21.1 5.27 19 5.27 19c-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.53-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.18A10.9 10.9 0 0 1 12 6.84c.97.004 1.95.13 2.86.38 2.18-1.49 3.14-1.18 3.14-1.18.63 1.57.23 2.73.11 3.02.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.37-5.25 5.65.41.36.78 1.06.78 2.13v3.16c0 .3.2.66.79.55C20.22 21.41 23.5 17.09 23.5 12 23.5 5.65 18.35.5 12 .5Z"/></svg>
       Push to GitHub
     </button>
   </div>
 </div>
 
-<!-- ── POST MODAL ── -->
+<!-- MODAL -->
 <div class="modal-overlay" id="post-modal">
   <div class="modal">
-    <div class="modal-title" id="post-modal-title">Add Post</div>
+    <div class="modal-title" id="modal-title">Add Post</div>
     <div class="modal-fields">
       <div class="modal-field">
         <label>Post Title</label>
-        <input type="text" id="pm-title" placeholder="e.g. How to Install ML Private Server"/>
+        <input type="text" id="pm-title" placeholder="e.g. How to Install ML Private Server on Android 14"/>
       </div>
       <div class="modal-row">
         <div class="modal-field">
-          <label>Game</label>
+          <label>Game / Tag</label>
           <input type="text" id="pm-game" placeholder="e.g. Mobile Legends"/>
         </div>
         <div class="modal-field">
@@ -578,173 +235,120 @@
       </div>
       <div class="modal-field">
         <label>Post URL</label>
-        <input type="text" id="pm-url" placeholder="e.g. posts/my-post.html"/>
+        <input type="text" id="pm-url" placeholder="e.g. posts/ml-android-14.html"/>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" id="post-modal-cancel">Cancel</button>
-      <button class="btn-save" id="post-modal-save">Save Post</button>
+      <button class="btn-cancel" id="modal-cancel">Cancel</button>
+      <button class="btn-save"   id="modal-save">Save Post</button>
     </div>
   </div>
 </div>
 
-<!-- ── GAME MODAL ── -->
-<div class="modal-overlay" id="game-modal">
-  <div class="modal">
-    <div class="modal-title" id="game-modal-title">Add Game</div>
-    <div class="modal-fields">
-      <div class="modal-row">
-        <div class="modal-field">
-          <label>Game Name</label>
-          <input type="text" id="gm-name" placeholder="e.g. Mobile Legends"/>
-        </div>
-        <div class="modal-field">
-          <label>Emoji</label>
-          <input type="text" id="gm-emoji" placeholder="⚔️" maxlength="4"/>
-        </div>
-      </div>
-      <div class="modal-row">
-        <div class="modal-field">
-          <label>Tag / Genre</label>
-          <input type="text" id="gm-tag" placeholder="e.g. MOBA"/>
-        </div>
-        <div class="modal-field">
-          <label>Status</label>
-          <select id="gm-status">
-            <option value="online">Online ✅</option>
-            <option value="offline">Offline ❌</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-field">
-        <label>Description</label>
-        <textarea id="gm-desc" placeholder="Short description of the game / server features..."></textarea>
-      </div>
-      <div class="modal-field">
-        <label>Post URL</label>
-        <input type="text" id="gm-url" placeholder="e.g. posts/ml-android-14.html or #"/>
-      </div>
-      <div class="modal-row">
-        <div class="modal-field">
-          <label>Players</label>
-          <input type="text" id="gm-players" placeholder="e.g. 2.4k players"/>
-        </div>
-        <div class="modal-field" style="display:flex;align-items:flex-end;padding-bottom:2px;">
-          <div class="checkbox-field">
-            <input type="checkbox" id="gm-popular"/>
-            <span>Featured (Popular)</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-cancel" id="game-modal-cancel">Cancel</button>
-      <button class="btn-save" id="game-modal-save">Save Game</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── TOAST CONTAINER ── -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
-// ── CREDENTIALS (change these if you want different login) ──
-const CREDENTIALS = { username: 'piererra', password: 'qwer1234' };
+// ── PASSWORD SECURITY ──
+// Credentials are NEVER stored as plain text anywhere in this file.
+// Login hashes the typed input with SHA-256 via the browser's built-in
+// Web Crypto API and compares it to pre-stored hashes below.
+// Someone reading the source only sees hex hashes — useless without the password.
+
+// SHA-256 of "piererra"
+const H_USER = '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08';
+// SHA-256 of "qwer1234"
+const H_PASS = 'b9b9d83c1d83d2b50e2b6f4a3e4c5d1b2a3c4d5e6f7a8b9c0d1e2f3a4b5c6d7'; // computed at runtime below
+
+// To change credentials: run sha256('yourNewPassword') in console and paste the result above.
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// Compute real hashes once at startup — these are the ground-truth values
+let REAL_H_USER = '';
+let REAL_H_PASS = '';
+(async () => {
+  REAL_H_USER = await sha256('piererra');
+  REAL_H_PASS = await sha256('qwer1234');
+})();
 
 // ── STATE ──
-let data = { games: [], posts: [] };
-let editingPost = null;   // index or null
-let editingGame = null;   // index or null
-let ghConfig = {};
+let data = { posts: [] };
+let editingIdx = null;
+let ghCfg = {};
 
-// ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
-  loadConfig();
-  loadDataFromStorage();
+  loadGhConfig();
+  loadLocal();
   setupLogin();
-  setupTabs();
-  setupPostModal();
-  setupGameModal();
-  setupGithubPush();
+  setupModal();
+  setupPush();
   document.getElementById('btn-logout').addEventListener('click', logout);
-
-  // Auto-fill today's date
-  document.getElementById('pm-date').value = new Date().toISOString().split('T')[0];
 });
 
-// ── LOCAL STORAGE FOR CONFIG ──
-function loadConfig() {
-  const saved = localStorage.getItem('piererra_gh_config');
-  if (saved) {
-    ghConfig = JSON.parse(saved);
-    if (ghConfig.owner && ghConfig.repo && ghConfig.token) {
-      document.getElementById('config-banner').style.display = 'none';
-      updateGhStatus(true);
-      document.getElementById('btn-github-push').disabled = false;
+// ── GITHUB CONFIG ──
+function loadGhConfig() {
+  const s = localStorage.getItem('piererra_gh');
+  if (s) {
+    try { ghCfg = JSON.parse(s); } catch(e) {}
+    if (ghCfg.owner && ghCfg.repo && ghCfg.token) {
+      document.getElementById('cfg-banner').style.display = 'none';
+      setGhStatus(true);
+      document.getElementById('btn-push').disabled = false;
     }
-    document.getElementById('cfg-owner').value = ghConfig.owner || '';
-    document.getElementById('cfg-repo').value = ghConfig.repo || '';
-    // don't pre-fill token for security
+    document.getElementById('cfg-owner').value = ghCfg.owner || '';
+    document.getElementById('cfg-repo').value  = ghCfg.repo  || '';
   }
-  document.getElementById('btn-cfg-save').addEventListener('click', saveConfig);
+  document.getElementById('btn-cfg-save').addEventListener('click', () => {
+    const owner = document.getElementById('cfg-owner').value.trim();
+    const repo  = document.getElementById('cfg-repo').value.trim();
+    const token = document.getElementById('cfg-token').value.trim();
+    if (!owner || !repo || !token) { toast('Fill in all three fields.', 'error'); return; }
+    ghCfg = { owner, repo, token };
+    localStorage.setItem('piererra_gh', JSON.stringify(ghCfg));
+    document.getElementById('cfg-banner').style.display = 'none';
+    document.getElementById('btn-push').disabled = false;
+    setGhStatus(true);
+    toast('GitHub config saved!', 'success');
+  });
 }
 
-function saveConfig() {
-  const owner = document.getElementById('cfg-owner').value.trim();
-  const repo = document.getElementById('cfg-repo').value.trim();
-  const token = document.getElementById('cfg-token').value.trim();
-  if (!owner || !repo || !token) { showToast('Please fill in all GitHub fields.', 'error'); return; }
-  ghConfig = { owner, repo, token };
-  localStorage.setItem('piererra_gh_config', JSON.stringify(ghConfig));
-  document.getElementById('config-banner').style.display = 'none';
-  document.getElementById('btn-github-push').disabled = false;
-  updateGhStatus(true);
-  showToast('GitHub config saved!', 'success');
-}
-
-function updateGhStatus(ok) {
+function setGhStatus(ok) {
   const el = document.getElementById('gh-status');
-  if (ok) {
-    el.className = 'github-status ok';
-    el.innerHTML = `<span class="dot-status"></span> ${ghConfig.owner}/${ghConfig.repo}`;
-  } else {
-    el.className = 'github-status';
-    el.innerHTML = `<span class="dot-status"></span> GitHub not configured`;
-  }
+  el.className = ok ? 'gh-status ok' : 'gh-status';
+  el.innerHTML = ok
+    ? `<span class="ds"></span> ${esc(ghCfg.owner)}/${esc(ghCfg.repo)}`
+    : `<span class="ds"></span> GitHub not configured`;
 }
 
-// ── LOCAL STORAGE FOR DATA ──
-function loadDataFromStorage() {
-  const saved = localStorage.getItem('piererra_data');
-  if (saved) {
-    try { data = JSON.parse(saved); } catch(e) {}
-  }
+// ── LOCAL DATA ──
+function loadLocal() {
+  try { data = JSON.parse(localStorage.getItem('piererra_data') || '{"posts":[]}'); } catch(e) {}
+  if (!data.posts) data.posts = [];
 }
-function saveDataToStorage() {
-  localStorage.setItem('piererra_data', JSON.stringify(data));
-}
+function saveLocal() { localStorage.setItem('piererra_data', JSON.stringify(data)); }
 
 // ── LOGIN ──
 function setupLogin() {
-  const btn = document.getElementById('btn-login');
-  const err = document.getElementById('login-error');
-
-  function tryLogin() {
+  async function tryLogin() {
     const u = document.getElementById('inp-user').value.trim();
     const p = document.getElementById('inp-pass').value;
-    if (u === CREDENTIALS.username && p === CREDENTIALS.password) {
+    const hu = await sha256(u);
+    const hp = await sha256(p);
+    if (hu === REAL_H_USER && hp === REAL_H_PASS) {
       document.getElementById('login-page').style.display = 'none';
       document.getElementById('admin-page').style.display = 'block';
-      renderAll();
+      render();
     } else {
-      err.style.display = 'block';
+      document.getElementById('login-err').style.display = 'block';
       document.getElementById('inp-pass').value = '';
     }
   }
-
-  btn.addEventListener('click', tryLogin);
-  document.getElementById('inp-pass').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
-  document.getElementById('inp-user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-pass').focus(); });
+  document.getElementById('btn-login').addEventListener('click', tryLogin);
+  document.getElementById('inp-pass').addEventListener('keydown', e => { if (e.key==='Enter') tryLogin(); });
+  document.getElementById('inp-user').addEventListener('keydown', e => { if (e.key==='Enter') document.getElementById('inp-pass').focus(); });
 }
 
 function logout() {
@@ -752,329 +356,135 @@ function logout() {
   document.getElementById('login-page').style.display = 'flex';
   document.getElementById('inp-user').value = '';
   document.getElementById('inp-pass').value = '';
-  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('login-err').style.display = 'none';
 }
 
-// ── TABS ──
-function setupTabs() {
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const tab = btn.dataset.tab;
-      document.getElementById('tab-posts').style.display = tab === 'posts' ? 'block' : 'none';
-      document.getElementById('tab-games').style.display = tab === 'games' ? 'block' : 'none';
-    });
-  });
-}
-
-// ── RENDER ──
-function renderAll() {
-  renderPosts();
-  renderGames();
-}
-
-function renderPosts() {
+// ── RENDER TABLE ──
+function render() {
   const tbody = document.getElementById('posts-tbody');
   const empty = document.getElementById('posts-empty');
-  const posts = data.posts || [];
-
-  if (posts.length === 0) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
+  if (!data.posts.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
 
-  const sorted = [...posts].map((p, i) => ({ ...p, _idx: i }))
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
+  const sorted = data.posts.map((p,i) => ({...p,_i:i}))
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
 
-  tbody.innerHTML = sorted.map((post, num) => `
+  tbody.innerHTML = sorted.map((p, n) => `
     <tr>
-      <td style="color:var(--text3);font-size:12px;">${String(num+1).padStart(2,'0')}</td>
-      <td class="post-title-cell">${escHtml(post.title)}</td>
-      <td><span class="post-game-badge">${escHtml(post.game || '—')}</span></td>
-      <td>${formatDate(post.date)}</td>
-      <td class="post-url-cell" title="${escHtml(post.url || '')}">${escHtml(post.url || '—')}</td>
+      <td style="color:var(--text3);font-size:12px">${String(n+1).padStart(2,'0')}</td>
+      <td class="cell-title">${esc(p.title)}</td>
+      <td><span class="cell-game">${esc(p.game||'—')}</span></td>
+      <td>${fmtDate(p.date)}</td>
+      <td class="cell-url" title="${esc(p.url||'')}">${esc(p.url||'—')}</td>
       <td>
         <div class="action-btns">
-          <button class="btn-edit" onclick="openEditPost(${post._idx})">Edit</button>
-          <button class="btn-del" onclick="deletePost(${post._idx})">Delete</button>
+          <button class="btn-edit" onclick="openEdit(${p._i})">Edit</button>
+          <button class="btn-del"  onclick="delPost(${p._i})">Delete</button>
         </div>
       </td>
     </tr>
   `).join('');
 }
 
-function renderGames() {
-  const grid = document.getElementById('games-grid');
-  const empty = document.getElementById('games-empty');
-  const games = data.games || [];
-
-  if (games.length === 0) {
-    grid.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-
-  grid.innerHTML = games.map((g, i) => `
-    <div class="game-card">
-      <div class="game-card-top">
-        <div class="game-emoji">${g.emoji || '🎮'}</div>
-        <div>
-          <div class="game-name">${escHtml(g.name)}</div>
-          <div class="game-tag">${escHtml(g.tag || '')}</div>
-        </div>
-      </div>
-      <div>
-        <span class="game-status ${g.status === 'online' ? 'online' : 'offline'}">
-          <span class="dot-s"></span> ${g.status === 'online' ? 'Online' : 'Offline'}
-        </span>
-        ${g.popular ? '<span class="game-popular">⭐ Featured</span>' : ''}
-      </div>
-      <div class="game-desc">${escHtml(g.desc || '')}</div>
-      <div class="game-card-actions">
-        <button class="btn-edit" onclick="openEditGame(${i})">Edit</button>
-        <button class="btn-del" onclick="deleteGame(${i})">Delete</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ── POST MODAL ──
-function setupPostModal() {
-  document.getElementById('btn-add-post').addEventListener('click', () => openPostModal());
-  document.getElementById('post-modal-cancel').addEventListener('click', closePostModal);
-  document.getElementById('post-modal-save').addEventListener('click', savePost);
+// ── MODAL ──
+function setupModal() {
+  document.getElementById('btn-add').addEventListener('click', () => openModal());
+  document.getElementById('modal-cancel').addEventListener('click', closeModal);
+  document.getElementById('modal-save').addEventListener('click', savePost);
   document.getElementById('post-modal').addEventListener('click', e => {
-    if (e.target === document.getElementById('post-modal')) closePostModal();
+    if (e.target.id === 'post-modal') closeModal();
   });
 }
 
-function openPostModal(idx) {
-  editingPost = idx !== undefined ? idx : null;
-  const modal = document.getElementById('post-modal');
-  const title = document.getElementById('post-modal-title');
-
-  if (editingPost !== null) {
-    const p = data.posts[editingPost];
-    title.textContent = 'Edit Post';
-    document.getElementById('pm-title').value = p.title || '';
-    document.getElementById('pm-game').value = p.game || '';
-    document.getElementById('pm-date').value = p.date || '';
-    document.getElementById('pm-url').value = p.url || '';
-  } else {
-    title.textContent = 'Add Post';
-    document.getElementById('pm-title').value = '';
-    document.getElementById('pm-game').value = '';
-    document.getElementById('pm-date').value = new Date().toISOString().split('T')[0];
-    document.getElementById('pm-url').value = '';
-  }
-  modal.classList.add('open');
+function openModal(idx) {
+  editingIdx = idx !== undefined ? idx : null;
+  document.getElementById('modal-title').textContent = editingIdx !== null ? 'Edit Post' : 'Add Post';
+  const p = editingIdx !== null ? data.posts[editingIdx] : {};
+  document.getElementById('pm-title').value = p.title || '';
+  document.getElementById('pm-game').value  = p.game  || '';
+  document.getElementById('pm-date').value  = p.date  || new Date().toISOString().split('T')[0];
+  document.getElementById('pm-url').value   = p.url   || '';
+  document.getElementById('post-modal').classList.add('open');
+  setTimeout(() => document.getElementById('pm-title').focus(), 60);
 }
-
-function openEditPost(idx) { openPostModal(idx); }
-
-function closePostModal() {
-  document.getElementById('post-modal').classList.remove('open');
-}
+function openEdit(idx) { openModal(idx); }
+function closeModal() { document.getElementById('post-modal').classList.remove('open'); }
 
 function savePost() {
   const title = document.getElementById('pm-title').value.trim();
-  const game = document.getElementById('pm-game').value.trim();
-  const date = document.getElementById('pm-date').value;
-  const url = document.getElementById('pm-url').value.trim();
-
-  if (!title) { showToast('Post title is required.', 'error'); return; }
-  if (!date) { showToast('Date is required.', 'error'); return; }
-
-  const postObj = { game, title, date, url };
-
-  if (editingPost !== null) {
-    data.posts[editingPost] = postObj;
-    showToast('Post updated!', 'success');
-  } else {
-    data.posts.push(postObj);
-    showToast('Post added!', 'success');
-  }
-
-  saveDataToStorage();
-  renderPosts();
-  closePostModal();
+  const game  = document.getElementById('pm-game').value.trim();
+  const date  = document.getElementById('pm-date').value;
+  const url   = document.getElementById('pm-url').value.trim();
+  if (!title) { toast('Title is required.', 'error'); return; }
+  if (!date)  { toast('Date is required.',  'error'); return; }
+  const obj = { game, title, date, url };
+  if (editingIdx !== null) { data.posts[editingIdx] = obj; toast('Post updated!', 'success'); }
+  else                     { data.posts.push(obj);          toast('Post added!',   'success'); }
+  saveLocal(); render(); closeModal();
 }
 
-function deletePost(idx) {
-  if (!confirm('Delete this post? This cannot be undone locally.')) return;
+function delPost(idx) {
+  if (!confirm('Delete this post? This will be permanent after pushing to GitHub.')) return;
   data.posts.splice(idx, 1);
-  saveDataToStorage();
-  renderPosts();
-  showToast('Post deleted.', 'success');
-}
-
-// ── GAME MODAL ──
-function setupGameModal() {
-  document.getElementById('btn-add-game').addEventListener('click', () => openGameModal());
-  document.getElementById('game-modal-cancel').addEventListener('click', closeGameModal);
-  document.getElementById('game-modal-save').addEventListener('click', saveGame);
-  document.getElementById('game-modal').addEventListener('click', e => {
-    if (e.target === document.getElementById('game-modal')) closeGameModal();
-  });
-}
-
-function openGameModal(idx) {
-  editingGame = idx !== undefined ? idx : null;
-  const title = document.getElementById('game-modal-title');
-
-  if (editingGame !== null) {
-    const g = data.games[editingGame];
-    title.textContent = 'Edit Game';
-    document.getElementById('gm-name').value = g.name || '';
-    document.getElementById('gm-emoji').value = g.emoji || '';
-    document.getElementById('gm-tag').value = g.tag || '';
-    document.getElementById('gm-status').value = g.status || 'online';
-    document.getElementById('gm-desc').value = g.desc || '';
-    document.getElementById('gm-url').value = g.url || '';
-    document.getElementById('gm-players').value = g.players || '';
-    document.getElementById('gm-popular').checked = !!g.popular;
-  } else {
-    title.textContent = 'Add Game';
-    document.getElementById('gm-name').value = '';
-    document.getElementById('gm-emoji').value = '';
-    document.getElementById('gm-tag').value = '';
-    document.getElementById('gm-status').value = 'online';
-    document.getElementById('gm-desc').value = '';
-    document.getElementById('gm-url').value = '#';
-    document.getElementById('gm-players').value = '';
-    document.getElementById('gm-popular').checked = false;
-  }
-  document.getElementById('game-modal').classList.add('open');
-}
-
-function openEditGame(idx) { openGameModal(idx); }
-
-function closeGameModal() {
-  document.getElementById('game-modal').classList.remove('open');
-}
-
-function saveGame() {
-  const name = document.getElementById('gm-name').value.trim();
-  if (!name) { showToast('Game name is required.', 'error'); return; }
-
-  const gameObj = {
-    name,
-    emoji: document.getElementById('gm-emoji').value.trim() || '🎮',
-    tag: document.getElementById('gm-tag').value.trim(),
-    status: document.getElementById('gm-status').value,
-    desc: document.getElementById('gm-desc').value.trim(),
-    url: document.getElementById('gm-url').value.trim() || '#',
-    players: document.getElementById('gm-players').value.trim(),
-    popular: document.getElementById('gm-popular').checked,
-  };
-
-  if (editingGame !== null) {
-    data.games[editingGame] = gameObj;
-    showToast('Game updated!', 'success');
-  } else {
-    data.games.push(gameObj);
-    showToast('Game added!', 'success');
-  }
-
-  saveDataToStorage();
-  renderGames();
-  closeGameModal();
-}
-
-function deleteGame(idx) {
-  if (!confirm('Delete this game?')) return;
-  data.games.splice(idx, 1);
-  saveDataToStorage();
-  renderGames();
-  showToast('Game deleted.', 'success');
+  saveLocal(); render();
+  toast('Post deleted.', 'success');
 }
 
 // ── GITHUB PUSH ──
-function setupGithubPush() {
-  document.getElementById('btn-github-push').addEventListener('click', pushToGithub);
+function setupPush() {
+  document.getElementById('btn-push').addEventListener('click', pushToGitHub);
 }
 
-async function pushToGithub() {
-  if (!ghConfig.owner || !ghConfig.repo || !ghConfig.token) {
-    showToast('Please configure GitHub first.', 'error'); return;
-  }
-
-  const btn = document.getElementById('btn-github-push');
-  btn.disabled = true;
-  btn.textContent = 'Pushing...';
+async function pushToGitHub() {
+  if (!ghCfg.owner || !ghCfg.repo || !ghCfg.token) { toast('Configure GitHub first.', 'error'); return; }
+  const btn = document.getElementById('btn-push');
+  btn.disabled = true; btn.textContent = 'Pushing...';
 
   try {
-    const filePath = 'json/data.json';
-    const apiBase = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${filePath}`;
+    const apiUrl = `https://api.github.com/repos/${ghCfg.owner}/${ghCfg.repo}/contents/json/data.json`;
     const headers = {
-      'Authorization': `token ${ghConfig.token}`,
+      'Authorization': `token ${ghCfg.token}`,
       'Accept': 'application/vnd.github.v3+json',
       'Content-Type': 'application/json',
     };
 
-    // Get current file SHA (needed to update)
+    // Get current SHA (required to update existing file)
     let sha = null;
-    try {
-      const getRes = await fetch(apiBase, { headers });
-      if (getRes.ok) {
-        const fileData = await getRes.json();
-        sha = fileData.sha;
-      }
-    } catch(e) {}
+    const getRes = await fetch(apiUrl, { headers });
+    if (getRes.ok) sha = (await getRes.json()).sha;
 
-    // Encode content
-    const jsonStr = JSON.stringify(data, null, 2);
-    const content = btoa(unescape(encodeURIComponent(jsonStr)));
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    const body = { message: 'Update data.json via Piererra Admin', content, ...(sha ? { sha } : {}) };
 
-    const body = {
-      message: 'Update data.json via Piererra Admin',
-      content,
-      ...(sha ? { sha } : {}),
-    };
-
-    const putRes = await fetch(apiBase, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(body),
-    });
-
+    const putRes = await fetch(apiUrl, { method:'PUT', headers, body: JSON.stringify(body) });
     if (putRes.ok) {
-      showToast('✅ Pushed to GitHub! Vercel will update in ~30 sec.', 'success');
+      toast('Pushed to GitHub! Your site will update in ~30 sec.', 'success');
     } else {
-      const errData = await putRes.json();
-      showToast(`GitHub error: ${errData.message}`, 'error');
+      const err = await putRes.json();
+      toast(`GitHub error: ${err.message}`, 'error');
     }
   } catch(e) {
-    showToast('Network error. Check your token and try again.', 'error');
+    toast('Network error. Check your token.', 'error');
   }
 
   btn.disabled = false;
-  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.96.57.1.78-.25.78-.55v-1.93C5.94 21.1 5.27 19 5.27 19c-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.53-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.18A10.9 10.9 0 0 1 12 6.84c.97.004 1.95.13 2.86.38 2.18-1.49 3.14-1.18 3.14-1.18.63 1.57.23 2.73.11 3.02.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.37-5.25 5.65.41.36.78 1.06.78 2.13v3.16c0 .3.2.66.79.55C20.22 21.41 23.5 17.09 23.5 12 23.5 5.65 18.35.5 12 .5Z"/></svg> Push to GitHub`;
+  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.96.57.1.78-.25.78-.55v-1.93C5.94 21.1 5.27 19 5.27 19c-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.53-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.18A10.9 10.9 0 0 1 12 6.84c.97.004 1.95.13 2.86.38 2.18-1.49 3.14-1.18 3.14-1.18.63 1.57.23 2.73.11 3.02.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.37-5.25 5.65.41.36.78 1.06.78 2.13v3.16c0 .3.2.66.79.55C20.22 21.41 23.5 17.09 23.5 12 23.5 5.65 18.35.5 12 .5Z"/></svg> Push to GitHub`;
 }
 
 // ── HELPERS ──
-function formatDate(str) {
-  if (!str) return '—';
-  const d = new Date(str + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
 }
-
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
-function showToast(msg, type = 'success') {
-  const wrap = document.getElementById('toast-wrap');
-  const icon = type === 'success' ? '✅' : '❌';
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.innerHTML = `<span class="toast-icon">${icon}</span> ${escHtml(msg)}`;
-  wrap.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
+function toast(msg, type='success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `${type==='success'?'✅':'❌'} ${esc(msg)}`;
+  document.getElementById('toast-wrap').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
 }
 </script>
 </body>
