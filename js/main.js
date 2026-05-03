@@ -34,38 +34,34 @@ async function loadData() {
   } catch (e) {
     allData = { posts: [], games: [] };
   }
-  renderFeatured(allData.games);
+  renderFeatured(allData.posts);
   renderPosts(allData.posts);
   handleDeepLink();
 }
 
 // ── FEATURED MARQUEE ───────────────────────────────────────
 
-function renderFeatured(games) {
-  const track   = document.getElementById('marquee-track');
-  const popular = games.filter(g => g.popular === true || g.popular === 'true');
+function renderFeatured(posts) {
+  const track    = document.getElementById('marquee-track');
+  const featured = posts.filter(p => p.featured === true && !p.draft);
 
-  if (!popular.length) {
-    track.innerHTML = '<span class="marquee-loading">No featured games yet</span>';
+  if (!featured.length) {
+    track.innerHTML = '<span class="marquee-loading">No featured posts yet</span>';
     return;
   }
 
   // Triplicate items so the seamless loop never shows a gap
-  const items = popular.map(g => {
-    const dot = g.status === 'online' ? '🟢' : '⚫';
-    const tag = g.tag ? ' · ' + esc(g.tag) : '';
-    return `<span class="mq-item" onclick='handleGameClick(${JSON.stringify(g).replace(/'/g, "&#39;")})'>${dot} ${esc(g.name)}${tag}</span><span class="mq-sep">✦</span>`;
+  const items = featured.map(p => {
+    const tag = p.game ? ' · ' + esc(p.game) : '';
+    return `<span class="mq-item" onclick='openFeaturedPost(${JSON.stringify({id:p.id,slug:p.slug}).replace(/'/g,"&#39;")})'>${esc(p.title)}${tag}</span><span class="mq-sep">✦</span>`;
   }).join('');
 
   track.innerHTML = items + items + items;
 }
 
-function handleGameClick(g) {
-  if (g.url && g.url !== '#') { window.open(g.url, '_blank'); return; }
-  const match = allData.posts.find(
-    p => p.game && p.game.toLowerCase() === g.name.toLowerCase() && !p.draft
-  );
-  if (match) openPost(match);
+function openFeaturedPost(ref) {
+  const post = allData.posts.find(p => p.id === ref.id || p.slug === ref.slug);
+  if (post) openPost(post);
 }
 
 // ── POSTS LIST ─────────────────────────────────────────────
