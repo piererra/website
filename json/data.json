@@ -1,5 +1,14 @@
 {
-  "games": [],
+  "games": [
+    {
+      "name": "Nandar World (DNM)",
+      "emoji": "🎮",
+      "tag": "MMORPG",
+      "status": "online",
+      "url": "",
+      "popular": true
+    }
+  ],
   "posts": [
     {
       "title": "Post Title",
