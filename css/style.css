@@ -66,10 +66,7 @@ nav {
   text-decoration: none; letter-spacing: -.5px;
   display: flex; align-items: center; gap: 7px; cursor: pointer;
 }
-.nav-logo .dot {
-  width: 8px; height: 8px; background: var(--accent);
-  border-radius: 50%; box-shadow: 0 0 10px var(--accent); flex-shrink: 0;
-}
+/* .dot removed */
 .nav-links { display: flex; gap: 32px; list-style: none; }
 .nav-links a {
   font-size: 14px; font-weight: 500; color: var(--text2);
@@ -154,13 +151,9 @@ nav {
   border-radius: 100px; padding: 6px 16px; margin-bottom: 32px;
   animation: fadeUp .7s ease both;
 }
-.hero-badge .pulse {
-  width: 6px; height: 6px; background: var(--accent);
-  border-radius: 50%; box-shadow: 0 0 8px var(--accent);
-  animation: pulse 2s ease infinite; flex-shrink: 0;
-}
+/* .pulse removed */
 
-/* title wrapper — holds the breathing border ring */
+/* title wrapper — no more box ring, just spacing */
 .hero-title {
   font-family: 'Sora', sans-serif;
   font-size: clamp(64px, 16vw, 128px);
@@ -168,18 +161,13 @@ nav {
   margin-bottom: 20px;
   position: relative; display: inline-block;
   padding: 10px 36px 16px; border-radius: 28px;
-  animation: fadeUp .7s .1s ease both, breathe 4s ease-in-out 1s infinite;
+  animation: fadeUp .7s .1s ease both;
 }
 
-/* glow ring pseudo-element */
-.hero-title::before {
-  content: '';
-  position: absolute; inset: 0;
-  border-radius: 28px; pointer-events: none;
-  animation: breatheRing 4s ease-in-out 1s infinite;
-}
+/* no box ring pseudo-element anymore */
+.hero-title::before { content: none; }
 
-/* the actual hologram text */
+/* the hologram text — breathing glow on the text outline itself */
 .holo {
   display: inline-block;
   background: linear-gradient(
@@ -197,7 +185,7 @@ nav {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: holoShift 5s linear infinite;
+  animation: holoShift 5s linear infinite, holoTextBreathe 4s ease-in-out 1s infinite;
   filter: drop-shadow(0 0 22px rgba(180,130,255,.5));
 }
 
@@ -356,26 +344,19 @@ footer { position: relative; z-index: 1; border-top: 1px solid var(--border); pa
   100% { background-position: 250% center; }
 }
 
-/* breathing glow ring around title */
-@keyframes breatheRing {
+/* text outline breathing glow on the Piererra title */
+@keyframes holoTextBreathe {
   0%, 100% {
-    box-shadow:
-      0 0 0 2px rgba(73,117,254,.45),
-      0 0 18px 5px rgba(180,130,255,.28),
-      0 0 40px 10px rgba(73,117,254,.12);
+    filter:
+      drop-shadow(0 0 8px rgba(120,80,255,.5))
+      drop-shadow(0 0 18px rgba(180,130,255,.3));
   }
   50% {
-    box-shadow:
-      0 0 0 3px rgba(140,190,255,.9),
-      0 0 36px 12px rgba(200,140,255,.6),
-      0 0 80px 24px rgba(73,117,254,.3);
+    filter:
+      drop-shadow(0 0 18px rgba(140,100,255,.95))
+      drop-shadow(0 0 40px rgba(200,140,255,.7))
+      drop-shadow(0 0 70px rgba(100,160,255,.4));
   }
-}
-
-/* subtle scale breath on the title wrapper */
-@keyframes breathe {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.013); }
 }
 
 /* marquee scroll */
