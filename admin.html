@@ -142,17 +142,16 @@
     .btn-publish:hover { opacity:.9; transform:translateY(-1px); }
     .btn-publish:disabled { opacity:.45; cursor:not-allowed; transform:none; }
 
-    /* GAMES EDITOR */
-    .games-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; margin-bottom:20px; }
-    .game-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .game-info { display:flex; align-items:center; gap:12px; flex:1; min-width:0; }
-    .game-emoji-disp { font-size:24px; }
-    .game-text { min-width:0; }
-    .game-name { font-family:'Sora',sans-serif; font-size:14px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .game-tag-disp { font-size:11px; color:var(--text3); }
-    .game-status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-    .game-status-dot.online { background:var(--green); box-shadow:0 0 6px var(--green); }
-    .game-status-dot.offline { background:var(--text3); }
+    /* FEATURED TOGGLE */
+    .toggle-wrap { display:flex; align-items:center; gap:8px; }
+    .toggle { position:relative; width:38px; height:22px; flex-shrink:0; }
+    .toggle input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; inset:0; background:rgba(73,117,254,.15); border:1px solid var(--border); border-radius:100px; cursor:pointer; transition:background .2s,border-color .2s; }
+    .toggle-slider::before { content:''; position:absolute; width:16px; height:16px; left:2px; top:2px; background:var(--text3); border-radius:50%; transition:transform .2s,background .2s; }
+    .toggle input:checked + .toggle-slider { background:rgba(74,222,128,.18); border-color:rgba(74,222,128,.45); }
+    .toggle input:checked + .toggle-slider::before { transform:translateX(16px); background:var(--green); box-shadow:0 0 6px var(--green); }
+    .toggle-label { font-size:11px; color:var(--text3); white-space:nowrap; }
+    .toggle input:checked ~ .toggle-label { color:var(--green); }
 
     /* SAVE BAR */
     .save-bar { position:fixed; bottom:0; left:0; right:0; z-index:100; background:rgba(2,6,52,.95); backdrop-filter:blur(12px); border-top:1px solid var(--border); padding:16px 40px; display:flex; align-items:center; justify-content:space-between; gap:14px; }
@@ -244,7 +243,7 @@
   <div class="admin-tabs">
     <button class="tab-btn active" data-tab="posts">📝 Posts</button>
     <button class="tab-btn" data-tab="editor">✏️ Editor</button>
-    <button class="tab-btn" data-tab="games">🎮 Featured Games</button>
+
   </div>
 
   <div class="admin-content">
@@ -257,7 +256,7 @@
       </div>
       <table class="posts-table">
         <thead><tr>
-          <th>#</th><th>Title</th><th>Game / Tag</th><th>Date</th><th>Status</th><th>Actions</th>
+          <th>#</th><th>Title</th><th>Game / Tag</th><th>Date</th><th>Status</th><th>Featured</th><th>Actions</th>
         </tr></thead>
         <tbody id="posts-tbody"></tbody>
       </table>
@@ -329,18 +328,7 @@
       </div>
     </div>
 
-    <!-- GAMES TAB -->
-    <div class="tab-panel" id="tab-games">
-      <div class="section-header">
-        <div class="section-heading">Featured <span>Games</span></div>
-        <button class="btn-add" id="btn-add-game">+ Add Game</button>
-      </div>
-      <div class="games-grid" id="games-grid"></div>
-      <div class="empty-state" id="games-empty" style="display:none;">
-        <div class="ei">🎮</div>
-        No featured games yet. Click <strong>+ Add Game</strong> to add one.
-      </div>
-    </div>
+
 
   </div>
 
@@ -353,43 +341,7 @@
   </div>
 </div>
 
-<!-- GAME MODAL -->
-<div class="modal-overlay" id="game-modal">
-  <div class="modal">
-    <div class="modal-title" id="gm-title">Add Game</div>
-    <div class="modal-fields">
-      <div class="modal-field">
-        <label>Game Name *</label>
-        <input type="text" id="gm-name" placeholder="e.g. Mobile Legends"/>
-      </div>
-      <div class="modal-row">
-        <div class="modal-field">
-          <label>Emoji</label>
-          <input type="text" id="gm-emoji" placeholder="🎮" maxlength="4"/>
-        </div>
-        <div class="modal-field">
-          <label>Tag</label>
-          <input type="text" id="gm-tag" placeholder="e.g. MOBA"/>
-        </div>
-      </div>
-      <div class="modal-field">
-        <label>Status</label>
-        <select id="gm-status">
-          <option value="online">🟢 Online</option>
-          <option value="offline">⚫ Offline</option>
-        </select>
-      </div>
-      <div class="modal-field">
-        <label>Link URL <span style="font-size:10px;color:var(--text3);text-transform:none;font-weight:400;letter-spacing:0">(optional)</span></label>
-        <input type="text" id="gm-url" placeholder="Leave blank to auto-link to its post"/>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-cancel" id="gm-cancel">Cancel</button>
-      <button class="btn-save" id="gm-save">Save Game</button>
-    </div>
-  </div>
-</div>
+
 
 <div class="toast-wrap" id="toast-wrap"></div>
 
@@ -407,7 +359,6 @@ const HASH_PASS = 'e5eb8c5f9e853b4e474d00fe5e6fd2c45b79b05f7e5e1dab23e5a3e3f5c9f
 // ── STATE ──
 let data = { posts: [], games: [] };
 let editingPostIdx = null;
-let editingGameIdx = null;
 let ghCfg = {};
 let hasUnsaved = false;
 
@@ -422,7 +373,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   setupLogin();
   setupTabs();
   setupEditor();
-  setupGames();
   setupPush();
   document.getElementById('btn-logout').addEventListener('click', logout);
   document.getElementById('btn-new-post').addEventListener('click', () => openEditor());
@@ -483,7 +433,7 @@ function setupLogin() {
     if (hu === window._RU && hp === window._RP) {
       document.getElementById('login-page').style.display = 'none';
       document.getElementById('admin-page').style.display = 'block';
-      renderPosts(); renderGames();
+      renderPosts();
     } else {
       document.getElementById('login-err').style.display = 'block';
       document.getElementById('inp-pass').value = '';
@@ -528,6 +478,15 @@ function renderPosts() {
       <td style="font-size:12px;color:var(--text3)">${fmtDate(p.date)}</td>
       <td><span style="font-size:11px;padding:3px 10px;border-radius:100px;background:${p.draft?'rgba(251,191,36,.12)':'rgba(74,222,128,.12)'};border:1px solid ${p.draft?'rgba(251,191,36,.3)':'rgba(74,222,128,.3)'};color:${p.draft?'var(--yellow)':'var(--green)'}">${p.draft?'Draft':'Published'}</span></td>
       <td>
+        <label class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" ${p.featured?'checked':''} onchange="toggleFeatured(${p._i}, this.checked)"/>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-label">${p.featured?'On':'Off'}</span>
+        </label>
+      </td>
+      <td>
         <div class="action-btns">
           <button class="btn-edit" onclick="openEditor(${p._i})">Edit</button>
           <button class="btn-del" onclick="delPost(${p._i})">Delete</button>
@@ -535,6 +494,17 @@ function renderPosts() {
       </td>
     </tr>
   `).join('');
+}
+
+function toggleFeatured(idx, val) {
+  data.posts[idx].featured = val;
+  saveLocal();
+  // update the label next to toggle without full re-render
+  const row = document.querySelectorAll('#posts-tbody tr')[
+    data.posts.map((p,i)=>({...p,_i:i})).sort((a,b)=>new Date(b.date)-new Date(a.date)).findIndex(p=>p._i===idx)
+  ];
+  if (row) row.querySelector('.toggle-label').textContent = val ? 'On' : 'Off';
+  toast(val ? '⭐ Post added to Featured marquee!' : 'Post removed from Featured.', 'success');
 }
 
 function delPost(idx) {
@@ -625,72 +595,6 @@ function publishPost() {
   saveLocal(); renderPosts();
   toast('Post saved! Click "Push to GitHub" to go live.', 'success');
   switchTab('posts');
-}
-
-// ── GAMES ──
-function renderGames() {
-  const grid = document.getElementById('games-grid');
-  const empty = document.getElementById('games-empty');
-  if (!data.games.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-  grid.innerHTML = data.games.map((g, i) => `
-    <div class="game-card">
-      <div class="game-info">
-        <span class="game-emoji-disp">${esc(g.emoji||'🎮')}</span>
-        <div class="game-text">
-          <div class="game-name">${esc(g.name)}</div>
-          <div class="game-tag-disp">${esc(g.tag||'')}</div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span class="game-status-dot ${g.status==='online'?'online':'offline'}"></span>
-        <button class="btn-edit" onclick="openGameModal(${i})">Edit</button>
-        <button class="btn-del" onclick="delGame(${i})">Del</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function setupGames() {
-  document.getElementById('btn-add-game').addEventListener('click', () => openGameModal());
-  document.getElementById('gm-cancel').addEventListener('click', () => document.getElementById('game-modal').classList.remove('open'));
-  document.getElementById('gm-save').addEventListener('click', saveGame);
-  document.getElementById('game-modal').addEventListener('click', e => { if (e.target.id==='game-modal') document.getElementById('game-modal').classList.remove('open'); });
-}
-
-function openGameModal(idx) {
-  editingGameIdx = idx !== undefined ? idx : null;
-  document.getElementById('gm-title').textContent = editingGameIdx !== null ? 'Edit Game' : 'Add Game';
-  const g = editingGameIdx !== null ? data.games[editingGameIdx] : {};
-  document.getElementById('gm-name').value   = g.name   || '';
-  document.getElementById('gm-emoji').value  = g.emoji  || '🎮';
-  document.getElementById('gm-tag').value    = g.tag    || '';
-  document.getElementById('gm-status').value = g.status || 'online';
-  document.getElementById('gm-url').value    = g.url    || '';
-  document.getElementById('game-modal').classList.add('open');
-}
-
-function saveGame() {
-  const name  = document.getElementById('gm-name').value.trim();
-  if (!name) { toast('Game name is required.', 'error'); return; }
-  const obj = {
-    name, emoji: document.getElementById('gm-emoji').value.trim() || '🎮',
-    tag: document.getElementById('gm-tag').value.trim(),
-    status: document.getElementById('gm-status').value,
-    url: document.getElementById('gm-url').value.trim(),
-    popular: true
-  };
-  if (editingGameIdx !== null) { data.games[editingGameIdx] = obj; toast('Game updated!','success'); }
-  else { data.games.push(obj); toast('Game added!','success'); }
-  saveLocal(); renderGames();
-  document.getElementById('game-modal').classList.remove('open');
-}
-
-function delGame(idx) {
-  if (!confirm('Remove this game?')) return;
-  data.games.splice(idx, 1);
-  saveLocal(); renderGames();
-  toast('Game removed.','success');
 }
 
 // ── GITHUB PUSH ──
