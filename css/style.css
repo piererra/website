@@ -294,7 +294,7 @@ nav {
   margin-bottom: 32px; transition: color .2s; padding: 0;
 }
 .post-back:hover { color: var(--text); }
-.post-cover { width: 100%; aspect-ratio: 16/7; object-fit: cover; border-radius: 20px; margin-bottom: 36px; border: 1px solid var(--border); }
+.post-cover { width: 100%; aspect-ratio: 16/7; object-fit: cover; border-radius: 20px; margin-bottom: 36px; border: 1px solid var(--border); display: none; }
 .post-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
 .post-meta-game { font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--accent-soft); background: rgba(73,117,254,.12); border: 1px solid var(--border); border-radius: 100px; padding: 4px 12px; }
 .post-meta-date { font-size: 12px; color: var(--text3); }
