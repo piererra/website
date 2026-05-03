@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Piererra — Android Private Server Games</title>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
@@ -21,11 +21,13 @@
   </ul>
 </nav>
 
-<!-- FEATURED STRIP -->
-<div class="featured-strip-wrap">
-  <div class="featured-strip-inner" id="featured-strip">
-    <div class="strip-label">🎮 Featured</div>
-    <div style="font-size:12px;color:var(--text3)">Loading...</div>
+<!-- FEATURED MARQUEE -->
+<div class="marquee-wrap">
+  <span class="marquee-label">🎮 FEATURED</span>
+  <div class="marquee-track-outer">
+    <div class="marquee-track" id="marquee-track">
+      <span class="marquee-loading">Loading...</span>
+    </div>
   </div>
 </div>
 
@@ -64,37 +66,15 @@
 
   <div class="divider"></div>
 
-  <!-- HOW IT WORKS -->
-  <div class="section-wrap" id="about">
-    <div class="section-eyebrow">How it works</div>
-    <h2 class="section-title">Get Started <span>in Minutes</span></h2>
-    <p class="section-desc">Finding and playing private servers on Android has never been easier.</p>
-    <div class="steps">
-      <div class="step">
-        <div class="step-icon">🎮</div>
-        <div class="step-num">STEP 01</div>
-        <div class="step-title">Browse Posts</div>
-        <div class="step-desc">Find the game you want and open its guide post.</div>
-      </div>
-      <div class="step">
-        <div class="step-icon">📖</div>
-        <div class="step-num">STEP 02</div>
-        <div class="step-title">Read the Guide</div>
-        <div class="step-desc">Follow the full setup guide — download links, install steps, and tips.</div>
-      </div>
-      <div class="step">
-        <div class="step-icon">⬇️</div>
-        <div class="step-num">STEP 03</div>
-        <div class="step-title">Download & Play</div>
-        <div class="step-desc">Install the APK on your Android and jump into the private server.</div>
-      </div>
-      <div class="step">
-        <div class="step-icon">🔔</div>
-        <div class="step-num">STEP 04</div>
-        <div class="step-title">Stay Updated</div>
-        <div class="step-desc">Bookmark Piererra and check back for new guides and server news.</div>
-      </div>
-    </div>
+  <!-- ABOUT -->
+  <div class="about-strip" id="about">
+    <span class="about-item">🎮 Browse Posts</span>
+    <span class="about-sep">·</span>
+    <span class="about-item">📖 Read the Guide</span>
+    <span class="about-sep">·</span>
+    <span class="about-item">⬇️ Download &amp; Play</span>
+    <span class="about-sep">·</span>
+    <span class="about-item">🔔 Stay Updated</span>
   </div>
 
   <!-- FOOTER -->
@@ -170,28 +150,24 @@
     handleDeepLink();
   }
 
-  // ── FEATURED STRIP ─────────────────────────
+  // ── FEATURED MARQUEE ───────────────────────
   function renderFeatured(games) {
-    const strip   = document.getElementById('featured-strip');
+    const track   = document.getElementById('marquee-track');
     const popular = games.filter(g => g.popular === true || g.popular === 'true');
 
     if (!popular.length) {
-      strip.innerHTML = '<div class="strip-label">🎮 Featured</div>'
-        + '<span style="font-size:12px;color:var(--text3)">No featured games yet</span>';
+      track.innerHTML = '<span class="marquee-loading">No featured games yet</span>';
       return;
     }
 
-    strip.innerHTML = '<div class="strip-label">🎮 Featured</div>'
-      + popular.map(g => `
-        <div class="strip-card" onclick='handleGameClick(${JSON.stringify(g).replace(/'/g,"&#39;")})'>
-          <span class="strip-emoji">${g.emoji || '🎮'}</span>
-          <div class="strip-info">
-            <span class="strip-name">${esc(g.name)}</span>
-            <span class="strip-tag">${esc(g.tag || '')}</span>
-          </div>
-          <span class="strip-dot ${g.status === 'online' ? '' : 'offline'}"></span>
-        </div>
-      `).join('');
+    // Build items × 3 so the loop looks seamless
+    const items = popular.map(g => {
+      const dot = g.status === 'online' ? '🟢' : '⚫';
+      const tag = g.tag ? ' · ' + esc(g.tag) : '';
+      return `<span class="mq-item" onclick='handleGameClick(${JSON.stringify(g).replace(/'/g,"&#39;")})'>${dot} ${esc(g.name)}${tag}</span><span class="mq-sep">✦</span>`;
+    }).join('');
+
+    track.innerHTML = items + items + items;
   }
 
   function handleGameClick(g) {
