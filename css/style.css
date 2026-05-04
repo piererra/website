@@ -41,7 +41,7 @@ body > canvas {
 .bg-layer { display: none; }
 
 /* ── SHARED FOOTER ── */
-#site-footer {
+.site-footer {
   position: relative; z-index: 1;
   border-top: 1px solid var(--border);
   padding: 28px 40px;
