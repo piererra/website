@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Piererra Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -114,7 +115,10 @@
 
     /* RICH EDITOR */
     .editor-toolbar { display:flex; flex-wrap:wrap; gap:4px; background:rgba(73,117,254,.05); border:1px solid var(--border); border-bottom:none; border-radius:12px 12px 0 0; padding:10px 12px; }
-    .tb-btn { font-size:12px; font-weight:700; color:var(--text2); background:none; border:1px solid transparent; border-radius:7px; padding:5px 10px; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; line-height:1; }
+    .tb-btn { font-size:13px; color:var(--text2); background:none; border:1px solid transparent; border-radius:7px; padding:6px 9px; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; line-height:1; display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:30px; }
+    .tb-btn:hover { color:var(--text); background:var(--surface2); border-color:var(--border); }
+    .tb-btn i { font-size:13px; pointer-events:none; }
+    .tb-btn.tb-active { color:var(--accent-soft); background:rgba(73,117,254,.15); border-color:var(--border2); }
     .tb-btn:hover { color:var(--text); background:var(--surface2); border-color:var(--border); }
     .tb-sep { width:1px; background:var(--border); margin:2px 4px; align-self:stretch; }
     .editor-body { min-height:340px; background:rgba(73,117,254,.04); border:1px solid var(--border); border-radius:0 0 12px 12px; padding:16px; font-size:14px; color:var(--text); font-family:'DM Sans',sans-serif; line-height:1.8; outline:none; }
@@ -375,39 +379,35 @@
               <button class="mode-btn" id="btn-mode-code">&lt;/&gt; HTML</button>
             </div>
             <div class="editor-toolbar" id="toolbar">
-              <!-- Row 1: History + Text format -->
-              <button class="tb-btn" data-cmd="undo" title="Undo">↩</button>
-              <button class="tb-btn" data-cmd="redo" title="Redo">↪</button>
+              <button class="tb-btn" data-cmd="undo" title="Undo"><i class="fa-solid fa-rotate-left"></i></button>
+              <button class="tb-btn" data-cmd="redo" title="Redo"><i class="fa-solid fa-rotate-right"></i></button>
               <div class="tb-sep"></div>
-              <button class="tb-btn" data-cmd="bold" title="Bold"><b>B</b></button>
-              <button class="tb-btn" data-cmd="italic" title="Italic"><i>I</i></button>
-              <button class="tb-btn" data-cmd="underline" title="Underline"><u>U</u></button>
-              <button class="tb-btn" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+              <button class="tb-btn" data-cmd="bold" title="Bold"><i class="fa-solid fa-bold"></i></button>
+              <button class="tb-btn" data-cmd="italic" title="Italic"><i class="fa-solid fa-italic"></i></button>
+              <button class="tb-btn" data-cmd="underline" title="Underline"><i class="fa-solid fa-underline"></i></button>
+              <button class="tb-btn" data-cmd="strikeThrough" title="Strikethrough"><i class="fa-solid fa-strikethrough"></i></button>
               <div class="tb-sep"></div>
-              <button class="tb-btn" data-cmd="h2" title="Heading 2">H2</button>
-              <button class="tb-btn" data-cmd="h3" title="Heading 3">H3</button>
-              <button class="tb-btn" data-cmd="p" title="Paragraph">¶ P</button>
+              <button class="tb-btn" data-cmd="h2" title="Heading 2" style="font-size:11px;font-weight:700;font-family:'Sora',sans-serif;">H2</button>
+              <button class="tb-btn" data-cmd="h3" title="Heading 3" style="font-size:11px;font-weight:700;font-family:'Sora',sans-serif;">H3</button>
+              <button class="tb-btn" data-cmd="p" title="Paragraph"><i class="fa-solid fa-paragraph"></i></button>
               <div class="tb-sep"></div>
-              <!-- Row 2: Align -->
-              <button class="tb-btn" data-cmd="justifyLeft" title="Align Left">⬅</button>
-              <button class="tb-btn" data-cmd="justifyCenter" title="Center">⬛</button>
-              <button class="tb-btn" data-cmd="justifyRight" title="Align Right">➡</button>
+              <button class="tb-btn" data-cmd="justifyLeft" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
+              <button class="tb-btn" data-cmd="justifyCenter" title="Center"><i class="fa-solid fa-align-center"></i></button>
+              <button class="tb-btn" data-cmd="justifyRight" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
               <div class="tb-sep"></div>
-              <!-- Row 3: Lists + structure -->
-              <button class="tb-btn" data-cmd="insertUnorderedList" title="Bullet List">• List</button>
-              <button class="tb-btn" data-cmd="insertOrderedList" title="Numbered List">1. List</button>
-              <button class="tb-btn" data-cmd="outdent" title="Outdent">⇤</button>
-              <button class="tb-btn" data-cmd="indent" title="Indent">⇥</button>
+              <button class="tb-btn" data-cmd="insertUnorderedList" title="Bullet List"><i class="fa-solid fa-list-ul"></i></button>
+              <button class="tb-btn" data-cmd="insertOrderedList" title="Numbered List"><i class="fa-solid fa-list-ol"></i></button>
+              <button class="tb-btn" data-cmd="outdent" title="Outdent"><i class="fa-solid fa-outdent"></i></button>
+              <button class="tb-btn" data-cmd="indent" title="Indent"><i class="fa-solid fa-indent"></i></button>
               <div class="tb-sep"></div>
-              <button class="tb-btn" data-cmd="blockquote" title="Quote">❝</button>
-              <button class="tb-btn" data-cmd="code" title="Inline Code">&lt;/&gt;</button>
-              <button class="tb-btn" data-cmd="hr" title="Horizontal Line">— HR</button>
+              <button class="tb-btn" data-cmd="blockquote" title="Blockquote"><i class="fa-solid fa-quote-left"></i></button>
+              <button class="tb-btn" data-cmd="code" title="Inline Code"><i class="fa-solid fa-code"></i></button>
+              <button class="tb-btn" data-cmd="hr" title="Horizontal Line"><i class="fa-solid fa-minus"></i></button>
               <div class="tb-sep"></div>
-              <!-- Row 4: Media + clear -->
-              <button class="tb-btn" data-cmd="createLink" title="Insert Link">🔗 Link</button>
-              <button class="tb-btn" data-cmd="insertImage" title="Insert Image">🖼 Image</button>
+              <button class="tb-btn" data-cmd="createLink" title="Insert Link"><i class="fa-solid fa-link"></i></button>
+              <button class="tb-btn" data-cmd="insertImage" title="Insert Image"><i class="fa-solid fa-image"></i></button>
               <div class="tb-sep"></div>
-              <button class="tb-btn" data-cmd="removeFormat" title="Clear Formatting">✕ Clear</button>
+              <button class="tb-btn" data-cmd="removeFormat" title="Clear Formatting"><i class="fa-solid fa-eraser"></i></button>
             </div>
             <div class="editor-body" id="editor-body" contenteditable="true"
               data-placeholder="Write your full post content here. Add headings, bullet points, download links, install steps — everything your readers need..."></div>
@@ -443,7 +443,7 @@
 <!-- LINK MODAL -->
 <div class="lm-overlay" id="link-modal">
   <div class="lm-box">
-    <div class="lm-title">🔗 Insert / Edit Link</div>
+    <div class="lm-title"><i class="fa-solid fa-link" style="font-size:14px;color:var(--accent-soft)"></i> Insert / Edit Link</div>
     <div class="lm-field">
       <label>Link Text</label>
       <input type="text" id="lm-text" placeholder="e.g. Download Here"/>
@@ -470,7 +470,7 @@
 <!-- IMAGE MODAL -->
 <div class="im-overlay" id="image-modal">
   <div class="im-box">
-    <div class="lm-title">🖼 Insert Image</div>
+    <div class="lm-title"><i class="fa-solid fa-image" style="font-size:14px;color:var(--accent-soft)"></i> Insert Image</div>
     <img class="im-preview" id="im-preview" src="" alt="preview"/>
     <div class="lm-field">
       <label>Image URL *</label>
