@@ -34,34 +34,38 @@ async function loadData() {
   } catch (e) {
     allData = { posts: [], games: [] };
   }
-  renderFeatured(allData.posts);
+  renderFeatured(allData.games);
   renderPosts(allData.posts);
   handleDeepLink();
 }
 
 // ── FEATURED MARQUEE ───────────────────────────────────────
 
-function renderFeatured(posts) {
-  const track    = document.getElementById('marquee-track');
-  const featured = posts.filter(p => p.featured === true && !p.draft);
+function renderFeatured(games) {
+  const track   = document.getElementById('marquee-track');
+  const popular = games.filter(g => g.popular === true || g.popular === 'true');
 
-  if (!featured.length) {
-    track.innerHTML = '<span class="marquee-loading">No featured posts yet</span>';
+  if (!popular.length) {
+    track.innerHTML = '<span class="marquee-loading">No featured games yet</span>';
     return;
   }
 
   // Triplicate items so the seamless loop never shows a gap
-  const items = featured.map(p => {
-    const tag = p.game ? ' · ' + esc(p.game) : '';
-    return `<span class="mq-item" onclick='openFeaturedPost(${JSON.stringify({id:p.id,slug:p.slug}).replace(/'/g,"&#39;")})'>${esc(p.title)}${tag}</span><span class="mq-sep">✦</span>`;
+  const items = popular.map(g => {
+    const dot = g.status === 'online' ? '🟢' : '⚫';
+    const tag = g.tag ? ' · ' + esc(g.tag) : '';
+    return `<span class="mq-item" onclick='handleGameClick(${JSON.stringify(g).replace(/'/g, "&#39;")})'>${dot} ${esc(g.name)}${tag}</span><span class="mq-sep">✦</span>`;
   }).join('');
 
   track.innerHTML = items + items + items;
 }
 
-function openFeaturedPost(ref) {
-  const post = allData.posts.find(p => p.id === ref.id || p.slug === ref.slug);
-  if (post) openPost(post);
+function handleGameClick(g) {
+  if (g.url && g.url !== '#') { window.open(g.url, '_blank'); return; }
+  const match = allData.posts.find(
+    p => p.game && p.game.toLowerCase() === g.name.toLowerCase() && !p.draft
+  );
+  if (match) openPost(match);
 }
 
 // ── POSTS LIST ─────────────────────────────────────────────
@@ -79,14 +83,6 @@ function renderPosts(posts) {
 
   container.innerHTML = sortedPosts.map((post, i) => `
     <div class="post-item" onclick="openPost(sortedPosts[${i}])">
-      <div class="post-thumb">
-        ${post.cover
-          ? `<img src="${esc(post.cover)}" alt=""
-              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
-             <span class="post-thumb-fallback" style="display:none">🎮</span>`
-          : `<span class="post-thumb-fallback">🎮</span>`
-        }
-      </div>
       <div class="post-content">
         <div class="post-game">${esc(post.game || '')}</div>
         <div class="post-title">${esc(post.title)}</div>
@@ -109,10 +105,6 @@ function openPost(post) {
   document.getElementById('pp-game').textContent  = post.game  || '';
   document.getElementById('pp-date').textContent  = formatDate(post.date);
   document.getElementById('pp-body').innerHTML    = post.content || '<p>No content yet.</p>';
-
-  const cover = document.getElementById('pp-cover');
-  if (post.cover) { cover.src = post.cover; cover.style.display = 'block'; }
-  else            { cover.style.display = 'none'; }
 
   const idx  = sortedPosts.findIndex(p => p.id === post.id);
   const prev = idx > 0                      ? sortedPosts[idx - 1] : null;
