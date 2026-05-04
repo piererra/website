@@ -499,8 +499,6 @@ async function sha256(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
-// Change these by running sha256('yourValue') in browser console and pasting result:
-// Current: username = "piererra", password = "qwer1234"
 const HASH_USER = '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08';
 const HASH_PASS = 'e5eb8c5f9e853b4e474d00fe5e6fd2c45b79b05f7e5e1dab23e5a3e3f5c9f2b1';
 
