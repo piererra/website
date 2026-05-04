@@ -187,15 +187,63 @@
     .btn-save { font-size:13px; font-weight:600; font-family:'Sora',sans-serif; color:#fff; background:var(--accent); border:none; border-radius:10px; padding:10px 22px; cursor:pointer; box-shadow:0 4px 16px rgba(73,117,254,.3); transition:opacity .2s; }
     .btn-save:hover { opacity:.9; }
 
+    /* VIEW/CODE TOGGLE */
+    .editor-mode-bar { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+    .mode-btn { font-size:11px; font-weight:600; font-family:'Sora',sans-serif; padding:5px 14px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--text3); cursor:pointer; transition:all .2s; }
+    .mode-btn.active { background:rgba(73,117,254,.15); border-color:var(--border2); color:var(--accent-soft); }
+    .editor-code { display:none; width:100%; min-height:340px; background:rgba(0,0,0,.35); border:1px solid var(--border); border-radius:0 0 12px 12px; padding:16px; font-size:13px; color:#c9d9ff; font-family:monospace; line-height:1.7; outline:none; resize:vertical; transition:border-color .2s; }
+    .editor-code:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(73,117,254,.12); }
+
     @media (max-width:680px) {
-      .admin-nav,.admin-content,.save-bar { padding-left:20px; padding-right:20px; }
-      .admin-tabs { padding:16px 20px 0; }
-      .cfg-banner { margin:16px 20px 0; }
+      /* NAV */
+      .admin-nav { padding:12px 16px; }
+      .gh-status { display:none; }
+      .btn-logout { font-size:11px; padding:7px 12px; }
+      .admin-badge { display:none; }
+
+      /* TABS */
+      .admin-tabs { padding:12px 16px 0; overflow-x:auto; flex-wrap:nowrap; gap:6px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+      .admin-tabs::-webkit-scrollbar { display:none; }
+      .tab-btn { white-space:nowrap; font-size:12px; padding:8px 14px; flex-shrink:0; }
+
+      /* CONTENT */
+      .admin-content { padding:16px 16px 140px; }
+      .cfg-banner { margin:12px 16px 0; }
       .cfg-fields { flex-direction:column; }
       .ef-row { flex-direction:column; }
-      .modal { padding:24px; }
-      .modal-row { flex-direction:column; }
-      .posts-table th:nth-child(4),.posts-table td:nth-child(4) { display:none; }
+
+      /* POSTS — replace table with cards on mobile */
+      .posts-table thead { display:none; }
+      .posts-table, .posts-table tbody, .posts-table tr, .posts-table td { display:block; width:100%; }
+      .posts-table tr { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:10px; position:relative; }
+      .posts-table tr:hover td { background:transparent; }
+      .posts-table td { padding:2px 0; border:none; font-size:13px; }
+      .posts-table td:first-child { display:none; }
+      .cell-title { font-size:14px; font-weight:600; color:var(--text); margin-bottom:4px; display:block; }
+      /* row with game tag + date inline */
+      .posts-table td:nth-child(3) { display:inline-block; margin-right:8px; }
+      .posts-table td:nth-child(4) { display:inline-block; font-size:11px; color:var(--text3); }
+      /* status + featured + actions stacked */
+      .posts-table td:nth-child(5),
+      .posts-table td:nth-child(6),
+      .posts-table td:nth-child(7) { display:block; margin-top:8px; }
+      .action-btns { gap:8px; }
+      .btn-edit, .btn-del { padding:8px 16px; font-size:12px; }
+
+      /* EDITOR */
+      .editor-wrap { max-width:100%; }
+      .editor-top { flex-direction:column; align-items:flex-start; gap:8px; margin-bottom:16px; }
+      .editor-actions { flex-direction:column; gap:10px; }
+      .btn-draft, .btn-publish { width:100%; justify-content:center; padding:14px; }
+
+      /* SAVE BAR */
+      .save-bar { padding:12px 16px; flex-direction:column; align-items:stretch; gap:10px; }
+      .save-hint { font-size:11px; text-align:center; }
+      .btn-github { justify-content:center; padding:13px; }
+
+      /* TOOLBAR wrap tighter */
+      .editor-toolbar { gap:3px; padding:8px; }
+      .tb-btn { font-size:11px; padding:5px 7px; }
     }
   </style>
 </head>
@@ -294,6 +342,10 @@
           </div>
           <div>
             <label class="ef-label">Post Content *</label>
+            <div class="editor-mode-bar">
+              <button class="mode-btn active" id="btn-mode-visual">👁 Visual</button>
+              <button class="mode-btn" id="btn-mode-code">&lt;/&gt; HTML</button>
+            </div>
             <div class="editor-toolbar" id="toolbar">
               <button class="tb-btn" data-cmd="bold" title="Bold"><b>B</b></button>
               <button class="tb-btn" data-cmd="italic" title="Italic"><i>I</i></button>
@@ -315,7 +367,8 @@
             </div>
             <div class="editor-body" id="editor-body" contenteditable="true"
               data-placeholder="Write your full post content here. Add headings, bullet points, download links, install steps — everything your readers need..."></div>
-            <div class="editor-hint">Tip: Select text and click a toolbar button to format it. Use H2 for section titles, H3 for sub-sections.</div>
+            <textarea class="editor-code" id="editor-code" spellcheck="false" placeholder="Raw HTML goes here..."></textarea>
+            <div class="editor-hint">Tip: Use <strong>👁 Visual</strong> to write normally, <strong>&lt;/&gt; HTML</strong> to edit raw code or clean up pasted content.</div>
           </div>
         </div>
         <div class="editor-actions">
@@ -524,16 +577,78 @@ function openEditor(idx) {
   document.getElementById('ef-date').value  = p.date  || new Date().toISOString().split('T')[0];
   document.getElementById('ef-cover').value = p.cover || '';
   document.getElementById('editor-body').innerHTML = p.content || '';
+  // Always open in visual mode
+  document.getElementById('editor-body').style.display = '';
+  document.getElementById('editor-code').style.display = 'none';
+  document.getElementById('toolbar').style.display = '';
+  document.getElementById('btn-mode-visual').classList.add('active');
+  document.getElementById('btn-mode-code').classList.remove('active');
   switchTab('editor');
   setTimeout(() => document.getElementById('ef-title').focus(), 80);
 }
 
 function setupEditor() {
+  const body = document.getElementById('editor-body');
+  const code = document.getElementById('editor-code');
+  const toolbar = document.getElementById('toolbar');
+  const btnVisual = document.getElementById('btn-mode-visual');
+  const btnCode   = document.getElementById('btn-mode-code');
+
+  // ── MODE TOGGLE ──
+  let mode = 'visual';
+  btnVisual.addEventListener('click', () => {
+    if (mode === 'visual') return;
+    mode = 'visual';
+    // sync code → visual
+    body.innerHTML = code.value;
+    body.style.display = ''; code.style.display = 'none';
+    toolbar.style.display = ''; 
+    btnVisual.classList.add('active'); btnCode.classList.remove('active');
+  });
+  btnCode.addEventListener('click', () => {
+    if (mode === 'code') return;
+    mode = 'code';
+    // sync visual → code
+    code.value = body.innerHTML;
+    body.style.display = 'none'; code.style.display = 'block';
+    toolbar.style.display = 'none';
+    btnCode.classList.add('active'); btnVisual.classList.remove('active');
+  });
+
+  // ── CLEAN PASTE — strip all inline styles/colors/backgrounds ──
+  body.addEventListener('paste', e => {
+    e.preventDefault();
+    const html = e.clipboardData.getData('text/html');
+    const text = e.clipboardData.getData('text/plain');
+    if (html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      // Remove all style attributes, class attributes, and specific bad elements
+      tmp.querySelectorAll('*').forEach(el => {
+        el.removeAttribute('style');
+        el.removeAttribute('class');
+        el.removeAttribute('bgcolor');
+        el.removeAttribute('color');
+        el.removeAttribute('face');
+        el.removeAttribute('size');
+        // Remove span wrappers that only carried styling
+        if (el.tagName === 'SPAN' && !el.getAttribute('style') && !el.children.length) {
+          el.replaceWith(document.createTextNode(el.textContent));
+        }
+      });
+      // Remove script/style tags entirely
+      tmp.querySelectorAll('script,style,meta,link').forEach(el => el.remove());
+      document.execCommand('insertHTML', false, tmp.innerHTML);
+    } else {
+      document.execCommand('insertText', false, text);
+    }
+  });
+
+  // ── TOOLBAR COMMANDS ──
   document.querySelectorAll('.tb-btn').forEach(btn => {
     btn.addEventListener('mousedown', e => {
       e.preventDefault();
       const cmd = btn.dataset.cmd;
-      const body = document.getElementById('editor-body');
       body.focus();
 
       if (cmd === 'h2') {
@@ -567,7 +682,10 @@ function getEditorData() {
   const game  = document.getElementById('ef-game').value.trim();
   const date  = document.getElementById('ef-date').value;
   const cover = document.getElementById('ef-cover').value.trim();
-  const content = document.getElementById('editor-body').innerHTML.trim();
+  // If in HTML mode, read from textarea; otherwise from contenteditable
+  const codeEl = document.getElementById('editor-code');
+  const bodyEl = document.getElementById('editor-body');
+  const content = (codeEl.style.display === 'block' ? codeEl.value : bodyEl.innerHTML).trim();
   return { title, game, date, cover, content };
 }
 
