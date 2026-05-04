@@ -9,7 +9,6 @@
 </head>
 <body>
 
-<div id="galaxy-canvas"></div>
 <div class="bg-layer"></div>
 
 <!-- NAVBAR -->
@@ -65,12 +64,12 @@
 
   <div class="divider"></div>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-copy">© 2026 Piererra — For informational purposes only</div>
-  </footer>
-
 </div>
+
+<!-- SHARED FOOTER — visible on both home and post page -->
+<footer id="site-footer">
+  <div class="footer-copy">© 2026 Piererra — For informational purposes only</div>
+</footer>
 
 <!-- POST PAGE -->
 <div id="post-page">
@@ -99,11 +98,13 @@
 <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.fog.min.js"></script>
 <script>
 VANTA.FOG({
-  el: '#galaxy-canvas',
+  el: document.body,
   THREE: THREE,
   mouseControls: true,
   touchControls: true,
-  gyroControls: false,
+  gyroControls: true,
+  minHeight: 200,
+  minWidth: 200,
   highlightColor: 0x6b40fe,
   midtoneColor:   0x3a1a6e,
   lowlightColor:  0x0a0530,
