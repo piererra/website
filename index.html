@@ -13,7 +13,7 @@
 
 <!-- NAVBAR -->
 <nav>
-  <div class="nav-logo" onclick="goHome()">Piererra</div>
+  <div class="nav-logo" onclick="goHome()">Piererra <span class="dot"></span></div>
   <ul class="nav-links">
     <li><a onclick="goHome()">Home</a></li>
     <li><a onclick="document.getElementById('posts').scrollIntoView({behavior:'smooth'})">Posts</a></li>
@@ -36,6 +36,7 @@
   <!-- HERO -->
   <div class="hero">
     <div class="hero-badge">
+      <span class="pulse"></span>
       Android Private Server Database
     </div>
     <h1 class="hero-title">
@@ -83,8 +84,6 @@
       </svg>
       Back to all posts
     </button>
-
-    <img id="pp-cover" class="post-cover" src="" alt=""/>
 
     <div class="post-meta">
       <span class="post-meta-game" id="pp-game"></span>
