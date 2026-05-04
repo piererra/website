@@ -30,24 +30,18 @@ body {
   overflow-x: hidden;
 }
 
-/* ── BACKGROUND GLOWS ── */
+/* ── GALAXY CANVAS BACKGROUND ── */
+#galaxy-canvas {
+  position: fixed; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+/* keep bg-layer for fallback color only */
 .bg-layer {
   position: fixed; inset: 0; z-index: 0;
-  pointer-events: none; overflow: hidden;
-}
-.bg-layer::before {
-  content: '';
-  position: absolute; top: -20%; left: -10%;
-  width: 60%; height: 70%;
-  background: radial-gradient(ellipse, rgba(73,117,254,.16) 0%, transparent 70%);
-  animation: drift1 18s ease-in-out infinite alternate;
-}
-.bg-layer::after {
-  content: '';
-  position: absolute; bottom: -10%; right: -10%;
-  width: 50%; height: 60%;
-  background: radial-gradient(ellipse, rgba(140,53,114,.12) 0%, transparent 70%);
-  animation: drift2 22s ease-in-out infinite alternate;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 30% 40%, rgba(73,117,254,.07) 0%, transparent 60%),
+              radial-gradient(ellipse at 75% 70%, rgba(140,53,114,.06) 0%, transparent 55%);
 }
 
 /* ── NAVBAR ── */
@@ -66,7 +60,10 @@ nav {
   text-decoration: none; letter-spacing: -.5px;
   display: flex; align-items: center; gap: 7px; cursor: pointer;
 }
-/* .dot removed */
+.nav-logo .dot {
+  width: 8px; height: 8px; background: var(--accent);
+  border-radius: 50%; box-shadow: 0 0 10px var(--accent); flex-shrink: 0;
+}
 .nav-links { display: flex; gap: 32px; list-style: none; }
 .nav-links a {
   font-size: 14px; font-weight: 500; color: var(--text2);
@@ -151,9 +148,13 @@ nav {
   border-radius: 100px; padding: 6px 16px; margin-bottom: 32px;
   animation: fadeUp .7s ease both;
 }
-/* .pulse removed */
+.hero-badge .pulse {
+  width: 6px; height: 6px; background: var(--accent);
+  border-radius: 50%; box-shadow: 0 0 8px var(--accent);
+  animation: pulse 2s ease infinite; flex-shrink: 0;
+}
 
-/* title wrapper — no more box ring, just spacing */
+/* title wrapper — holds the breathing border ring */
 .hero-title {
   font-family: 'Sora', sans-serif;
   font-size: clamp(64px, 16vw, 128px);
@@ -161,13 +162,18 @@ nav {
   margin-bottom: 20px;
   position: relative; display: inline-block;
   padding: 10px 36px 16px; border-radius: 28px;
-  animation: fadeUp .7s .1s ease both;
+  animation: fadeUp .7s .1s ease both, breathe 4s ease-in-out 1s infinite;
 }
 
-/* no box ring pseudo-element anymore */
-.hero-title::before { content: none; }
+/* glow ring pseudo-element */
+.hero-title::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 28px; pointer-events: none;
+  animation: breatheRing 4s ease-in-out 1s infinite;
+}
 
-/* the hologram text — breathing glow on the text outline itself */
+/* the actual hologram text */
 .holo {
   display: inline-block;
   background: linear-gradient(
@@ -185,7 +191,7 @@ nav {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: holoShift 5s linear infinite, holoTextBreathe 4s ease-in-out 1s infinite;
+  animation: holoShift 5s linear infinite;
   filter: drop-shadow(0 0 22px rgba(180,130,255,.5));
 }
 
@@ -325,9 +331,6 @@ footer { position: relative; z-index: 1; border-top: 1px solid var(--border); pa
 /* ===========================================================
    KEYFRAMES
    =========================================================== */
-@keyframes drift1 { to { transform: translate(4%,6%); } }
-@keyframes drift2 { to { transform: translate(-5%,-4%); } }
-
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -344,19 +347,26 @@ footer { position: relative; z-index: 1; border-top: 1px solid var(--border); pa
   100% { background-position: 250% center; }
 }
 
-/* text outline breathing glow on the Piererra title */
-@keyframes holoTextBreathe {
+/* breathing glow ring around title */
+@keyframes breatheRing {
   0%, 100% {
-    filter:
-      drop-shadow(0 0 8px rgba(120,80,255,.5))
-      drop-shadow(0 0 18px rgba(180,130,255,.3));
+    box-shadow:
+      0 0 0 2px rgba(73,117,254,.45),
+      0 0 18px 5px rgba(180,130,255,.28),
+      0 0 40px 10px rgba(73,117,254,.12);
   }
   50% {
-    filter:
-      drop-shadow(0 0 18px rgba(140,100,255,.95))
-      drop-shadow(0 0 40px rgba(200,140,255,.7))
-      drop-shadow(0 0 70px rgba(100,160,255,.4));
+    box-shadow:
+      0 0 0 3px rgba(140,190,255,.9),
+      0 0 36px 12px rgba(200,140,255,.6),
+      0 0 80px 24px rgba(73,117,254,.3);
   }
+}
+
+/* subtle scale breath on the title wrapper */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.013); }
 }
 
 /* marquee scroll */
