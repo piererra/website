@@ -31,12 +31,22 @@ body {
 }
 
 /* ── VANTA FOG BACKGROUND ── */
-#galaxy-canvas {
-  position: fixed; inset: 0; z-index: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
+/* Vanta injects its canvas into body directly */
+body > canvas {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
 }
 .bg-layer { display: none; }
+
+/* ── SHARED FOOTER ── */
+#site-footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 28px 40px;
+  text-align: center;
+}
 
 /* ── NAVBAR ── */
 nav {
