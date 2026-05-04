@@ -17,19 +17,16 @@ Guides, changelogs, and updates — all in one place.
 
 **Piererra** is a lightweight, fast, and fully static website built for the Android private server gaming community. No frameworks, no databases — just clean HTML, CSS, and JavaScript powered by a single JSON file.
 
-Posts are written and managed through a custom-built admin panel and pushed directly to GitHub, going **live in ~30 seconds** via Vercel's automatic deployment.
+Posts publish directly to GitHub and go **live in ~30 seconds** via Vercel's automatic deployment.
 
 ---
 
 ## ✨ Features
 
 - 🌌 **Holographic hero** — animated gradient text with a breathing glow effect
-- 📰 **Post system** — publish guides, changelogs, and news with a rich text editor
+- 🌫️ **Vanta.js FOG background** — real-time WebGL volumetric fog that responds to mouse, touch, and gyroscope
+- 📰 **Post system** — publish guides, changelogs, and news
 - ⭐ **Featured marquee** — toggle any post to appear in the scrolling featured bar
-- 🛠 **Custom admin panel** — full post editor with Visual / HTML mode toggle
-- 🧹 **Clean paste** — strips foreign styles when copying text from other sites
-- 🔗 **Link modal** — insert links with custom text, open-in-new-tab option, and remove button
-- 🖼 **Image modal** — insert images with alt text, caption, and live preview
 - 📱 **Mobile-first** — fully responsive on all screen sizes
 - ⚡ **Zero backend** — everything runs from `data.json`, no server required
 - 🚀 **Auto-deploy** — push to GitHub → live on Vercel in seconds
@@ -41,7 +38,6 @@ Posts are written and managed through a custom-built admin panel and pushed dire
 ```
 piererra/
 ├── index.html          ← Main site (single-page)
-├── admin.html          ← Admin panel (post editor)
 ├── css/
 │   └── style.css       ← All styling
 ├── js/
@@ -55,15 +51,7 @@ piererra/
 ## 🚀 How It Works
 
 ```
-You write a post in admin.html
-        ↓
-Click "Push to GitHub"
-        ↓
-data.json updates in the repo
-        ↓
-Vercel detects the change
-        ↓
-Site is live in ~30 seconds ⚡
+Write a post → Push to GitHub → Vercel deploys → Live in ~30 sec ⚡
 ```
 
 ---
@@ -76,6 +64,7 @@ Site is live in ~30 seconds ⚡
 | Styling | CSS3 (custom, no framework) |
 | Logic | Vanilla JavaScript |
 | Data | JSON (flat file database) |
+| Background | Vanta.js FOG (WebGL) |
 | Icons | Font Awesome 6 |
 | Fonts | Sora + DM Sans (Google Fonts) |
 | Hosting | Vercel |
@@ -83,29 +72,11 @@ Site is live in ~30 seconds ⚡
 
 ---
 
-## ✏️ Admin Panel
-
-The built-in admin panel at `/admin.html` lets you:
-
-- ✅ Create, edit, and delete posts
-- ✅ Toggle **Featured** on any post (shows in the marquee)
-- ✅ Switch between **Visual** and **HTML** editor modes
-- ✅ Insert links with custom text + open-in-new-tab
-- ✅ Insert images with caption and live preview
-- ✅ Save drafts or publish directly
-- ✅ Push everything to GitHub with one button
-
-> ⚠️ The admin panel is protected by a local password. Never commit your GitHub token to the repo.
-
----
-
 ## 📦 Setup
 
 1. **Fork or clone** this repo
 2. Connect it to [Vercel](https://vercel.com) — import the GitHub repo and deploy
-3. Open `admin.html` in your browser
-4. Enter your **GitHub token**, **username**, and **repo name** in the settings
-5. Start writing posts!
+3. Visit your live site at your Vercel URL
 
 ---
 
