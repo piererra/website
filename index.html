@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<canvas id="galaxy-canvas"></canvas>
+<div id="galaxy-canvas"></div>
 <div class="bg-layer"></div>
 
 <!-- NAVBAR -->
@@ -98,173 +98,23 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.fog.min.js"></script>
 <script>
-// ── PIERERRA — HOLO SMOKE WIND ─────────────────────────────
-(function () {
-  const canvas = document.getElementById('galaxy-canvas');
-  const ctx    = canvas.getContext('2d');
-  let W, H;
-
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-  resize();
-  window.addEventListener('resize', () => { resize(); initParticles(); });
-
-  // ── HOLO COLOR PALETTE cycling over time ──
-  // Returns an rgba string that slowly shifts through galaxy hues
-  function holoColor(t, offset, alpha) {
-    const h = (t * 18 + offset) % 360;
-    return `hsla(${h},80%,62%,${alpha})`;
-  }
-
-  // ── WIND FIELD — simplex-like layered sine noise ──
-  function windX(x, y, t) {
-    return (
-      Math.sin(x * 0.0018 + t * 0.22) * 0.55 +
-      Math.sin(y * 0.0024 + t * 0.17) * 0.30 +
-      Math.sin((x + y) * 0.0012 + t * 0.13) * 0.15
-    );
-  }
-  function windY(x, y, t) {
-    return (
-      Math.cos(x * 0.0020 + t * 0.19) * 0.20 +
-      Math.cos(y * 0.0016 + t * 0.14) * 0.35 +
-      Math.cos((x - y) * 0.0014 + t * 0.11) * 0.10
-    );
-  }
-
-  // ── SMOKE PARTICLE ──
-  function rand(a, b) { return Math.random() * (b - a) + a; }
-
-  function makeParticle() {
-    // Spawn from left edge or random reset points
-    const fromLeft = Math.random() < 0.65;
-    return {
-      x:        fromLeft ? rand(-120, -20) : rand(0, W),
-      y:        rand(0, H),
-      r:        rand(55, 175),        // blob radius — large for smoky feel
-      opacity:  0,
-      maxOp:    rand(0.025, 0.072),   // dark smoke — very low opacity
-      speed:    rand(0.28, 0.85),     // base horizontal drift
-      hueOff:   rand(0, 360),         // per-particle hue offset for variety
-      life:     0,
-      maxLife:  rand(320, 720),       // frames alive
-      fadeIn:   rand(60, 120),
-      fadeOut:  rand(60, 120),
-      wobble:   rand(0, Math.PI * 2),
-      wobbleSpd:rand(0.008, 0.022),
-    };
-  }
-
-  let particles = [];
-  function initParticles() {
-    const COUNT = Math.min(Math.floor((W * H) / 9000), 80);
-    particles = Array.from({ length: COUNT }, () => {
-      const p = makeParticle();
-      // stagger starting life so screen isn't empty at load
-      p.life = rand(0, p.maxLife);
-      p.opacity = p.maxOp * 0.5;
-      p.x = rand(0, W);
-      return p;
-    });
-  }
-  initParticles();
-
-  // ── STARS ──
-  const STARS = Array.from({ length: 180 }, () => ({
-    x: Math.random(), y: Math.random(),
-    r: rand(0.3, 1.4),
-    twinkle: rand(0, Math.PI * 2),
-    twinkleSpd: rand(0.012, 0.032)
-  }));
-
-  // ── MAIN LOOP ──
-  let t = 0;
-  let hidden = false;
-  document.addEventListener('visibilitychange', () => { hidden = document.hidden; });
-
-  function draw() {
-    requestAnimationFrame(draw);
-    if (hidden) return;
-    t += 1;
-
-    // Deep space background with slow color breath
-    const bgHue = (t * 0.04) % 360;
-    ctx.fillStyle = `hsl(${230 + Math.sin(t*0.008)*18},${68 + Math.sin(t*0.005)*8}%,${7 + Math.sin(t*0.006)*2}%)`;
-    ctx.fillRect(0, 0, W, H);
-
-    // ── stars ──
-    STARS.forEach(s => {
-      const tw = 0.45 + 0.55 * Math.sin(t * s.twinkleSpd + s.twinkle);
-      ctx.beginPath();
-      ctx.arc(s.x * W, s.y * H, s.r * tw, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(200,220,255,${0.5 * tw})`;
-      ctx.fill();
-    });
-
-    // ── smoke particles ──
-    ctx.globalCompositeOperation = 'screen'; // additive blend = glowing smoke
-
-    particles.forEach((p, i) => {
-      p.life += 1;
-
-      // Fade in / out envelope
-      if (p.life < p.fadeIn) {
-        p.opacity = p.maxOp * (p.life / p.fadeIn);
-      } else if (p.life > p.maxLife - p.fadeOut) {
-        p.opacity = p.maxOp * ((p.maxLife - p.life) / p.fadeOut);
-      } else {
-        p.opacity = p.maxOp;
-      }
-
-      // Respawn
-      if (p.life >= p.maxLife) {
-        particles[i] = makeParticle();
-        return;
-      }
-
-      // Wind advection
-      const wx = windX(p.x, p.y, t * 0.05) * 1.8;
-      const wy = windY(p.x, p.y, t * 0.05) * 1.2;
-      p.wobble += p.wobbleSpd;
-      p.x += p.speed + wx + Math.sin(p.wobble) * 0.18;
-      p.y += wy     + Math.cos(p.wobble * 0.7) * 0.12;
-
-      // Wrap vertically, reset if gone off right
-      if (p.y < -p.r * 2)  p.y = H + p.r;
-      if (p.y > H + p.r * 2) p.y = -p.r;
-      if (p.x > W + p.r * 2) {
-        particles[i] = makeParticle(); return;
-      }
-
-      // Draw soft smoke blob — radial gradient circle
-      const col1 = holoColor(t * 0.015, p.hueOff, p.opacity);
-      const col2 = holoColor(t * 0.015, p.hueOff + 40, p.opacity * 0.4);
-      const col3 = holoColor(t * 0.015, p.hueOff + 80, 0);
-
-      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
-      g.addColorStop(0.0, col1);
-      g.addColorStop(0.4, col2);
-      g.addColorStop(1.0, col3);
-
-      ctx.beginPath();
-      // Slightly squashed ellipse for a wispy, horizontal smoke feel
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.scale(1.45, 0.72);
-      ctx.arc(0, 0, p.r, 0, Math.PI * 2);
-      ctx.restore();
-      ctx.fillStyle = g;
-      ctx.fill();
-    });
-
-    ctx.globalCompositeOperation = 'source-over';
-  }
-
-  draw();
-})();
+VANTA.FOG({
+  el: '#galaxy-canvas',
+  THREE: THREE,
+  mouseControls: true,
+  touchControls: true,
+  gyroControls: false,
+  highlightColor: 0x6b40fe,
+  midtoneColor:   0x3a1a6e,
+  lowlightColor:  0x0a0530,
+  baseColor:      0x020420,
+  blurFactor:     0.72,
+  speed:          1.4,
+  zoom:           0.9
+});
 </script>
 <script src="js/main.js"></script>
 </body>
