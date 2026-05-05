@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Piererra — GM Commands</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&family=DM+Sans:opsz,wght@9..40,300;9..40,400&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.fog.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:       #020420;
+    --surface:  rgba(255,255,255,.04);
+    --surface2: rgba(255,255,255,.07);
+    --border:   rgba(255,255,255,.08);
+    --border2:  rgba(73,117,254,.35);
+    --text:     #e8eeff;
+    --text2:    #8fa4d4;
+    --text3:    #4a5a8a;
+    --accent:   #4975fe;
+    --mono:     'JetBrains Mono', monospace;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── LOCK SCREEN ── */
+  #lock-screen {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+
+  .lock-card {
+    width: 100%; max-width: 400px;
+    background: rgba(10,15,60,.85);
+    border: 1px solid var(--border2);
+    border-radius: 24px;
+    padding: 40px 36px;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 0 80px rgba(73,117,254,.15), 0 32px 64px rgba(0,0,0,.6);
+    animation: lockIn .5s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes lockIn {
+    from { opacity:0; transform:translateY(24px) scale(.97); }
+    to   { opacity:1; transform:none; }
+  }
+
+  .lock-icon {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, rgba(73,117,254,.2), rgba(168,85,247,.2));
+    border: 1px solid rgba(73,117,254,.3);
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin: 0 auto 24px;
+    animation: iconPulse 3s ease-in-out infinite;
+  }
+  @keyframes iconPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(73,117,254,.3); }
+    50%      { box-shadow: 0 0 0 12px rgba(73,117,254,0); }
+  }
+
+  .lock-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px; font-weight: 800;
+    text-align: center; margin-bottom: 6px;
+    background: linear-gradient(90deg, #a0c4ff, #c77dff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .lock-sub {
+    font-size: 13px; color: var(--text3);
+    text-align: center; margin-bottom: 28px;
+  }
+
+  .lock-field {
+    position: relative; margin-bottom: 14px;
+  }
+  .lock-field input {
+    width: 100%;
+    background: rgba(73,117,254,.06);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 46px 13px 16px;
+    font-size: 14px; font-family: var(--mono);
+    color: var(--text); outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    letter-spacing: 2px;
+  }
+  .lock-field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(73,117,254,.15);
+  }
+  .lock-field input::placeholder { letter-spacing: 0; color: var(--text3); font-family: 'DM Sans',sans-serif; }
+  .eye-btn {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: var(--text3); font-size: 16px; padding: 4px;
+    transition: color .2s;
+  }
+  .eye-btn:hover { color: var(--text); }
+
+  .lock-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #4975fe, #7c3aed);
+    border: none; border-radius: 12px;
+    padding: 14px; font-size: 14px; font-weight: 700;
+    font-family: 'Sora', sans-serif; color: #fff;
+    cursor: pointer; transition: opacity .2s, transform .15s;
+    letter-spacing: .5px;
+  }
+  .lock-btn:hover { opacity: .9; }
+  .lock-btn:active { transform: scale(.98); }
+
+  .lock-error {
+    margin-top: 12px;
+    background: rgba(248,113,113,.1);
+    border: 1px solid rgba(248,113,113,.25);
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 12px; color: #fca5a5; text-align: center;
+    display: none;
+    animation: shake .4s ease;
+  }
+  .lock-error.show { display: block; }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-8px)}
+    40%{transform:translateX(8px)}
+    60%{transform:translateX(-5px)}
+    80%{transform:translateX(5px)}
+  }
+
+  .lock-attempts {
+    margin-top: 10px;
+    font-size: 11px; color: var(--text3); text-align: center;
+  }
+
+  /* ── MAIN CONTENT ── */
+  #main-content { display: none; min-height: 100vh; position: relative; z-index: 1; }
+
+  /* NAV */
+  .cmd-nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 32px;
+    background: rgba(2,4,32,.8); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .cmd-nav-logo {
+    font-family: 'Sora', sans-serif;
+    font-size: 16px; font-weight: 800;
+    background: linear-gradient(90deg, #a0c4ff, #c77dff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .cmd-nav-tag {
+    font-size: 11px; font-weight: 600; font-family: 'Sora',sans-serif;
+    padding: 4px 12px; border-radius: 100px;
+    background: rgba(73,117,254,.12); border: 1px solid rgba(73,117,254,.25);
+    color: #a0c4ff; letter-spacing: .5px;
+  }
+  .cmd-lock-btn {
+    font-size: 12px; font-weight: 600; font-family: 'Sora',sans-serif;
+    padding: 7px 14px; border-radius: 10px;
+    background: rgba(255,255,255,.05); border: 1px solid var(--border);
+    color: var(--text2); cursor: pointer; transition: all .2s;
+  }
+  .cmd-lock-btn:hover { background: rgba(255,255,255,.09); color: var(--text); }
+
+  /* CONTENT WRAP */
+  .cmd-wrap { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .cmd-header { margin-bottom: 48px; }
+  .cmd-header-eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 10px;
+  }
+  .cmd-header-title {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(28px, 6vw, 44px); font-weight: 800;
+    line-height: 1.1; margin-bottom: 12px;
+  }
+  .cmd-header-title span {
+    background: linear-gradient(90deg, #a0c4ff, #c77dff, #ff9ef5);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .cmd-header-sub { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+  /* SEARCH */
+  .cmd-search-wrap { position: relative; margin-bottom: 36px; }
+  .cmd-search {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 13px 16px 13px 44px;
+    font-size: 14px; color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    outline: none; transition: border-color .2s, box-shadow .2s;
+  }
+  .cmd-search:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(73,117,254,.12);
+  }
+  .cmd-search::placeholder { color: var(--text3); }
+  .cmd-search-icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--text3); font-size: 16px; pointer-events: none;
+  }
+
+  /* CATEGORY */
+  .cmd-category { margin-bottom: 36px; animation: fadeUp .5s ease both; }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:none; }
+  }
+
+  .cat-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cat-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .cat-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: .5px; text-transform: uppercase;
+  }
+  .cat-count {
+    margin-left: auto;
+    font-size: 11px; color: var(--text3);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 100px; padding: 2px 10px;
+  }
+
+  /* COMMAND CARD */
+  .cmd-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    transition: border-color .2s, background .2s, transform .15s;
+    cursor: default;
+  }
+  .cmd-card:hover {
+    background: var(--surface2);
+    border-color: rgba(73,117,254,.2);
+    transform: translateX(3px);
+  }
+
+  .cmd-syntax-row {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px;
+    margin-bottom: 8px; flex-wrap: wrap;
+  }
+  .cmd-syntax {
+    font-family: var(--mono);
+    font-size: 14px; font-weight: 600;
+    color: #e0f0ff;
+    background: rgba(73,117,254,.1);
+    border: 1px solid rgba(73,117,254,.2);
+    border-radius: 8px; padding: 5px 12px;
+    word-break: break-all;
+  }
+  .cmd-copy {
+    flex-shrink: 0;
+    font-size: 11px; font-weight: 600; font-family: 'Sora',sans-serif;
+    padding: 5px 12px; border-radius: 8px;
+    background: rgba(255,255,255,.05); border: 1px solid var(--border);
+    color: var(--text3); cursor: pointer; transition: all .2s;
+    white-space: nowrap;
+  }
+  .cmd-copy:hover { background: rgba(73,117,254,.15); color: var(--accent); border-color: rgba(73,117,254,.3); }
+  .cmd-copy.copied { color: #4ade80; border-color: rgba(74,222,128,.3); background: rgba(74,222,128,.08); }
+
+  .cmd-desc {
+    font-size: 13px; color: var(--text2); line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .cmd-example-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .cmd-example-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    color: var(--text3); text-transform: uppercase; flex-shrink: 0;
+  }
+  .cmd-example-val {
+    font-family: var(--mono);
+    font-size: 12px; color: #a0c4ff;
+    background: rgba(160,196,255,.07);
+    border-radius: 6px; padding: 3px 10px;
+  }
+
+  /* UNKNOWN BADGE */
+  .unknown-badge {
+    display: inline-block;
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    padding: 2px 8px; border-radius: 100px;
+    background: rgba(107,114,128,.15); border: 1px solid rgba(107,114,128,.3);
+    color: #9ca3af; text-transform: uppercase; margin-bottom: 8px;
+  }
+
+  /* NO RESULTS */
+  .cmd-empty {
+    text-align: center; padding: 48px 24px;
+    color: var(--text3); font-size: 14px; display: none;
+  }
+  .cmd-empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* FOOTER */
+  .cmd-footer {
+    border-top: 1px solid var(--border);
+    padding: 24px; text-align: center;
+    font-size: 12px; color: var(--text3);
+    position: relative; z-index: 1;
+  }
+
+  @media (max-width: 600px) {
+    .cmd-nav { padding: 12px 16px; }
+    .cmd-wrap { padding: 32px 16px 60px; }
+    .cmd-card { padding: 14px 16px; }
+    .cmd-syntax { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── LOCK SCREEN ── -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-icon">🔐</div>
+    <div class="lock-title">GM Command List</div>
+    <div class="lock-sub">Enter the access password to continue</div>
+    <div class="lock-field">
+      <input type="password" id="pw-input" placeholder="Enter password" autocomplete="off" spellcheck="false"/>
+      <button class="eye-btn" id="eye-btn" tabindex="-1">👁</button>
+    </div>
+    <button class="lock-btn" id="unlock-btn">Unlock Access</button>
+    <div class="lock-error" id="lock-error">Incorrect password. Please try again.</div>
+    <div class="lock-attempts" id="lock-attempts"></div>
+  </div>
+</div>
+
+<!-- ── MAIN CONTENT ── -->
+<div id="main-content">
+
+  <nav class="cmd-nav">
+    <div class="cmd-nav-logo">Piererra</div>
+    <div class="cmd-nav-tag">GM Commands</div>
+    <button class="cmd-lock-btn" onclick="lockPage()">🔒 Lock</button>
+  </nav>
+
+  <div class="cmd-wrap">
+    <div class="cmd-header">
+      <div class="cmd-header-eyebrow">Private Server</div>
+      <h1 class="cmd-header-title">GM <span>Command List</span></h1>
+      <p class="cmd-header-sub">All known GM commands for private server use. Click any command to copy the syntax.</p>
+    </div>
+
+    <div class="cmd-search-wrap">
+      <span class="cmd-search-icon">🔍</span>
+      <input class="cmd-search" id="cmd-search" placeholder="Search commands..." autocomplete="off"/>
+    </div>
+
+    <div id="cmd-list"></div>
+    <div class="cmd-empty" id="cmd-empty">
+      <div class="cmd-empty-icon">🔎</div>
+      No commands match your search.
+    </div>
+  </div>
+
+  <footer class="cmd-footer">
+    © 2026 Piererra — For informational purposes only
+  </footer>
+</div>
+
+<script>
+// ── ENCRYPTED PAYLOAD (AES-256-GCM) ────────────────────────
+// Inspect Element shows only this ciphertext — no commands visible
+const PAYLOAD = {"salt":"25fcd92b51679836726affe53167c42f","iv":"44788c79bc0f64711b21f58a","tag":"3097bef9695350d337a40338aa7ccfda","data":"61371f7201e8b5302861a7d7ca0d16538ad6d08c4a5fd5a634c27a74bad3887e78a57f76457be43aca6f345775d54641af0fe2b7164c180c017e351f584f8d04ede3e053b3eb398e441d304c47ee07eabc28e224f180ac8bdfd3523fbc543d2cbc026d86cba09f4f3725dd7c80e51bb594130ca4b43adeab2c2d549a7f769eaae8805569eda585394d3c06ecf73d20317efecb34482a4b34d158087b2b0663a90aca22667f9bcc6d01e264fd2f7d826680f0e764574380929ceccb7ee644c89c9cdc8c4e37803930a1a1ceb42667e3795d569cae3c502b1f485df127fb03f8e4aadf35761e15759587e4296d73cca756784ed286e1b721bd8bd26ac1bc4a972cd4c96bd1e84b1399c47c299f4fb78558ff26bfa5b92cd643f0cda8c44aca95ed3047b22ef000ad03b5a4fe44d6e25670183c190d5f8e4eb94974e77d9e4fb0807815a1ed920b97eed7d762e0d3b00678ec5520b301eb863fd5a15206d17cec1dd7424ac0583d42dc16bbc1b6058cbce4e7cf5fabeadb09072be83376ae664e76e00d6d8eeb317ec6bbbee252a5fb29887f7910e4b659e85b2c8b0fec405234d77454982886179a82899c543bc9de1c06a422cbfcae7ef2139e465d0fcc34cd2758ceada2df9701ac9b3a00e294f6d97244d7d20cfd8ffccb68975b5b2b2fce6d231b5c1f2d53d373c63c936b67d05716276f0cbf45a510c60443a8058cc5f0e807763fa76a716b6aa2eba77c04d58ca0eaac439988430e5b7d3a7f23756788c747f79fc2dffd4e5eee831b0534c9a0704c408023e439010601bdb05e499a9e7daab79f07b3561a8cdc2ab7308c00c9030d72d619fd4646b408c60fd4857b8ca98424803dfb0b81f5441212b61bdd686af53cca144317a04eba228a37996045748f64eb1a6dfded452e01eeae8aba5ae42c2df6b45aa904bad4f16b923293dadfd64463a9c81c2e241fdff61b7be6c9fe1fdd44de8a96628b0fca8fa3042228a99594e47953410826de026a1dfc0e2eddfada3a2dfc2eee9501fd7af31350ce306fabfd46b2d6ffca72d49f5ff8d903cf1f176101af79a9edb96b421064edc9680f1154c56ee0b408bb9dc85cd940417ef0adea715faf51474bf7f1d0beb347c813f20a8b9ddafd81826e103c1af02408bdf07663d0b385bc395060fa7063bfe6d56bec784b27fc28473c686051c5d6b1f840651005212315aedd0c83226edbccc81c9dc42d1d75581943c80223cdba1a94a44597435d0cab4aa9c887d0c8f13b91f80b292a965a4718ec55992eb397f14793ee17a9862e925bafff04ef0092d063b6ea4af447a7c369204183e5c17cd0d63af51bbfe7f440646c1862e000218a0693fd3b2e76df9ec98a0a9cb9363a9f2fb4335bfde6d43f327411c0b91d4a97d1e9dee709f6ecbd36b7806c987c72ce1ecd1dad37722c49c0e71e6820f86605a6e0d7c2d1b753c9140d807d16c6bb9839c8ba18d2f2b2339ace2d96495b9aabd703e331f43e42661b3b4ea8b3361e15669fc37dccf6f5efcd0f64f7e6671fc93417d23d6db42564a84d23a27556ffa163d7feb29454b3769c563437de1a455b7abb445a96a2ce3a2f83d2348f1858796d001fe649e2cb2bf1a802d490b3f51308234ea114473f7405b3fd5901300f25485555fa2ec02ea7d5eb8fb3a030c93a458d2a0b6776a9e879ecaed73fdb35ab45d506f49e82c2f1f8705682b1f57a00f02bc4d0ad8915bafbe5f4bd356f5c786d5543794ca4c14688ac4507dddbe7e86ac75997712a84e1a0c3d0fcab37025049c443e34d0aaf72e931a52bb2f0ab784abe554d516fc8e12ddf7e7cef3691eb76effb12e48c134fd33a2fe8dd204dcbf1898c143cf1d713b85e5404a1dedb076c89f19ced6abf94ebc95c4be87d98d8ef4aed19ec006551f1ad867fb3dfa15bd6f3cb91eee839f581b86189a3c39dc9555b02ec9a7c71bfb4d691cc19db38e41d1ec9bab610576c34e12e4e36ebffc3df7196052160d583e21d6d7a4c067967c32a0be1f57e8249e5b31132913b9274b0543b250c2103c2a500dee579e963543c8dcaeae343ffc77c65e25ee106fb26e64efde164726155edf13820ff745cf3bc5f7216c969ce67526939d67b316a69b11faa5f03d58077ec0f3136c5e7b062d461c0e3d7060b523a765db7aa4e2a9603ea1f561149b8da85ee0e631829e59c4b7681fc9f82c665e86017b64f14bff4514ba3a1cc9722a17cf3a5df435c7f3d28c0c5bc4603501c35d10562af284daf6781185564eb67178a9c72ac152a6c75bd565d73107a5e0fc216f1edebd36c6dc7d105c57de38df27923b3952a9238f96616b022297b53a4b83bfe84aaaeb4dd11ec3ee3f093a7f0a6c0f1307cc1f7b56f4aaf2f498f3185a22f0936de6c30837789e96784060883fdecb33ade7fc0d171258d7339f62d8877ce90c16cff3d5201b2b15175c215bb0c67da31c351935cb83f6ea8a2c26f9dd948a5e91dddf1db277594b25c9972683973b946c4269ef9a865320d2e0455e6723dbbe6c72d342f6038374841c58b2d0ae1a3a28080ad1f50b6b87f5217349c7787e3523fc1d8486eacf422d6e0d35ad3bc5ece3b512433daf38c2b0355de7ceec1fbd027ae219ed9de258ce30f53bb9139942155fd6ee52a952f54bf641c3239014177c650b116e09db87ae6fa18d1bd30698738f462b2394af7a604521cc4b15310499ec6b586aece8ca45de1f727f96b7151b3f6219a0b1e71ac68d0f99d80d38f465d5cbb6846afbf00d8e52b083972006212a029e82a2ddbdedcde1372ac602091c4eb368b64ea0be0f19a281fe1a9d00ca377398b86f278cd3b9c110ad11bfbe7f30c5d09ca5f3933f6c94852001eb31920d6a127a26d15d9d96a15430993acc474e385aa81e1611be25d88544a9ca26a454c82038a"};
+
+// ── CRYPTO HELPERS (Web Crypto API) ────────────────────────
+function hexToBytes(hex) {
+  const arr = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2)
+    arr[i / 2] = parseInt(hex.slice(i, i + 2), 16);
+  return arr;
+}
+
+async function deriveKey(password, salt) {
+  const enc = new TextEncoder();
+  const raw = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    raw,
+    { name: 'AES-GCM', length: 256 },
+    false, ['decrypt']
+  );
+}
+
+async function decrypt(password) {
+  const salt       = hexToBytes(PAYLOAD.salt);
+  const iv         = hexToBytes(PAYLOAD.iv);
+  const tag        = hexToBytes(PAYLOAD.tag);
+  const ciphertext = hexToBytes(PAYLOAD.data);
+  // AES-GCM: ciphertext + tag combined
+  const combined = new Uint8Array(ciphertext.length + tag.length);
+  combined.set(ciphertext); combined.set(tag, ciphertext.length);
+  try {
+    const key       = await deriveKey(password, salt);
+    const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, combined);
+    return JSON.parse(new TextDecoder().decode(decrypted));
+  } catch {
+    return null;
+  }
+}
+
+// ── LOCK / UNLOCK LOGIC ────────────────────────────────────
+let attempts = 0;
+const MAX_ATTEMPTS = 5;
+let lockoutUntil = 0;
+
+document.getElementById('eye-btn').addEventListener('click', () => {
+  const inp = document.getElementById('pw-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+});
+
+document.getElementById('pw-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') tryUnlock();
+});
+document.getElementById('unlock-btn').addEventListener('click', tryUnlock);
+
+async function tryUnlock() {
+  const now = Date.now();
+  if (now < lockoutUntil) {
+    const secs = Math.ceil((lockoutUntil - now) / 1000);
+    showError(`Too many attempts. Wait ${secs}s.`);
+    return;
+  }
+
+  const pw = document.getElementById('pw-input').value;
+  if (!pw) { showError('Please enter the password.'); return; }
+
+  const btn = document.getElementById('unlock-btn');
+  btn.textContent = 'Verifying...'; btn.disabled = true;
+
+  const result = await decrypt(pw);
+
+  btn.textContent = 'Unlock Access'; btn.disabled = false;
+
+  if (result) {
+    attempts = 0;
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    renderCommands(result);
+    initVanta();
+  } else {
+    attempts++;
+    document.getElementById('pw-input').value = '';
+    if (attempts >= MAX_ATTEMPTS) {
+      lockoutUntil = Date.now() + 30000;
+      showError('Too many failed attempts. Locked for 30 seconds.');
+    } else {
+      showError(`Incorrect password. ${MAX_ATTEMPTS - attempts} attempt${MAX_ATTEMPTS - attempts !== 1 ? 's' : ''} remaining.`);
+    }
+    const attEl = document.getElementById('lock-attempts');
+    attEl.textContent = attempts > 0 ? `Failed attempts: ${attempts}/${MAX_ATTEMPTS}` : '';
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('lock-error');
+  el.textContent = msg;
+  el.classList.remove('show');
+  void el.offsetWidth; // reflow for animation restart
+  el.classList.add('show');
+}
+
+function lockPage() {
+  document.getElementById('main-content').style.display = 'none';
+  document.getElementById('lock-screen').style.display = 'flex';
+  document.getElementById('pw-input').value = '';
+  document.getElementById('cmd-list').innerHTML = '';
+}
+
+// ── RENDER COMMANDS ────────────────────────────────────────
+function renderCommands(data) {
+  const list = document.getElementById('cmd-list');
+  list.innerHTML = '';
+
+  data.categories.forEach((cat, ci) => {
+    const sec = document.createElement('div');
+    sec.className = 'cmd-category';
+    sec.style.animationDelay = `${ci * 0.07}s`;
+    sec.dataset.catid = cat.id;
+
+    const isUnknown = cat.id === 'unknown';
+
+    sec.innerHTML = `
+      <div class="cat-header">
+        <div class="cat-icon" style="background:${cat.color}18;border:1px solid ${cat.color}33">${cat.icon}</div>
+        <div class="cat-title" style="color:${cat.color}">${cat.label} Commands</div>
+        <div class="cat-count">${cat.commands.length} cmd${cat.commands.length !== 1 ? 's' : ''}</div>
+      </div>
+      ${cat.commands.map((cmd, i) => `
+        <div class="cmd-card" data-search="${(cmd.syntax + cmd.desc + cmd.example).toLowerCase()}">
+          ${isUnknown ? '<span class="unknown-badge">⚠ Unknown Usage</span>' : ''}
+          <div class="cmd-syntax-row">
+            <code class="cmd-syntax">${escHtml(cmd.syntax)}</code>
+            <button class="cmd-copy" onclick="copyCmd(this, '${escAttr(cmd.syntax)}')">Copy</button>
+          </div>
+          <div class="cmd-desc">${escHtml(cmd.desc)}</div>
+          <div class="cmd-example-row">
+            <span class="cmd-example-label">Example</span>
+            <span class="cmd-example-val">${escHtml(cmd.example)}</span>
+          </div>
+        </div>
+      `).join('')}
+    `;
+    list.appendChild(sec);
+  });
+
+  // search
+  document.getElementById('cmd-search').addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    let anyVisible = false;
+    document.querySelectorAll('.cmd-card').forEach(card => {
+      const match = !q || card.dataset.search.includes(q);
+      card.style.display = match ? '' : 'none';
+      if (match) anyVisible = true;
+    });
+    document.querySelectorAll('.cmd-category').forEach(cat => {
+      const visibleCards = cat.querySelectorAll('.cmd-card:not([style*="none"])');
+      cat.style.display = visibleCards.length ? '' : 'none';
+    });
+    document.getElementById('cmd-empty').style.display = anyVisible ? 'none' : 'block';
+  });
+}
+
+function copyCmd(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  return s.replace(/'/g,"\\'");
+}
+
+// ── VANTA ────────────────────────────────────────────────
+function initVanta() {
+  if (window._vanta) return;
+  window._vanta = VANTA.FOG({
+    el: document.body,
+    THREE: THREE,
+    mouseControls: true,
+    touchControls: true,
+    gyroControls: true,
+    highlightColor: 0x6b40fe,
+    midtoneColor:   0x3a1a6e,
+    lowlightColor:  0x0a0530,
+    baseColor:      0x020420,
+    blurFactor:     0.72,
+    speed:          1.4,
+    zoom:           0.9
+  });
+}
+</script>
+</body>
+</html>
