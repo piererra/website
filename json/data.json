@@ -22,4 +22,10 @@
       "featured": true
     }
   ]
+  "cmdPayload": {
+  "salt": "25fcd92b51679836726affe53167c42f",
+  "iv": "44788c79bc0f64711b21f58a",
+  "tag": "3097bef9695350d337a40338aa7ccfda",
+  "data": "61371f72...038a"
+}
 }
