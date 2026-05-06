@@ -31,14 +31,20 @@ body {
 }
 
 /* ── VANTA FOG BACKGROUND ── */
-/* Vanta injects its canvas into body directly */
+/* bg-layer is the fixed full-viewport anchor for the Vanta canvas */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+/* Fallback: if Vanta ever injects into body directly, keep it fixed */
 body > canvas {
   position: fixed !important;
   inset: 0 !important;
   z-index: 0 !important;
   pointer-events: none !important;
 }
-.bg-layer { display: none; }
 
 /* ── SHARED FOOTER ── */
 .site-footer {
