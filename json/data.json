@@ -23,5 +23,332 @@
     }
   ],
   "cmdPassword": null,
-  "cmdData": null
+  "cmdData": {
+    "categories": [
+      {
+        "id": "item",
+        "label": "Item",
+        "icon": "📦",
+        "color": "#4975fe",
+        "commands": [
+          {
+            "syntax": "@giveme <itemID> <qty>",
+            "desc": "Give yourself any item by its item ID. Quantity is optional and defaults to 1.",
+            "example": "@giveme 102 99999"
+          },
+          {
+            "syntax": "@giveme2 <itemID> <qty>",
+            "desc": "Alternative give-item command on some servers.",
+            "example": "@giveme2 5001 1"
+          },
+          {
+            "syntax": "@item <itemID> <qty>",
+            "desc": "Give an item by ID directly to your inventory.",
+            "example": "@item 101 9999"
+          },
+          {
+            "syntax": "@dropall",
+            "desc": "Drop all items in your inventory on the ground.",
+            "example": "@dropall"
+          },
+          {
+            "syntax": "@storage",
+            "desc": "Open your personal storage warehouse from anywhere.",
+            "example": "@storage"
+          }
+        ]
+      },
+      {
+        "id": "player",
+        "label": "Player",
+        "icon": "👤",
+        "color": "#a78bfa",
+        "commands": [
+          {
+            "syntax": "@level <level>",
+            "desc": "Instantly set your Base Level to the specified value.",
+            "example": "@level 99"
+          },
+          {
+            "syntax": "@joblevel <level>",
+            "desc": "Instantly set your Job Level to the specified value.",
+            "example": "@joblevel 70"
+          },
+          {
+            "syntax": "@heal",
+            "desc": "Fully restore your HP and SP to maximum.",
+            "example": "@heal"
+          },
+          {
+            "syntax": "@alive",
+            "desc": "Resurrect yourself in place after dying.",
+            "example": "@alive"
+          },
+          {
+            "syntax": "@job <jobID>",
+            "desc": "Change your character's job class using the job number.",
+            "example": "@job 4"
+          },
+          {
+            "syntax": "@speed <value>",
+            "desc": "Set your movement speed. Default is 150; lower values are faster.",
+            "example": "@speed 100"
+          },
+          {
+            "syntax": "@noks",
+            "desc": "Toggle Kill-Steal protection on or off for your character.",
+            "example": "@noks"
+          },
+          {
+            "syntax": "@autoloot <rate>",
+            "desc": "Automatically pick up items dropped by monsters. Rate is 0–100 (%). Use @autoloot 0 to disable.",
+            "example": "@autoloot 100"
+          },
+          {
+            "syntax": "@alootid +<itemID>",
+            "desc": "Add a specific item ID to your auto-loot whitelist.",
+            "example": "@alootid +7227"
+          },
+          {
+            "syntax": "@alootid -<itemID>",
+            "desc": "Remove a specific item ID from your auto-loot whitelist.",
+            "example": "@alootid -7227"
+          },
+          {
+            "syntax": "@autoloottype +<type>",
+            "desc": "Auto-loot all items of a specific type (healing, etc).",
+            "example": "@autoloottype +healing"
+          }
+        ]
+      },
+      {
+        "id": "stats",
+        "label": "Stats & Skills",
+        "icon": "⚔️",
+        "color": "#34d399",
+        "commands": [
+          {
+            "syntax": "@str <value>",
+            "desc": "Set your STR (Strength) stat to the given value.",
+            "example": "@str 99"
+          },
+          {
+            "syntax": "@agi <value>",
+            "desc": "Set your AGI (Agility) stat to the given value.",
+            "example": "@agi 99"
+          },
+          {
+            "syntax": "@vit <value>",
+            "desc": "Set your VIT (Vitality) stat to the given value.",
+            "example": "@vit 99"
+          },
+          {
+            "syntax": "@int <value>",
+            "desc": "Set your INT (Intelligence) stat to the given value.",
+            "example": "@int 99"
+          },
+          {
+            "syntax": "@dex <value>",
+            "desc": "Set your DEX (Dexterity) stat to the given value.",
+            "example": "@dex 99"
+          },
+          {
+            "syntax": "@luk <value>",
+            "desc": "Set your LUK (Luck) stat to the given value.",
+            "example": "@luk 99"
+          },
+          {
+            "syntax": "@allskills",
+            "desc": "Learn all skills available for your current class instantly.",
+            "example": "@allskills"
+          },
+          {
+            "syntax": "@resetskills",
+            "desc": "Reset all spent skill points back to unspent.",
+            "example": "@resetskills"
+          },
+          {
+            "syntax": "@resetstats",
+            "desc": "Reset all spent stat points back to unspent.",
+            "example": "@resetstats"
+          },
+          {
+            "syntax": "@skillid <skillID> <level>",
+            "desc": "Learn a specific skill by ID at the given level.",
+            "example": "@skillid 1 5"
+          }
+        ]
+      },
+      {
+        "id": "zeny",
+        "label": "Zeny & Currency",
+        "icon": "💰",
+        "color": "#fbbf24",
+        "commands": [
+          {
+            "syntax": "@zeny <amount>",
+            "desc": "Add the specified amount of Zeny (gold) to your character.",
+            "example": "@zeny 10000000"
+          },
+          {
+            "syntax": "@giveme 102 <amount>",
+            "desc": "Give Zeny via item ID 102 (Zeny item).",
+            "example": "@giveme 102 9999999"
+          },
+          {
+            "syntax": "@giveme 101 <amount>",
+            "desc": "Give Copper coins via item ID 101.",
+            "example": "@giveme 101 9999999"
+          }
+        ]
+      },
+      {
+        "id": "teleport",
+        "label": "Teleport",
+        "icon": "🌀",
+        "color": "#f472b6",
+        "commands": [
+          {
+            "syntax": "@warp <mapName> <x> <y>",
+            "desc": "Warp to a specific map. X/Y coordinates are optional.",
+            "example": "@warp prontera 155 183"
+          },
+          {
+            "syntax": "@go <number>",
+            "desc": "Quick-warp to a preset town by its shortcut number (0–17).",
+            "example": "@go 0"
+          },
+          {
+            "syntax": "@jump <x> <y>",
+            "desc": "Teleport to specific coordinates on your current map.",
+            "example": "@jump 200 150"
+          },
+          {
+            "syntax": "@memo",
+            "desc": "Save your current position as a warp point (up to 3 slots).",
+            "example": "@memo"
+          },
+          {
+            "syntax": "@return",
+            "desc": "Return to your save point (Respawn location).",
+            "example": "@return"
+          }
+        ]
+      },
+      {
+        "id": "info",
+        "label": "Info & Search",
+        "icon": "🔍",
+        "color": "#60a5fa",
+        "commands": [
+          {
+            "syntax": "@whodrops <itemID>",
+            "desc": "Find which monsters drop a specific item by ID.",
+            "example": "@whodrops 7227"
+          },
+          {
+            "syntax": "@whereis <monsterName>",
+            "desc": "Find what map a monster spawns on.",
+            "example": "@whereis Poring"
+          },
+          {
+            "syntax": "@mobinfo <monsterName>",
+            "desc": "Show detailed stats and drop info for a monster.",
+            "example": "@mobinfo Poring"
+          },
+          {
+            "syntax": "@iteminfo <itemName>",
+            "desc": "Show info about an item by name.",
+            "example": "@iteminfo Zeny"
+          },
+          {
+            "syntax": "@time",
+            "desc": "Display the current server time and date.",
+            "example": "@time"
+          },
+          {
+            "syntax": "@rates",
+            "desc": "Show the server's EXP and Drop rate multipliers.",
+            "example": "@rates"
+          },
+          {
+            "syntax": "@uptime",
+            "desc": "Show how long the server has been running.",
+            "example": "@uptime"
+          },
+          {
+            "syntax": "@users",
+            "desc": "Show the number of players currently online.",
+            "example": "@users"
+          }
+        ]
+      },
+      {
+        "id": "misc",
+        "label": "Misc",
+        "icon": "⚙️",
+        "color": "#fb923c",
+        "commands": [
+          {
+            "syntax": "@die",
+            "desc": "Kill your own character instantly (useful for resetting).",
+            "example": "@die"
+          },
+          {
+            "syntax": "@hide",
+            "desc": "Toggle invisibility (GM-only on most servers).",
+            "example": "@hide"
+          },
+          {
+            "syntax": "@refresh",
+            "desc": "Refresh your character's visual position on screen.",
+            "example": "@refresh"
+          },
+          {
+            "syntax": "@noask",
+            "desc": "Toggle auto-reject for party/trade/duel requests.",
+            "example": "@noask"
+          },
+          {
+            "syntax": "@exp",
+            "desc": "Show your current Base and Job EXP percentage.",
+            "example": "@exp"
+          },
+          {
+            "syntax": "@homtalk <message>",
+            "desc": "Make your homunculus say a message.",
+            "example": "@homtalk Hello!"
+          }
+        ]
+      },
+      {
+        "id": "unknown",
+        "label": "Unknown / Untested",
+        "icon": "❓",
+        "color": "#9ca3af",
+        "commands": [
+          {
+            "syntax": "@gmspeed <value>",
+            "desc": "Super speed mode — may not work on all private servers.",
+            "example": "@gmspeed 5"
+          },
+          {
+            "syntax": "@invisible",
+            "desc": "Full invisibility toggle — GM-only on most servers.",
+            "example": "@invisible"
+          },
+          {
+            "syntax": "@raisemap",
+            "desc": "Resurrect all dead players on the current map.",
+            "example": "@raisemap"
+          },
+          {
+            "syntax": "@raise",
+            "desc": "Resurrect a specific player by name.",
+            "example": "@raise PlayerName"
+          }
+        ]
+      }
+    ]
+  }
 }
