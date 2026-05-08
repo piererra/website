@@ -2,151 +2,223 @@
   {
     "id": "1032",
     "name": "Angeling",
+    "level": 35,
+    "type": "mvp"
+  },
+  {
+    "id": "3001",
+    "name": "Golden Thief Bug",
+    "level": 45,
     "type": "mvp"
   },
   {
     "id": "1021",
     "name": "Deviling",
+    "level": 48,
     "type": "mvp"
   },
   {
     "id": "1135",
     "name": "Orc Hero",
+    "level": 55,
     "type": "mvp"
   },
   {
     "id": "1116",
     "name": "Maya",
+    "level": 58,
     "type": "mvp"
   },
   {
     "id": "1187",
     "name": "Orc Lord",
+    "level": 60,
     "type": "mvp"
   },
   {
     "id": "1012",
     "name": "Goblin Leader",
+    "level": 62,
     "type": "mvp"
   },
   {
     "id": "1103",
     "name": "Drake",
+    "level": 65,
     "type": "mvp"
   },
   {
     "id": "1196",
     "name": "Edgga",
+    "level": 68,
     "type": "mvp"
   },
   {
     "id": "1121",
     "name": "Mistress",
+    "level": 70,
     "type": "mvp"
   },
   {
     "id": "1107",
     "name": "Osiris",
+    "level": 72,
     "type": "mvp"
   },
   {
     "id": "1113",
     "name": "Phreeoni",
+    "level": 76,
     "type": "mvp"
   },
   {
     "id": "1202",
     "name": "Moonlight Flower",
+    "level": 79,
     "type": "mvp"
   },
   {
     "id": "1200",
     "name": "Dracula",
+    "level": 80,
     "type": "mvp"
   },
   {
     "id": "1144",
     "name": "Doppelganger",
+    "level": 83,
     "type": "mvp"
   },
   {
     "id": "1237",
     "name": "Pharaoh",
+    "level": 86,
     "type": "mvp"
   },
   {
     "id": "1041",
     "name": "Baphomet",
+    "level": 90,
     "type": "mvp"
   },
   {
     "id": "1151",
     "name": "Vocal",
+    "level": 18,
     "type": "mini"
   },
   {
     "id": "1153",
     "name": "Toad",
+    "level": 27,
     "type": "mini"
   },
   {
     "id": "1059",
     "name": "Eclipse",
+    "level": 31,
     "type": "mini"
   },
   {
     "id": "1125",
     "name": "Dragonfly",
+    "level": 40,
     "type": "mini"
   },
   {
     "id": "1152",
     "name": "Mastering",
+    "level": 40,
     "type": "mini"
   },
   {
     "id": "1263",
     "name": "Steel Fur Grizzly",
+    "level": 40,
     "type": "mini"
   },
   {
     "id": "1055",
     "name": "Choco",
+    "level": 43,
     "type": "mini"
   },
   {
     "id": "1252",
     "name": "King Ambernite",
+    "level": 51,
     "type": "mini"
   },
   {
     "id": "1264",
     "name": "Ancient Obeaune",
+    "level": 55,
     "type": "mini"
   },
   {
     "id": "1265",
     "name": "Vagabond Wolf",
+    "level": 55,
     "type": "mini"
   },
   {
     "id": "1250",
     "name": "Highest General",
+    "level": 65,
     "type": "mini"
   },
   {
     "id": "1201",
     "name": "Cat O'Nine-Tail",
+    "level": 79,
+    "type": "mini"
+  },
+  {
+    "id": "1266",
+    "name": "Gryphon",
+    "level": 80,
     "type": "mini"
   },
   {
     "id": "1117",
     "name": "Maya Purple",
+    "level": 81,
     "type": "mini"
   },
   {
     "id": "1251",
     "name": "Infernal Nightmare",
+    "level": 82,
+    "type": "mini"
+  },
+  {
+    "id": "1253",
+    "name": "Ancient Strouf",
+    "level": 85,
+    "type": "mini"
+  },
+  {
+    "id": "1234",
+    "name": "Kobold Leader",
+    "level": 88,
+    "type": "mini"
+  },
+  {
+    "id": "1036",
+    "name": "Ghostring",
+    "level": 90,
+    "type": "mini"
+  },
+  {
+    "id": "1235",
+    "name": "Anubis",
+    "level": 96,
+    "type": "mini"
+  },
+  {
+    "id": "1221",
+    "name": "Dark Priest",
+    "level": 98,
     "type": "mini"
   }
 ]
