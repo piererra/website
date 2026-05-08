@@ -477,6 +477,10 @@
   }
 
 
+  /* ── MONSTER MODAL (reuses item-modal styles) ── */
+  #monster-modal-overlay { display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,.7); backdrop-filter:blur(6px); align-items:center; justify-content:center; }
+  #monster-modal-overlay.open { display:flex; }
+
 </style>
 </head>
 <body>
@@ -536,6 +540,25 @@
 </div>
 
 
+<!-- ── MONSTER ID MODAL ── -->
+<div id="monster-modal-overlay">
+  <div class="item-modal">
+    <div class="item-modal-header">
+      <div>
+        <div class="item-modal-title">👾 MVP Monster IDs</div>
+        <div class="item-modal-sub">These are MVP monsters only. Mini and normal monsters are not listed.</div>
+      </div>
+      <button class="item-modal-close" id="monster-modal-close">✕</button>
+    </div>
+    <div class="item-modal-search-wrap">
+      <input class="item-modal-search" id="monster-modal-search" type="text" placeholder="Search by ID or name…" autocomplete="off"/>
+      <div class="item-modal-count" id="monster-modal-count"></div>
+    </div>
+    <div class="item-modal-list" id="monster-modal-list"></div>
+  </div>
+</div>
+
+
 <!-- ── ITEM ID MODAL ── (placed BEFORE script so elements exist when JS runs) -->
 <div id="item-modal-overlay" role="dialog" aria-modal="true" aria-label="Item ID List">
   <div class="item-modal">
@@ -554,13 +577,13 @@
 </div>
 
 <script>
-// ── AUTH & DATA — loaded from data.json + items.json ───────
+// ── AUTH & DATA — loaded from data.json + items.json + monsters.json ──
 // Passwords stored as salted SHA-256 hash — never reversible from client side.
-// Item IDs loaded from separate items.json to keep this file small.
 
 let _cmdPasswordConfig = null;
 let CMD_DATA = null;
 let GM_ITEMS = [];
+let GM_MONSTERS = [];
 
 async function sha256hex(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
@@ -569,7 +592,6 @@ async function sha256hex(str) {
 
 async function loadAll() {
   try {
-    // Load data.json (password config + command data)
     const r1 = await fetch('json/data.json?v=' + Date.now());
     if (!r1.ok) throw new Error('data.json fetch failed');
     const d = await r1.json();
@@ -579,16 +601,16 @@ async function loadAll() {
     showError('Could not load configuration. Check your network or file path.');
     return;
   }
-
   try {
-    // Load items.json (item ID reference — separate file for performance)
     const r2 = await fetch('json/items.json?v=' + Date.now());
     if (r2.ok) GM_ITEMS = await r2.json();
-  } catch (e) {
-    GM_ITEMS = []; // non-fatal — item modal will just be empty
-  }
+  } catch (e) { GM_ITEMS = []; }
 
-  // Show correct lock screen state
+  try {
+    const r3 = await fetch('json/monsters.json?v=' + Date.now());
+    if (r3.ok) GM_MONSTERS = await r3.json();
+  } catch (e) { GM_MONSTERS = []; }
+
   if (!_cmdPasswordConfig || !_cmdPasswordConfig.hash) {
     showError('Password not set. Please contact the admin.');
     document.getElementById('unlock-btn').disabled = true;
@@ -620,15 +642,12 @@ async function tryUnlock() {
   }
   const pw = document.getElementById('pw-input').value;
   if (!pw) { showError('Please enter the password.'); return; }
-
   if (!_cmdPasswordConfig || !_cmdPasswordConfig.hash) {
     showError('Password not set. Please contact the admin.');
     return;
   }
-
   const btn = document.getElementById('unlock-btn');
   btn.textContent = 'Verifying...'; btn.disabled = true;
-
   const attempt = await sha256hex(_cmdPasswordConfig.salt + pw);
   btn.textContent = 'Unlock Access'; btn.disabled = false;
 
@@ -674,10 +693,10 @@ function lockPage() {
 }
 
 // ── RENDER COMMANDS ───────────────────────────────────────
-function isItemCmd(cmd) {
-  const h = (cmd.syntax + ' ' + cmd.desc).toLowerCase();
-  return /\bitem(id|_id)?\b|<item[^>]*>|\[item[^\]]*\]|<itemID>/.test(h);
-}
+// Categories that get an Item ID button
+const ITEM_CAT_IDS = ['item'];
+// Categories that get a Monster ID button
+const MONSTER_CAT_IDS = ['monster'];
 
 function renderCommands(data) {
   const list = document.getElementById('cmd-list');
@@ -689,6 +708,8 @@ function renderCommands(data) {
     sec.style.animationDelay = `${ci * 0.07}s`;
     sec.dataset.catid = cat.id;
     const isUnknown = cat.id === 'unknown';
+    const showItemBtn   = ITEM_CAT_IDS.includes(cat.id);
+    const showMonsterBtn = MONSTER_CAT_IDS.includes(cat.id);
 
     sec.innerHTML = `
       <div class="cat-header">
@@ -702,7 +723,8 @@ function renderCommands(data) {
           <div class="cmd-syntax-row">
             <code class="cmd-syntax">${escHtml(cmd.syntax)}</code>
             <button class="cmd-copy" onclick="copyCmd(this, '${escAttr(cmd.syntax)}')">Copy</button>
-            ${isItemCmd(cmd) ? '<button class="item-list-btn" onclick="openItemModal()">📦 Item IDs</button>' : ''}
+            ${showItemBtn    ? '<button class="item-list-btn" onclick="openItemModal()">📦 Item IDs</button>' : ''}
+            ${showMonsterBtn ? '<button class="item-list-btn" style="background:rgba(248,113,113,.10);border-color:rgba(248,113,113,.25);color:#fca5a5;" onclick="openMonsterModal()">👾 Monster IDs</button>' : ''}
           </div>
           <div class="cmd-desc">${escHtml(cmd.desc)}</div>
           <div class="cmd-example-row">
@@ -716,7 +738,6 @@ function renderCommands(data) {
   });
 
   const searchEl = document.getElementById('cmd-search');
-  // Remove previous listener to avoid stacking
   searchEl.replaceWith(searchEl.cloneNode(true));
   document.getElementById('cmd-search').addEventListener('input', function() {
     const q = this.value.toLowerCase().trim();
@@ -750,12 +771,12 @@ function escAttr(s) {
 
 // ── ITEM MODAL ────────────────────────────────────────────
 let _filteredItems = [];
-let _renderPage = 0;
+let _itemPage = 0;
 const PAGE_SIZE = 80;
 
 function openItemModal() {
   _filteredItems = GM_ITEMS;
-  _renderPage = 0;
+  _itemPage = 0;
   document.getElementById('item-modal-search').value = '';
   document.getElementById('item-modal-overlay').classList.add('open');
   document.getElementById('item-modal-search').focus();
@@ -769,59 +790,99 @@ function renderItemList() {
   const total = _filteredItems.length;
   document.getElementById('item-modal-count').textContent =
     total.toLocaleString() + ' item' + (total !== 1 ? 's' : '');
-
-  if (total === 0) {
-    list.innerHTML = '<div class="item-modal-empty">No items match your search.</div>';
-    return;
-  }
-
-  const slice = _filteredItems.slice(_renderPage * PAGE_SIZE, (_renderPage + 1) * PAGE_SIZE);
+  if (total === 0) { list.innerHTML = '<div class="item-modal-empty">No items match your search.</div>'; return; }
+  const slice = _filteredItems.slice(_itemPage * PAGE_SIZE, (_itemPage + 1) * PAGE_SIZE);
   const rows = slice.map(item => {
     const safeName = String(item.name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    return `<div class="item-row" onclick="copyItemId('${escAttr(item.id)}',this)" title="Click to copy ID">
+    return `<div class="item-row" onclick="copyModalId('${escAttr(item.id)}',this)" title="Click to copy ID">
       <span class="item-id">${item.id}</span>
       <span class="item-name">${safeName}</span>
       <span class="item-copy-hint">copy</span>
     </div>`;
   }).join('');
-
-  _renderPage === 0 ? (list.innerHTML = rows) : list.insertAdjacentHTML('beforeend', rows);
-
+  _itemPage === 0 ? (list.innerHTML = rows) : list.insertAdjacentHTML('beforeend', rows);
   list.onscroll = function() {
     if (this.scrollTop + this.clientHeight >= this.scrollHeight - 80) {
-      if (_renderPage < Math.ceil(_filteredItems.length / PAGE_SIZE) - 1) {
-        _renderPage++;
-        renderItemList();
-      }
+      if (_itemPage < Math.ceil(_filteredItems.length / PAGE_SIZE) - 1) { _itemPage++; renderItemList(); }
     }
   };
 }
-function copyItemId(id, rowEl) {
+
+document.getElementById('item-modal-close').addEventListener('click', closeItemModal);
+document.getElementById('item-modal-overlay').addEventListener('click', function(e) { if (e.target === this) closeItemModal(); });
+document.getElementById('item-modal-search').addEventListener('input', function() {
+  const q = this.value.toLowerCase().trim();
+  _filteredItems = q ? GM_ITEMS.filter(i => i.id.includes(q) || i.name.toLowerCase().includes(q)) : GM_ITEMS;
+  _itemPage = 0;
+  document.getElementById('item-modal-list').scrollTop = 0;
+  renderItemList();
+});
+
+// ── MONSTER MODAL ─────────────────────────────────────────
+let _filteredMonsters = [];
+let _monsterPage = 0;
+
+function openMonsterModal() {
+  _filteredMonsters = GM_MONSTERS;
+  _monsterPage = 0;
+  document.getElementById('monster-modal-search').value = '';
+  document.getElementById('monster-modal-overlay').classList.add('open');
+  document.getElementById('monster-modal-search').focus();
+  renderMonsterList();
+}
+function closeMonsterModal() {
+  document.getElementById('monster-modal-overlay').classList.remove('open');
+}
+function renderMonsterList() {
+  const list = document.getElementById('monster-modal-list');
+  const total = _filteredMonsters.length;
+  document.getElementById('monster-modal-count').textContent =
+    total.toLocaleString() + ' monster' + (total !== 1 ? 's' : '');
+  if (total === 0) { list.innerHTML = '<div class="item-modal-empty">No monsters match your search.</div>'; return; }
+  const slice = _filteredMonsters.slice(_monsterPage * PAGE_SIZE, (_monsterPage + 1) * PAGE_SIZE);
+  const rows = slice.map(m => {
+    const safeName = String(m.name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return `<div class="item-row" onclick="copyModalId('${escAttr(m.id)}',this)" title="Click to copy ID">
+      <span class="item-id">${m.id}</span>
+      <span class="item-name">${safeName}</span>
+      <span class="item-copy-hint">copy</span>
+    </div>`;
+  }).join('');
+  _monsterPage === 0 ? (list.innerHTML = rows) : list.insertAdjacentHTML('beforeend', rows);
+  list.onscroll = function() {
+    if (this.scrollTop + this.clientHeight >= this.scrollHeight - 80) {
+      if (_monsterPage < Math.ceil(_filteredMonsters.length / PAGE_SIZE) - 1) { _monsterPage++; renderMonsterList(); }
+    }
+  };
+}
+
+document.getElementById('monster-modal-close').addEventListener('click', closeMonsterModal);
+document.getElementById('monster-modal-overlay').addEventListener('click', function(e) { if (e.target === this) closeMonsterModal(); });
+document.getElementById('monster-modal-search').addEventListener('input', function() {
+  const q = this.value.toLowerCase().trim();
+  _filteredMonsters = q ? GM_MONSTERS.filter(m => m.id.includes(q) || m.name.toLowerCase().includes(q)) : GM_MONSTERS;
+  _monsterPage = 0;
+  document.getElementById('monster-modal-list').scrollTop = 0;
+  renderMonsterList();
+});
+
+// ── SHARED COPY for modals ─────────────────────────────────
+function copyModalId(id, rowEl) {
   navigator.clipboard.writeText(id).then(() => {
     const hint = rowEl.querySelector('.item-copy-hint');
-    const idEl = rowEl.querySelector('.item-id');
+    const idEl  = rowEl.querySelector('.item-id');
     if (hint) hint.textContent = '✓ copied';
-    if (idEl) { idEl.style.color = '#4ade80'; idEl.style.borderColor = 'rgba(74,222,128,.4)'; }
+    if (idEl)  { idEl.style.color = '#4ade80'; idEl.style.borderColor = 'rgba(74,222,128,.4)'; }
     setTimeout(() => {
       if (hint) hint.textContent = 'copy';
-      if (idEl) { idEl.style.color = ''; idEl.style.borderColor = ''; }
+      if (idEl)  { idEl.style.color = ''; idEl.style.borderColor = ''; }
     }, 1500);
   });
 }
 
-document.getElementById('item-modal-close').addEventListener('click', closeItemModal);
-document.getElementById('item-modal-overlay').addEventListener('click', function(e) {
-  if (e.target === this) closeItemModal();
-});
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeItemModal(); });
-document.getElementById('item-modal-search').addEventListener('input', function() {
-  const q = this.value.toLowerCase().trim();
-  _filteredItems = q
-    ? GM_ITEMS.filter(i => i.id.includes(q) || i.name.toLowerCase().includes(q))
-    : GM_ITEMS;
-  _renderPage = 0;
-  document.getElementById('item-modal-list').scrollTop = 0;
-  renderItemList();
+// ── SHARED ESC key ─────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeItemModal(); closeMonsterModal(); }
 });
 
 // ── VANTA ─────────────────────────────────────────────────
