@@ -22,9 +22,6 @@
       "featured": true
     }
   ],
-  "cmdPassword": {
-    "salt": "f37f8a73d65c5f60d8e8e7f142e4d38b64f1be26c9ef96eb55764933e114e450",
-    "hash": "4ac9764374d2644aa187a827e2b3b39bc9ce4b4e48b90a89a51470f7ace212bd"
-  },
+  "cmdPassword": null,
   "cmdData": null
 }
