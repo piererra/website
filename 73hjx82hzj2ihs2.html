@@ -278,6 +278,7 @@
       .tb-btn { font-size:11px; padding:5px 7px; }
     }
   </style>
+  <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </head>
 <body>
 <div class="bg-layer"></div>
@@ -301,28 +302,14 @@
   <div class="admin-nav">
     <div class="admin-logo">Piererra <span class="dot"></span><span class="admin-badge">Admin</span></div>
     <div class="nav-right">
-      <div class="gh-status" id="gh-status"><span class="ds"></span> GitHub not configured</div>
       <button class="btn-logout" id="btn-logout">Sign Out</button>
-    </div>
-  </div>
-
-  <div class="cfg-banner" id="cfg-banner">
-    <div class="icon">⚙️</div>
-    <div style="flex:1">
-      <div class="cfg-title">One-time GitHub Setup</div>
-      <div class="cfg-body">Enter your GitHub details to publish posts directly to your site. Token needs <strong>Contents: Read &amp; Write</strong> scope on your repo only. <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">Generate fine-grained token →</a></div>
-      <div class="cfg-fields">
-        <input class="cfg-input" id="cfg-owner" placeholder="GitHub username"/>
-        <input class="cfg-input" id="cfg-repo" placeholder="Repo name (e.g. piererra)"/>
-        <input class="cfg-input" id="cfg-token" type="password" placeholder="Personal Access Token"/>
-        <button class="btn-cfg" id="btn-cfg-save">Save</button>
-      </div>
     </div>
   </div>
 
   <div class="admin-tabs">
     <button class="tab-btn active" data-tab="posts">📝 Posts</button>
     <button class="tab-btn" data-tab="editor">✏️ Editor</button>
+    <button class="tab-btn" data-tab="passwords">🔐 Passwords</button>
 
   </div>
 
@@ -426,6 +413,48 @@
     </div>
 
 
+    <!-- PASSWORDS TAB -->
+    <div class="tab-panel" id="tab-passwords">
+      <div class="editor-wrap" style="max-width:560px;">
+        <div style="margin-bottom:28px;">
+          <div class="section-heading" style="margin-bottom:6px;">Command List <span>Password</span></div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;">Controls access to <code style="background:rgba(73,117,254,.15);border-radius:4px;padding:2px 8px;color:#a0c4ff;font-size:12px;">command-list.html</code>. Stored as a salted hash — never readable by visitors.</div>
+        </div>
+        <div id="pw-status-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;margin-bottom:20px;">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Current Status</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div id="pw-status-dot" style="width:10px;height:10px;border-radius:50%;background:var(--text3);flex-shrink:0;"></div>
+            <div>
+              <div id="pw-status-label" style="font-size:14px;font-weight:600;color:var(--text2);">Loading...</div>
+              <div id="pw-status-sub" style="font-size:11px;color:var(--text3);margin-top:2px;"></div>
+            </div>
+            <span id="pw-display" style="margin-left:auto;font-family:monospace;font-size:20px;letter-spacing:4px;color:var(--text3);">••••••••</span>
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;" id="pw-form-title">Set Password</div>
+          <div style="margin-bottom:14px;">
+            <label class="ef-label">New Password</label>
+            <div style="position:relative;">
+              <input class="ef-input" id="pw-new" type="password" placeholder="Enter new password" autocomplete="new-password" style="padding-right:48px;"/>
+              <button type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;" onclick="const i=document.getElementById('pw-new');i.type=i.type==='password'?'text':'password'">👁</button>
+            </div>
+          </div>
+          <div style="margin-bottom:20px;">
+            <label class="ef-label">Confirm Password</label>
+            <input class="ef-input" id="pw-confirm" type="password" placeholder="Repeat new password" autocomplete="new-password"/>
+          </div>
+          <div id="pw-form-error" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(248,113,113,.10);border:1px solid rgba(248,113,113,.25);border-radius:10px;font-size:13px;color:var(--red);"></div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn-publish" id="pw-save-btn" style="flex:1;justify-content:center;" onclick="saveNewPassword()">💾 Save Password</button>
+            <button id="pw-clear-btn" style="display:none;font-size:12px;font-weight:600;font-family:'Sora',sans-serif;color:var(--red);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:11px 16px;cursor:pointer;" onclick="clearPassword()">🗑 Remove</button>
+          </div>
+          <div style="margin-top:14px;font-size:11px;color:var(--text3);">After saving, click <strong style="color:var(--yellow);">Push to GitHub</strong> to apply.</div>
+        </div>
+      </div>
+    </div>
+
+
 
   </div>
 
@@ -509,7 +538,7 @@ let hasUnsaved = false;
 
 // ── INIT ──
 window.addEventListener('DOMContentLoaded', async () => {
-    loadLocal();
+  loadLocal();
   setupLogin();
   setupTabs();
   setupEditor();
@@ -521,7 +550,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btn-publish').addEventListener('click', publishPost);
 });
 
-// GitHub config handled server-side via env vars
 
 
 // ── LOCAL DATA ──
@@ -529,6 +557,7 @@ function loadLocal() {
   try { data = JSON.parse(localStorage.getItem('piererra_data') || '{"posts":[],"games":[]}'); } catch(e) {}
   if (!data.posts) data.posts = [];
   if (!data.games) data.games = [];
+  if (data.cmdPassword === undefined) data.cmdPassword = null;
 }
 function saveLocal() { localStorage.setItem('piererra_data', JSON.stringify(data)); hasUnsaved = true; }
 
@@ -538,41 +567,32 @@ function setupLogin() {
     const u = document.getElementById('inp-user').value.trim();
     const p = document.getElementById('inp-pass').value;
     if (!u || !p) { showLoginErr('Please enter username and password.'); return; }
-
     const btn = document.getElementById('btn-login');
     btn.disabled = true; btn.textContent = 'Verifying...';
-
     try {
       const res = await fetch('/api/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'login', username: u, password: p })
       });
-      const data = await res.json();
-      if (res.ok && data.ok) {
-        // Store session token (hashed u+p) in sessionStorage only — cleared on tab close
-        sessionStorage.setItem('piererra_session', await sha256(u + p + 'session'));
+      const d = await res.json();
+      if (res.ok && d.ok) {
         sessionStorage.setItem('piererra_u', u);
         sessionStorage.setItem('piererra_p', p);
         document.getElementById('login-page').style.display = 'none';
         document.getElementById('admin-page').style.display = 'block';
         renderPosts();
       } else {
-        showLoginErr(data.error || 'Invalid credentials.');
+        showLoginErr(d.error || 'Invalid credentials.');
         document.getElementById('inp-pass').value = '';
       }
-    } catch (e) {
-      showLoginErr('Network error. Check your connection.');
-    }
+    } catch (e) { showLoginErr('Network error. Check your connection.'); }
     btn.disabled = false; btn.textContent = 'Login';
   }
-
   function showLoginErr(msg) {
     const el = document.getElementById('login-err');
-    el.textContent = msg;
-    el.style.display = 'block';
+    el.textContent = msg; el.style.display = 'block';
   }
-
   document.getElementById('btn-login').addEventListener('click', tryLogin);
   document.getElementById('inp-pass').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
   document.getElementById('inp-user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-pass').focus(); });
@@ -918,49 +938,99 @@ function setupPush() {
 async function pushToGitHub() {
   const btn = document.getElementById('btn-push');
   btn.disabled = true; btn.textContent = 'Pushing...';
-
-  // Get credentials from sessionStorage (set at login)
   const u = sessionStorage.getItem('piererra_u');
   const p = sessionStorage.getItem('piererra_p');
-
   if (!u || !p) {
     toast('Session expired. Please log in again.', 'error');
-    btn.disabled = false; btn.innerHTML = getPushBtnHTML();
-    location.reload();
-    return;
+    btn.disabled = false; location.reload(); return;
   }
-
   try {
     const res = await fetch('/api/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'save',
-        username: u,
-        password: p,
-        content: JSON.stringify(data, null, 2)
-      })
+      body: JSON.stringify({ action: 'save', username: u, password: p, content: JSON.stringify(data, null, 2) })
     });
-
     const result = await res.json();
     if (res.ok && result.ok) {
       toast('🚀 Pushed! Your site updates in ~30 seconds.', 'success');
       hasUnsaved = false;
       document.getElementById('btn-push').disabled = true;
-    } else {
-      toast(result.error || 'Push failed.', 'error');
-    }
-  } catch (e) {
-    toast('Network error. Check your connection.', 'error');
-  }
-
+    } else { toast(result.error || 'Push failed.', 'error'); }
+  } catch (e) { toast('Network error. Check your connection.', 'error'); }
   btn.disabled = !hasUnsaved;
-  btn.innerHTML = getPushBtnHTML();
+  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.96.57.1.78-.25.78-.55v-1.93C5.94 21.1 5.27 19 5.27 19c-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.53-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.18A10.9 10.9 0 0 1 12 6.84c.97.004 1.95.13 2.86.38 2.18-1.49 3.14-1.18 3.14-1.18.63 1.57.23 2.73.11 3.02.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.37-5.25 5.65.41.36.78 2.13v3.16c0 .3.2.65.79.55C20.71 21.42 24 17.1 24 12c0-6.35-5.15-11.5-12-11.5z"/></svg> Push to GitHub`;
 }
 
-function getPushBtnHTML() {
-  return `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.96.57.1.78-.25.78-.55v-1.93C5.94 21.1 5.27 19 5.27 19c-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.53-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.18A10.9 10.9 0 0 1 12 6.84c.97.004 1.95.13 2.86.38 2.18-1.49 3.14-1.18 3.14-1.18.63 1.57.23 2.73.11 3.02.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.37-5.25 5.65.41.36.78 2.13v3.16c0 .3.2.65.79.55C20.71 21.42 24 17.1 24 12c0-6.35-5.15-11.5-12-11.5z"/></svg> Push to GitHub`;
+// ── PASSWORD MANAGEMENT ──────────────────────────────────────
+async function sha256hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
+function genSalt(len=32) {
+  const arr = crypto.getRandomValues(new Uint8Array(len));
+  return Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+async function loadPasswordStatus() {
+  try {
+    const res = await fetch('json/data.json?v=' + Date.now());
+    if (!res.ok) throw new Error();
+    const d = await res.json();
+    updatePasswordStatusUI(d.cmdPassword || null);
+  } catch { document.getElementById('pw-status-label').textContent = 'Could not load data.json'; }
+}
+function updatePasswordStatusUI(cmdPassword) {
+  const dot = document.getElementById('pw-status-dot');
+  const label = document.getElementById('pw-status-label');
+  const sub = document.getElementById('pw-status-sub');
+  const title = document.getElementById('pw-form-title');
+  const clearBtn = document.getElementById('pw-clear-btn');
+  if (cmdPassword && cmdPassword.hash) {
+    dot.style.background = 'var(--green)'; dot.style.boxShadow = '0 0 6px var(--green)';
+    label.style.color = 'var(--green)'; label.textContent = 'Password is set';
+    sub.textContent = 'Hash: ' + cmdPassword.hash.substring(0,16) + '…';
+    title.textContent = 'Change Password'; clearBtn.style.display = 'block';
+  } else {
+    dot.style.background = 'var(--red)'; dot.style.boxShadow = '0 0 6px var(--red)';
+    label.style.color = 'var(--red)'; label.textContent = 'No password set';
+    sub.textContent = 'command-list.html will show "Password not set" error';
+    title.textContent = 'Set Password'; clearBtn.style.display = 'none';
+  }
+}
+async function saveNewPassword() {
+  const pw = document.getElementById('pw-new').value;
+  const pw2 = document.getElementById('pw-confirm').value;
+  const errEl = document.getElementById('pw-form-error');
+  errEl.style.display = 'none';
+  function showPwErr(msg) { errEl.textContent = msg; errEl.style.display = 'block'; }
+  if (!pw) { showPwErr('Please enter a new password.'); return; }
+  if (pw !== pw2) { showPwErr('Passwords do not match.'); return; }
+  if (pw.length < 4) { showPwErr('Password must be at least 4 characters.'); return; }
+  const btn = document.getElementById('pw-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const salt = genSalt();
+  const hash = await sha256hex(salt + pw);
+  data.cmdPassword = { salt, hash };
+  saveLocal(); hasUnsaved = true;
+  document.getElementById('btn-push').disabled = false;
+  updatePasswordStatusUI(data.cmdPassword);
+  document.getElementById('pw-new').value = '';
+  document.getElementById('pw-confirm').value = '';
+  toast('Password saved! Click "Push to GitHub" to apply.', 'success');
+  btn.disabled = false; btn.textContent = '💾 Save Password';
+}
+async function clearPassword() {
+  if (!confirm('Remove the command list password?')) return;
+  data.cmdPassword = null;
+  saveLocal(); hasUnsaved = true;
+  document.getElementById('btn-push').disabled = false;
+  updatePasswordStatusUI(null);
+  toast('Password removed. Push to GitHub to apply.', 'success');
+}
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.tab === 'passwords') loadPasswordStatus();
+  });
+});
 
 // ── HELPERS ──
 function fmtDate(s) {
