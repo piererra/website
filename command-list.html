@@ -595,7 +595,6 @@
 // ── AUTH & DATA — loaded from data.json + items.json + monsters.json ──
 // Passwords stored as salted SHA-256 hash — never reversible from client side.
 
-let _cmdPasswordConfig = null;
 // Commands are fetched from /api/commands after unlock — never stored in this file
 let CMD_DATA = null;
 let GM_ITEMS = [];
@@ -607,31 +606,16 @@ async function sha256hex(str) {
 }
 
 async function loadAll() {
-  try {
-    const r1 = await fetch('json/data.json?v=' + Date.now());
-    if (!r1.ok) throw new Error('data.json fetch failed');
-    const d = await r1.json();
-    _cmdPasswordConfig = d.cmdPassword || null;
-  } catch (e) {
-    showError('Could not load configuration. Check your network or file path.');
-    return;
-  }
+  // Load item and monster reference data (public, non-sensitive)
   try {
     const r2 = await fetch('json/items.json?v=' + Date.now());
     if (r2.ok) GM_ITEMS = await r2.json();
   } catch (e) { GM_ITEMS = []; }
-
   try {
     const r3 = await fetch('json/monsters.json?v=' + Date.now());
     if (r3.ok) GM_MONSTERS = await r3.json();
   } catch (e) { GM_MONSTERS = []; }
-
-  if (!_cmdPasswordConfig || !_cmdPasswordConfig.hash) {
-    showError('Password not set. Please contact the admin.');
-    document.getElementById('unlock-btn').disabled = true;
-    document.getElementById('pw-input').disabled = true;
-    document.getElementById('pw-input').placeholder = 'No password configured';
-  }
+  // Password verification is fully server-side via /api/passwords
 }
 loadAll();
 
@@ -657,61 +641,72 @@ async function tryUnlock() {
   }
   const pw = document.getElementById('pw-input').value;
   if (!pw) { showError('Please enter the password.'); return; }
-  if (!_cmdPasswordConfig || !_cmdPasswordConfig.hash) {
-    showError('Password not set. Please contact the admin.');
-    return;
-  }
+
   const btn = document.getElementById('unlock-btn');
   btn.textContent = 'Verifying...'; btn.disabled = true;
-  const attempt = await sha256hex(_cmdPasswordConfig.salt + pw);
-  btn.textContent = 'Unlock Access'; btn.disabled = false;
 
-  if (attempt === _cmdPasswordConfig.hash) {
-    attempts = 0;
-    // Fetch commands from server — only served after password verification
-    btn.textContent = 'Loading...'; btn.disabled = true;
-    try {
-      const cmdRes = await fetch('/api/commands', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          salt: _cmdPasswordConfig.salt,
-          hash: _cmdPasswordConfig.hash
-        })
-      });
-      const cmdJson = await cmdRes.json();
-      if (cmdRes.ok && cmdJson.ok) {
-        CMD_DATA = cmdJson.data;
-      } else {
-        CMD_DATA = null;
+  try {
+    // Send password to server — hash never exposed to client
+    const res = await fetch('/api/passwords', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'verify', password: pw })
+    });
+    const result = await res.json();
+
+    if (res.ok && result.ok) {
+      // Store token in sessionStorage (cleared on tab close)
+      sessionStorage.setItem('cmd_token', result.token);
+      attempts = 0;
+
+      // Show expiry warning if close to expiry
+      if (result.daysLeft !== undefined && result.daysLeft <= 2) {
+        showError(`⚡ Password expires in ${result.daysLeft} day${result.daysLeft !== 1 ? 's' : ''}.`);
       }
-    } catch (e) {
-      CMD_DATA = null;
-    }
-    btn.textContent = 'Unlock Access'; btn.disabled = false;
 
-    document.getElementById('lock-screen').style.display = 'none';
-    document.getElementById('main-content').style.display = 'block';
-    if (!CMD_DATA || !CMD_DATA.categories || CMD_DATA.categories.length === 0) {
-      document.getElementById('cmd-list').innerHTML =
-        '<div class="cmd-empty" style="display:block;"><div class="cmd-empty-icon">📭</div>No commands available.</div>';
+      btn.textContent = 'Loading...';
+      // Fetch commands using token
+      try {
+        const cmdRes = await fetch('/api/commands', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: result.token })
+        });
+        const cmdJson = await cmdRes.json();
+        CMD_DATA = cmdRes.ok && cmdJson.ok ? cmdJson.data : null;
+      } catch { CMD_DATA = null; }
+
+      btn.textContent = 'Unlock Access'; btn.disabled = false;
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('main-content').style.display = 'block';
+      if (!CMD_DATA || !CMD_DATA.categories || CMD_DATA.categories.length === 0) {
+        document.getElementById('cmd-list').innerHTML =
+          '<div class="cmd-empty" style="display:block;"><div class="cmd-empty-icon">📭</div>No commands available.</div>';
+      } else {
+        renderCommands(CMD_DATA);
+      }
+      initVanta();
+
     } else {
-      renderCommands(CMD_DATA);
+      attempts++;
+      document.getElementById('pw-input').value = '';
+      if (attempts >= MAX_ATTEMPTS) {
+        lockoutUntil = Date.now() + 30000;
+        showError('Too many failed attempts. Locked for 30 seconds.');
+      } else {
+        const left = MAX_ATTEMPTS - attempts;
+        // Show server error message (includes expiry message if expired)
+        showError((result.error || 'Incorrect password.') + (left < MAX_ATTEMPTS ? ` ${left} attempt${left !== 1 ? 's' : ''} remaining.` : ''));
+      }
+      document.getElementById('lock-attempts').textContent =
+        attempts > 0 ? `Failed attempts: ${attempts}/${MAX_ATTEMPTS}` : '';
+      btn.textContent = 'Unlock Access'; btn.disabled = false;
     }
-    initVanta();
-  } else {
-    attempts++;
-    document.getElementById('pw-input').value = '';
-    if (attempts >= MAX_ATTEMPTS) {
-      lockoutUntil = Date.now() + 30000;
-      showError('Too many failed attempts. Locked for 30 seconds.');
-    } else {
-      const left = MAX_ATTEMPTS - attempts;
-      showError(`Incorrect password. ${left} attempt${left !== 1 ? 's' : ''} remaining.`);
-    }
-    document.getElementById('lock-attempts').textContent =
-      attempts > 0 ? `Failed attempts: ${attempts}/${MAX_ATTEMPTS}` : '';
+  } catch (e) {
+    showError('Network error. Check your connection.');
+    btn.textContent = 'Unlock Access'; btn.disabled = false;
   }
+}
 }
 
 function showError(msg) {
