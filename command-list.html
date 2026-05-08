@@ -546,7 +546,7 @@
     <div class="item-modal-header">
       <div>
         <div class="item-modal-title">👾 MVP Monster IDs</div>
-        <div class="item-modal-sub">These are MVP monsters only. Mini and normal monsters are not listed.</div>
+        <div class="item-modal-sub"><span style="color:#fb923c;font-weight:600;">■ MVP</span> &nbsp;<span style="color:#c084fc;font-weight:600;">■ Mini</span> &nbsp;Normal monsters not listed.</div>
       </div>
       <button class="item-modal-close" id="monster-modal-close">✕</button>
     </div>
@@ -606,10 +606,7 @@ async function loadAll() {
     if (r2.ok) GM_ITEMS = await r2.json();
   } catch (e) { GM_ITEMS = []; }
 
-  try {
-    const r3 = await fetch('json/monsters.json?v=' + Date.now());
-    if (r3.ok) GM_MONSTERS = await r3.json();
-  } catch (e) { GM_MONSTERS = []; }
+  GM_MONSTERS = [{"id": "1021", "name": "Deviling"}, {"id": "1135", "name": "Orc Hero"}, {"id": "1116", "name": "Maya"}, {"id": "1041", "name": "Baphomet"}, {"id": "1187", "name": "Orc Lord"}, {"id": "1012", "name": "Goblin Leader"}, {"id": "1103", "name": "Drake"}, {"id": "1196", "name": "Edgga"}, {"id": "1121", "name": "Mistress"}, {"id": "1107", "name": "Osiris"}, {"id": "1032", "name": "Angeling"}, {"id": "1113", "name": "Phreeoni"}, {"id": "1202", "name": "Moonlight Flower"}, {"id": "1200", "name": "Dracula"}, {"id": "1144", "name": "Doppelganger"}, {"id": "1237", "name": "Pharaoh"}];
 
   if (!_cmdPasswordConfig || !_cmdPasswordConfig.hash) {
     showError('Password not set. Please contact the admin.');
@@ -842,9 +839,17 @@ function renderMonsterList() {
   const slice = _filteredMonsters.slice(_monsterPage * PAGE_SIZE, (_monsterPage + 1) * PAGE_SIZE);
   const rows = slice.map(m => {
     const safeName = String(m.name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const isMvp  = m.type === 'mvp';
+    const isMini = m.type === 'mini';
+    const idColor   = isMvp  ? '#fb923c' : isMini ? '#c084fc' : '';
+    const idBorder  = isMvp  ? 'rgba(251,146,60,.35)'  : isMini ? 'rgba(192,132,252,.35)' : '';
+    const idBg      = isMvp  ? 'rgba(251,146,60,.10)'  : isMini ? 'rgba(192,132,252,.10)' : '';
+    const badge     = isMvp  ? '<span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:1px 5px;border-radius:4px;background:rgba(251,146,60,.15);color:#fb923c;border:1px solid rgba(251,146,60,.3);margin-left:6px;">MVP</span>'
+                    : isMini ? '<span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:1px 5px;border-radius:4px;background:rgba(192,132,252,.15);color:#c084fc;border:1px solid rgba(192,132,252,.3);margin-left:6px;">MINI</span>'
+                    : '';
     return `<div class="item-row" onclick="copyModalId('${escAttr(m.id)}',this)" title="Click to copy ID">
-      <span class="item-id">${m.id}</span>
-      <span class="item-name">${safeName}</span>
+      <span class="item-id" style="color:${idColor};border-color:${idBorder};background:${idBg}">${m.id}</span>
+      <span class="item-name">${safeName}${badge}</span>
       <span class="item-copy-hint">copy</span>
     </div>`;
   }).join('');
