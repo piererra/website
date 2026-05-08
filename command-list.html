@@ -887,9 +887,10 @@ function renderMonsterList() {
     const badge     = isMvp  ? '<span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:1px 5px;border-radius:4px;background:rgba(251,146,60,.15);color:#fb923c;border:1px solid rgba(251,146,60,.3);margin-left:6px;">MVP</span>'
                     : isMini ? '<span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:1px 5px;border-radius:4px;background:rgba(192,132,252,.15);color:#c084fc;border:1px solid rgba(192,132,252,.3);margin-left:6px;">MINI</span>'
                     : '';
+    const lvLabel = m.level ? `<span style="font-size:10px;color:var(--text3);margin-left:6px;font-family:monospace;">Lv${m.level}</span>` : '';
     return `<div class="item-row" onclick="copyModalId('${escAttr(m.id)}',this)" title="Click to copy ID">
       <span class="item-id" style="color:${idColor};border-color:${idBorder};background:${idBg}">${m.id}</span>
-      <span class="item-name">${safeName}${badge}</span>
+      <span class="item-name">${safeName}${badge}${lvLabel}</span>
       <span class="item-copy-hint">copy</span>
     </div>`;
   }).join('');
