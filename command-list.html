@@ -596,8 +596,8 @@
 // Passwords stored as salted SHA-256 hash — never reversible from client side.
 
 let _cmdPasswordConfig = null;
-// CMD_DATA is hardcoded below — commands live in this file, not data.json
-const CMD_DATA = {"categories": [{"id": "item", "label": "Item", "icon": "📦", "color": "#4975fe", "commands": [{"syntax": "<itemID> <qty>", "desc": "Give yourself any item by its Item ID. Quantity is required.", "example": "101 99"}]}, {"id": "refine", "label": "Refine", "icon": "⚒️", "color": "#60a5fa", "commands": [{"syntax": "refine <eqid> <qty>", "desc": "Refine an equipped item. eqid is the equipment slot index (0 = first slot). qty is the refine level.", "example": "refine 0 20"}]}, {"id": "quest", "label": "Quest", "icon": "📜", "color": "#fbbf24", "commands": [{"syntax": "finishtask <taskid>", "desc": "Instantly complete a quest/task by its Task ID.", "example": "finishtask 1001010"}, {"syntax": "deltask <taskid>", "desc": "Delete/remove a quest from your quest log. (Usage unconfirmed)", "example": "deltask 1001010"}, {"syntax": "cleartask", "desc": "Clear all tasks/quests. (Usage unconfirmed)", "example": "cleartask"}]}, {"id": "monster", "label": "Monster", "icon": "👾", "color": "#f87171", "commands": [{"syntax": "addmonster <monsterid> <qty>", "desc": "Spawn a monster near you by its Monster ID. qty sets how many to spawn.", "example": "addmonster 1041 1"}, {"syntax": "killmonster", "desc": "Kill monsters around you. (Usage unconfirmed)", "example": "killmonster"}]}, {"id": "inventory", "label": "Inventory", "icon": "🎒", "color": "#34d399", "commands": [{"syntax": "clearbag 0", "desc": "Clear/empty your entire bag/inventory.", "example": "clearbag 0"}]}, {"id": "teleport", "label": "Teleport", "icon": "🌀", "color": "#a78bfa", "commands": [{"syntax": "goto <cityid>", "desc": "Teleport to a city by its City ID.", "example": "goto 7"}]}, {"id": "attribute", "label": "Attribute", "icon": "⚔️", "color": "#fb923c", "commands": [{"syntax": "addattr <attname> <qty>", "desc": "Add points to a specific attribute. Available: str, agi, vit, int, dex, luck.", "example": "addattr str 99"}, {"syntax": "kami", "desc": "Add a preset amount of stats/attributes at once. Exact usage unconfirmed.", "example": "kami"}]}, {"id": "unknown", "label": "Unknown", "icon": "❓", "color": "#9ca3af", "commands": [{"syntax": "baselevel", "desc": "Related to base level. Exact usage unknown.", "example": "baselevel"}, {"syntax": "medal", "desc": "Related to medals/achievements. Exact usage unknown.", "example": "medal"}, {"syntax": "testpay", "desc": "Possibly a payment/currency test command. Exact usage unknown.", "example": "testpay"}]}]};
+// Commands are fetched from /api/commands after unlock — never stored in this file
+let CMD_DATA = null;
 let GM_ITEMS = [];
 let GM_MONSTERS = [];
 
@@ -668,11 +668,33 @@ async function tryUnlock() {
 
   if (attempt === _cmdPasswordConfig.hash) {
     attempts = 0;
+    // Fetch commands from server — only served after password verification
+    btn.textContent = 'Loading...'; btn.disabled = true;
+    try {
+      const cmdRes = await fetch('/api/commands', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          salt: _cmdPasswordConfig.salt,
+          hash: _cmdPasswordConfig.hash
+        })
+      });
+      const cmdJson = await cmdRes.json();
+      if (cmdRes.ok && cmdJson.ok) {
+        CMD_DATA = cmdJson.data;
+      } else {
+        CMD_DATA = null;
+      }
+    } catch (e) {
+      CMD_DATA = null;
+    }
+    btn.textContent = 'Unlock Access'; btn.disabled = false;
+
     document.getElementById('lock-screen').style.display = 'none';
     document.getElementById('main-content').style.display = 'block';
     if (!CMD_DATA || !CMD_DATA.categories || CMD_DATA.categories.length === 0) {
       document.getElementById('cmd-list').innerHTML =
-        '<div class="cmd-empty" style="display:block;"><div class="cmd-empty-icon">📭</div>No commands configured yet.</div>';
+        '<div class="cmd-empty" style="display:block;"><div class="cmd-empty-icon">📭</div>No commands available.</div>';
     } else {
       renderCommands(CMD_DATA);
     }
