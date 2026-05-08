@@ -478,8 +478,18 @@
 
 
   /* ── MONSTER MODAL (reuses item-modal styles) ── */
-  #monster-modal-overlay { display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,.7); backdrop-filter:blur(6px); align-items:center; justify-content:center; }
-  #monster-modal-overlay.open { display:flex; }
+  #monster-modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,.72); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  #monster-modal-overlay.open { display: flex; }
+  .item-modal-legend {
+    display: flex; align-items: center; gap: 14px;
+    padding: 8px 22px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px; flex-shrink: 0;
+  }
 
 </style>
   <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
@@ -542,18 +552,22 @@
 
 
 <!-- ── MONSTER ID MODAL ── -->
-<div id="monster-modal-overlay">
+<div id="monster-modal-overlay" role="dialog" aria-modal="true" aria-label="Monster ID List">
   <div class="item-modal">
-    <div class="item-modal-header">
-      <div>
-        <div class="item-modal-title">👾 MVP Monster IDs</div>
-        <div class="item-modal-sub"><span style="color:#fb923c;font-weight:600;">■ MVP</span> &nbsp;<span style="color:#c084fc;font-weight:600;">■ Mini</span> &nbsp;Normal monsters not listed.</div>
-      </div>
-      <button class="item-modal-close" id="monster-modal-close">✕</button>
+    <div class="item-modal-head">
+      <div class="item-modal-title">👾 Monster ID Reference</div>
+      <div class="item-modal-count" id="monster-modal-count">0 monsters</div>
+      <button class="item-modal-close" id="monster-modal-close" title="Close">✕</button>
     </div>
     <div class="item-modal-search-wrap">
-      <input class="item-modal-search" id="monster-modal-search" type="text" placeholder="Search by ID or name…" autocomplete="off"/>
-      <div class="item-modal-count" id="monster-modal-count"></div>
+      <span class="item-modal-search-icon">🔍</span>
+      <input class="item-modal-search" id="monster-modal-search"
+             placeholder="Search by ID or monster name..." autocomplete="off"/>
+    </div>
+    <div class="item-modal-legend">
+      <span style="color:#fb923c;font-weight:700;">⬟ MVP</span>
+      <span style="color:#c084fc;font-weight:700;">⬟ Mini</span>
+      <span style="color:var(--text3);font-size:11px;">Normal monsters not listed</span>
     </div>
     <div class="item-modal-list" id="monster-modal-list"></div>
   </div>
