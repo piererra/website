@@ -310,7 +310,6 @@
     <button class="tab-btn active" data-tab="posts">📝 Posts</button>
     <button class="tab-btn" data-tab="editor">✏️ Editor</button>
     <button class="tab-btn" data-tab="passwords">🔐 Passwords</button>
-    <button class="tab-btn" data-tab="passwords">🔐 Passwords</button>
 
   </div>
 
@@ -414,46 +413,6 @@
     </div>
 
 
-    <!-- PASSWORDS TAB -->
-    <div class="tab-panel" id="tab-passwords">
-      <div class="editor-wrap" style="max-width:560px;">
-        <div style="margin-bottom:28px;">
-          <div class="section-heading" style="margin-bottom:6px;">Command List <span>Password</span></div>
-          <div style="font-size:13px;color:var(--text2);line-height:1.6;">Controls access to <code style="background:rgba(73,117,254,.15);border-radius:4px;padding:2px 8px;color:#a0c4ff;font-size:12px;">command-list.html</code>. Stored as a salted hash — never readable by visitors.</div>
-        </div>
-        <div id="pw-status-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;margin-bottom:20px;">
-          <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Current Status</div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div id="pw-status-dot" style="width:10px;height:10px;border-radius:50%;background:var(--text3);flex-shrink:0;"></div>
-            <div>
-              <div id="pw-status-label" style="font-size:14px;font-weight:600;color:var(--text2);">Loading...</div>
-              <div id="pw-status-sub" style="font-size:11px;color:var(--text3);margin-top:2px;"></div>
-            </div>
-            <span id="pw-display" style="margin-left:auto;font-family:monospace;font-size:20px;letter-spacing:4px;color:var(--text3);">••••••••</span>
-          </div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;">
-          <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;" id="pw-form-title">Set Password</div>
-          <div style="margin-bottom:14px;">
-            <label class="ef-label">New Password</label>
-            <div style="position:relative;">
-              <input class="ef-input" id="pw-new" type="password" placeholder="Enter new password" autocomplete="new-password" style="padding-right:48px;"/>
-              <button type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;" onclick="const i=document.getElementById('pw-new');i.type=i.type==='password'?'text':'password'">👁</button>
-            </div>
-          </div>
-          <div style="margin-bottom:20px;">
-            <label class="ef-label">Confirm Password</label>
-            <input class="ef-input" id="pw-confirm" type="password" placeholder="Repeat new password" autocomplete="new-password"/>
-          </div>
-          <div id="pw-form-error" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(248,113,113,.10);border:1px solid rgba(248,113,113,.25);border-radius:10px;font-size:13px;color:var(--red);"></div>
-          <div style="display:flex;gap:10px;">
-            <button class="btn-publish" id="pw-save-btn" style="flex:1;justify-content:center;" onclick="saveNewPassword()">💾 Save Password</button>
-            <button id="pw-clear-btn" style="display:none;font-size:12px;font-weight:600;font-family:'Sora',sans-serif;color:var(--red);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:11px 16px;cursor:pointer;" onclick="clearPassword()">🗑 Remove</button>
-          </div>
-          <div style="margin-top:14px;font-size:11px;color:var(--text3);">After saving, click <strong style="color:var(--yellow);">Push to GitHub</strong> to apply.</div>
-        </div>
-      </div>
-    </div>
 
 
     <!-- PASSWORDS TAB -->
@@ -461,7 +420,7 @@
       <div class="editor-wrap" style="max-width:600px;">
         <div style="margin-bottom:24px;">
           <div class="section-heading" style="margin-bottom:6px;">Command List <span>Passwords</span></div>
-          <div style="font-size:13px;color:var(--text2);line-height:1.6;">Manage access passwords for <code style="background:rgba(73,117,254,.15);border-radius:4px;padding:2px 8px;color:#a0c4ff;font-size:12px;">command-list.html</code>. Multiple passwords supported. Stored securely in Upstash KV.</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;">Manage access passwords for <code style="background:rgba(73,117,254,.15);border-radius:4px;padding:2px 8px;color:#a0c4ff;font-size:12px;">command-list.html</code>. Multiple passwords supported. Stored securely in Upstash KV — no GitHub push needed.</div>
         </div>
 
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;margin-bottom:20px;">
@@ -469,7 +428,7 @@
             <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:1px;text-transform:uppercase;">Active Passwords</div>
             <button onclick="loadPasswordList()" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:6px;font-family:'Sora',sans-serif;">↻ Refresh</button>
           </div>
-          <div id="pw-list"><div style="color:var(--text3);font-size:13px;">Open this tab to load passwords.</div></div>
+          <div id="pw-list"><div style="color:var(--text3);font-size:13px;">Loading...</div></div>
         </div>
 
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;">
@@ -511,7 +470,6 @@
         </div>
       </div>
     </div>
-
 
 
   </div>
@@ -629,8 +587,7 @@ function setupLogin() {
     btn.disabled = true; btn.textContent = 'Verifying...';
     try {
       const res = await fetch('/api/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'login', username: u, password: p })
       });
       const d = await res.json();
@@ -1001,8 +958,7 @@ async function pushToGitHub() {
   if (!u || !p) { toast('Session expired. Please log in again.', 'error'); location.reload(); return; }
   try {
     const res = await fetch('/api/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'save', username: u, password: p, content: JSON.stringify(data, null, 2) })
     });
     const result = await res.json();
@@ -1013,88 +969,15 @@ async function pushToGitHub() {
     } else { toast(result.error || 'Push failed.', 'error'); }
   } catch { toast('Network error.', 'error'); }
   btn.disabled = !hasUnsaved;
-  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.96.57.1.78-.25.78-.55v-1.93C5.94 21.1 5.27 19 5.27 19c-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.53-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.18A10.9 10.9 0 0 1 12 6.84c.97.004 1.95.13 2.86.38 2.18-1.49 3.14-1.18 3.14-1.18.63 1.57.23 2.73.11 3.02.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.37-5.25 5.65.41.36.78 2.13v3.16c0 .3.2.65.79.55C20.71 21.42 24 17.1 24 12c0-6.35-5.15-11.5-12-11.5z"/></svg> Push to GitHub`;
+  btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.96.57.1.78-.25.78-.55v-1.93C5.94 21.1 5.27 19 5.27 19c-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.53-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.18A10.9 10.9 0 0 1 12 6.84c.97.004 1.95.13 2.86.38 2.18-1.49 3.14-1.18 3.14-1.18.63 1.57.23 2.73.11 3.02.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.37-5.25 5.65.41.36.78 2.13v3.16c0 .3.2.65.79.55C20.71 21.42 24 17.1 24 12c0-6.35-5.15-11.5-12-11.5z"/></svg> Push to GitHub';
 }
-
-// ── PASSWORD MANAGEMENT ──────────────────────────────────────
-async function sha256hex(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-function genSalt(len=32) {
-  const arr = crypto.getRandomValues(new Uint8Array(len));
-  return Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-async function loadPasswordStatus() {
-  try {
-    const res = await fetch('json/data.json?v=' + Date.now());
-    if (!res.ok) throw new Error();
-    const d = await res.json();
-    updatePasswordStatusUI(d.cmdPassword || null);
-  } catch { document.getElementById('pw-status-label').textContent = 'Could not load data.json'; }
-}
-function updatePasswordStatusUI(cmdPassword) {
-  const dot = document.getElementById('pw-status-dot');
-  const label = document.getElementById('pw-status-label');
-  const sub = document.getElementById('pw-status-sub');
-  const title = document.getElementById('pw-form-title');
-  const clearBtn = document.getElementById('pw-clear-btn');
-  if (cmdPassword && cmdPassword.hash) {
-    dot.style.background = 'var(--green)'; dot.style.boxShadow = '0 0 6px var(--green)';
-    label.style.color = 'var(--green)'; label.textContent = 'Password is set';
-    sub.textContent = 'Hash: ' + cmdPassword.hash.substring(0,16) + '…';
-    title.textContent = 'Change Password'; clearBtn.style.display = 'block';
-  } else {
-    dot.style.background = 'var(--red)'; dot.style.boxShadow = '0 0 6px var(--red)';
-    label.style.color = 'var(--red)'; label.textContent = 'No password set';
-    sub.textContent = 'command-list.html will show "Password not set" error';
-    title.textContent = 'Set Password'; clearBtn.style.display = 'none';
-  }
-}
-async function saveNewPassword() {
-  const pw = document.getElementById('pw-new').value;
-  const pw2 = document.getElementById('pw-confirm').value;
-  const errEl = document.getElementById('pw-form-error');
-  errEl.style.display = 'none';
-  function showPwErr(msg) { errEl.textContent = msg; errEl.style.display = 'block'; }
-  if (!pw) { showPwErr('Please enter a new password.'); return; }
-  if (pw !== pw2) { showPwErr('Passwords do not match.'); return; }
-  if (pw.length < 4) { showPwErr('Password must be at least 4 characters.'); return; }
-  const btn = document.getElementById('pw-save-btn');
-  btn.disabled = true; btn.textContent = 'Saving…';
-  const salt = genSalt();
-  const hash = await sha256hex(salt + pw);
-  data.cmdPassword = { salt, hash };
-  saveLocal(); hasUnsaved = true;
-  document.getElementById('btn-push').disabled = false;
-  updatePasswordStatusUI(data.cmdPassword);
-  document.getElementById('pw-new').value = '';
-  document.getElementById('pw-confirm').value = '';
-  toast('Password saved! Click "Push to GitHub" to apply.', 'success');
-  btn.disabled = false; btn.textContent = '💾 Save Password';
-}
-async function clearPassword() {
-  if (!confirm('Remove the command list password?')) return;
-  data.cmdPassword = null;
-  saveLocal(); hasUnsaved = true;
-  document.getElementById('btn-push').disabled = false;
-  updatePasswordStatusUI(null);
-  toast('Password removed. Push to GitHub to apply.', 'success');
-}
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (btn.dataset.tab === 'passwords') loadPasswordStatus();
-  });
-});
-
 
 // ── PASSWORD MANAGEMENT (Upstash KV) ─────────────────────────
 
 function getAdminCreds() {
   return { username: sessionStorage.getItem('piererra_u'), password: sessionStorage.getItem('piererra_p') };
 }
-
-function escHtmlAdmin(s) {
+function escA(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
@@ -1108,14 +991,14 @@ async function loadPasswordList() {
       body: JSON.stringify({ action:'list', username, password })
     });
     const data = await res.json();
-    if (!res.ok) { listEl.innerHTML = `<div style="color:var(--red);font-size:13px;">${data.error}</div>`; return; }
+    if (!res.ok) { listEl.innerHTML = `<div style="color:var(--red);font-size:13px;padding:8px 0;">${data.error}</div>`; return; }
     renderPasswordList(data.passwords);
-  } catch { listEl.innerHTML = '<div style="color:var(--red);font-size:13px;">Network error.</div>'; }
+  } catch(e) { listEl.innerHTML = `<div style="color:var(--red);font-size:13px;padding:8px 0;">Network error: ${e.message}</div>`; }
 }
 
 function renderPasswordList(passwords) {
   const listEl = document.getElementById('pw-list');
-  if (!passwords.length) {
+  if (!passwords || !passwords.length) {
     listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px 0;text-align:center;">No passwords yet. Add one below.</div>';
     return;
   }
@@ -1124,23 +1007,23 @@ function renderPasswordList(passwords) {
     const isExpired = pw.expiresAt && now > new Date(pw.expiresAt).getTime();
     const daysLeft = pw.expiresAt ? Math.ceil((new Date(pw.expiresAt) - now)/(1000*60*60*24)) : null;
     const expiringSoon = !isExpired && daysLeft !== null && daysLeft <= 2;
-    let statusColor = isExpired ? 'var(--red)' : expiringSoon ? 'var(--yellow)' : 'var(--green)';
-    let statusText  = isExpired ? 'Expired' : expiringSoon ? daysLeft+'d left' : 'Active';
-    let expiryText  = pw.expiresAt
+    const statusColor = isExpired ? 'var(--red)' : expiringSoon ? 'var(--yellow)' : 'var(--green)';
+    const statusText  = isExpired ? 'Expired' : expiringSoon ? daysLeft+'d left' : 'Active';
+    const expiryText  = pw.expiresAt
       ? (isExpired ? 'Expired ' : 'Expires ') + new Date(pw.expiresAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
       : 'No expiry';
-    const createdText = pw.createdAt ? ' · Added ' + new Date(pw.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+    const createdText = pw.createdAt ? ' · ' + new Date(pw.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
     return `<div class="pw-list-item">
       <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
         <div style="width:8px;height:8px;border-radius:50%;background:${statusColor};box-shadow:0 0 5px ${statusColor};flex-shrink:0;"></div>
         <div style="min-width:0;">
-          <div style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtmlAdmin(pw.label)}</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escA(pw.label)}</div>
           <div style="font-size:11px;color:var(--text3);margin-top:2px;">${expiryText}${createdText}</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
         <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;background:${statusColor}18;color:${statusColor};border:1px solid ${statusColor}33;">${statusText}</span>
-        <button onclick="deletePassword('${pw.id}','${escHtmlAdmin(pw.label)}')" style="font-size:11px;font-weight:600;font-family:'Sora',sans-serif;color:var(--red);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:5px 10px;cursor:pointer;">🗑</button>
+        <button onclick="deletePassword('${pw.id}','${escA(pw.label)}')" style="font-size:11px;font-weight:600;font-family:'Sora',sans-serif;color:var(--red);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:5px 10px;cursor:pointer;">🗑</button>
       </div>
     </div>`;
   }).join('');
@@ -1182,7 +1065,7 @@ async function saveNewPassword() {
       toast(`Password "${label}" added!`, 'success');
       loadPasswordList();
     } else { showPwErr(data.error || 'Failed to add password.'); }
-  } catch { showPwErr('Network error.'); }
+  } catch(e) { showPwErr('Network error: ' + e.message); }
   btn.disabled = false; btn.textContent = '+ Add Password';
 }
 
@@ -1197,33 +1080,30 @@ async function deletePassword(id, label) {
     const data = await res.json();
     if (res.ok && data.ok) { toast(`"${label}" removed.`, 'success'); loadPasswordList(); }
     else { toast(data.error || 'Failed.', 'error'); }
-  } catch { toast('Network error.', 'error'); }
+  } catch(e) { toast('Network error: ' + e.message, 'error'); }
 }
 
 document.getElementById('pw-expiry-btns').addEventListener('click', function(e) {
-  const btn = e.target.closest('.expiry-btn');
-  if (!btn) return;
-  document.querySelectorAll('.expiry-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const days = btn.dataset.days;
+  const b = e.target.closest('.expiry-btn');
+  if (!b) return;
+  document.querySelectorAll('.expiry-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  const days = b.dataset.days;
   document.getElementById('pw-custom-days-wrap').style.display = days === 'custom' ? 'block' : 'none';
   const preview = document.getElementById('pw-expiry-preview');
   if (days === '0') { preview.textContent = 'Password will never expire.'; }
   else if (days === 'custom') { preview.textContent = 'Enter number of days above.'; }
   else {
-    const expDate = new Date(Date.now() + parseInt(days)*24*60*60*1000)
-      .toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
-    preview.textContent = `Expires on ${expDate}`;
+    const d = parseInt(days);
+    preview.textContent = 'Expires on ' + new Date(Date.now()+d*86400000).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
   }
 });
 document.getElementById('pw-custom-days').addEventListener('input', function() {
   const d = parseInt(this.value);
   const preview = document.getElementById('pw-expiry-preview');
-  if (d > 0) {
-    const expDate = new Date(Date.now() + d*24*60*60*1000)
-      .toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
-    preview.textContent = `Expires on ${expDate}`;
-  } else { preview.textContent = 'Enter a valid number of days.'; }
+  preview.textContent = d > 0
+    ? 'Expires on ' + new Date(Date.now()+d*86400000).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})
+    : 'Enter a valid number of days.';
 });
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => { if (btn.dataset.tab === 'passwords') loadPasswordList(); });
