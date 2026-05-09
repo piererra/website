@@ -486,8 +486,7 @@
   #monster-modal-overlay.open { display: flex; }
   .item-modal-legend {
     display: flex; align-items: center; gap: 14px;
-    padding: 8px 22px 10px;
-    border-bottom: 1px solid var(--border);
+    padding: 8px 22px 10px; border-bottom: 1px solid var(--border);
     font-size: 12px; flex-shrink: 0;
   }
 
@@ -507,7 +506,7 @@
     <div class="lock-sub">Enter the access password to continue</div>
     <div class="lock-field">
       <input type="password" id="pw-input" placeholder="Enter password" autocomplete="off" spellcheck="false"/>
-      <button class="eye-btn" id="eye-btn" tabindex="-1">👁</button>
+      <button class="eye-btn" id="eye-btn" tabindex="-1"><i class="fa-solid fa-eye" id="eye-icon"></i></button>
     </div>
     <button class="lock-btn" id="unlock-btn">Unlock Access</button>
     <div class="lock-error" id="lock-error">Incorrect password. Please try again.</div>
@@ -561,8 +560,7 @@
     </div>
     <div class="item-modal-search-wrap">
       <span class="item-modal-search-icon">🔍</span>
-      <input class="item-modal-search" id="monster-modal-search"
-             placeholder="Search by ID or monster name..." autocomplete="off"/>
+      <input class="item-modal-search" id="monster-modal-search" placeholder="Search by ID or monster name..." autocomplete="off"/>
     </div>
     <div class="item-modal-legend">
       <span style="color:#fb923c;font-weight:700;">⬟ MVP</span>
@@ -595,7 +593,6 @@
 // ── AUTH & DATA — loaded from data.json + items.json + monsters.json ──
 // Passwords stored as salted SHA-256 hash — never reversible from client side.
 
-// Commands are fetched from /api/commands after unlock — never stored in this file
 let CMD_DATA = null;
 let GM_ITEMS = [];
 let GM_MONSTERS = [];
@@ -605,17 +602,19 @@ async function sha256hex(str) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
+let CMD_DATA = null;
+let GM_ITEMS = [];
+let GM_MONSTERS = [];
+
 async function loadAll() {
-  // Load item and monster reference data (public, non-sensitive)
   try {
     const r2 = await fetch('json/items.json?v=' + Date.now());
     if (r2.ok) GM_ITEMS = await r2.json();
-  } catch (e) { GM_ITEMS = []; }
+  } catch { GM_ITEMS = []; }
   try {
     const r3 = await fetch('json/monsters.json?v=' + Date.now());
     if (r3.ok) GM_MONSTERS = await r3.json();
-  } catch (e) { GM_MONSTERS = []; }
-  // Password verification is fully server-side via /api/passwords
+  } catch { GM_MONSTERS = []; }
 }
 loadAll();
 
@@ -625,8 +624,11 @@ const MAX_ATTEMPTS = 5;
 let lockoutUntil = 0;
 
 document.getElementById('eye-btn').addEventListener('click', () => {
-  const inp = document.getElementById('pw-input');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
+  const inp  = document.getElementById('pw-input');
+  const icon = document.getElementById('eye-icon');
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  icon.className = show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
 });
 document.getElementById('pw-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') tryUnlock();
@@ -646,7 +648,6 @@ async function tryUnlock() {
   btn.textContent = 'Verifying...'; btn.disabled = true;
 
   try {
-    // Send password to server — hash never exposed to client
     const res = await fetch('/api/passwords', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -655,17 +656,14 @@ async function tryUnlock() {
     const result = await res.json();
 
     if (res.ok && result.ok) {
-      // Store token in sessionStorage (cleared on tab close)
-      sessionStorage.setItem('cmd_token', result.token);
       attempts = 0;
+      sessionStorage.setItem('cmd_token', result.token);
 
-      // Show expiry warning if close to expiry
       if (result.daysLeft !== undefined && result.daysLeft <= 2) {
         showError(`⚡ Password expires in ${result.daysLeft} day${result.daysLeft !== 1 ? 's' : ''}.`);
       }
 
       btn.textContent = 'Loading...';
-      // Fetch commands using token
       try {
         const cmdRes = await fetch('/api/commands', {
           method: 'POST',
@@ -679,7 +677,7 @@ async function tryUnlock() {
       btn.textContent = 'Unlock Access'; btn.disabled = false;
       document.getElementById('lock-screen').style.display = 'none';
       document.getElementById('main-content').style.display = 'block';
-      if (!CMD_DATA || !CMD_DATA.categories || CMD_DATA.categories.length === 0) {
+      if (!CMD_DATA || !CMD_DATA.categories || !CMD_DATA.categories.length) {
         document.getElementById('cmd-list').innerHTML =
           '<div class="cmd-empty" style="display:block;"><div class="cmd-empty-icon">📭</div>No commands available.</div>';
       } else {
@@ -695,18 +693,16 @@ async function tryUnlock() {
         showError('Too many failed attempts. Locked for 30 seconds.');
       } else {
         const left = MAX_ATTEMPTS - attempts;
-        // Show server error message (includes expiry message if expired)
         showError((result.error || 'Incorrect password.') + (left < MAX_ATTEMPTS ? ` ${left} attempt${left !== 1 ? 's' : ''} remaining.` : ''));
       }
       document.getElementById('lock-attempts').textContent =
         attempts > 0 ? `Failed attempts: ${attempts}/${MAX_ATTEMPTS}` : '';
       btn.textContent = 'Unlock Access'; btn.disabled = false;
     }
-  } catch (e) {
+  } catch(e) {
     showError('Network error. Check your connection.');
     btn.textContent = 'Unlock Access'; btn.disabled = false;
   }
-}
 }
 
 function showError(msg) {
