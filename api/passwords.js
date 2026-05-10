@@ -26,8 +26,8 @@ function safeEqual(a, b) {
 
 function getKV() {
   return {
-    url:   process.env.STORAGE_KV_REST_API_URL   || process.env.STORAGE_KV_REST_API_URL   || '',
-    token: process.env.STORAGE_KV_REST_API_TOKEN || process.env.STORAGE_KV_REST_API_TOKEN || '',
+    url:   process.env.STORAGE_KV_REST_API_URL   || '',
+    token: process.env.STORAGE_KV_REST_API_TOKEN || '',
   };
 }
 
