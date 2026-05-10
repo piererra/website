@@ -476,7 +476,6 @@
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
   }
 
-
   /* ── MONSTER MODAL (reuses item-modal styles) ── */
   #monster-modal-overlay {
     display: none; position: fixed; inset: 0; z-index: 1000;
@@ -591,20 +590,10 @@
 </div>
 
 <script>
-// ── AUTH & DATA — loaded from data.json + items.json + monsters.json ──
-// Passwords stored as salted SHA-256 hash — never reversible from client side.
+// ── DATA — loaded from items.json + monsters.json ──
 
-let CMD_DATA = null;
-let GM_ITEMS = [];
-let GM_MONSTERS = [];
-
-async function sha256hex(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-let CMD_DATA = null;
-let GM_ITEMS = [];
+let CMD_DATA    = null;
+let GM_ITEMS    = [];
 let GM_MONSTERS = [];
 
 async function loadAll() {
@@ -620,7 +609,7 @@ async function loadAll() {
 loadAll();
 
 // ── LOCK / UNLOCK ─────────────────────────────────────────
-let attempts = 0;
+let attempts    = 0;
 const MAX_ATTEMPTS = 5;
 let lockoutUntil = 0;
 
@@ -737,7 +726,7 @@ function renderCommands(data) {
     sec.className = 'cmd-category';
     sec.style.animationDelay = `${ci * 0.07}s`;
     sec.dataset.catid = cat.id;
-    const isUnknown = cat.id === 'unknown';
+    const isUnknown     = cat.id === 'unknown';
     const showItemBtn   = ITEM_CAT_IDS.includes(cat.id);
     const showMonsterBtn = MONSTER_CAT_IDS.includes(cat.id);
 
@@ -874,12 +863,12 @@ function renderMonsterList() {
     const safeName = String(m.name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const isMvp  = m.type === 'mvp';
     const isMini = m.type === 'mini';
-    const idColor   = isMvp  ? '#fb923c' : isMini ? '#c084fc' : '';
-    const idBorder  = isMvp  ? 'rgba(251,146,60,.35)'  : isMini ? 'rgba(192,132,252,.35)' : '';
-    const idBg      = isMvp  ? 'rgba(251,146,60,.10)'  : isMini ? 'rgba(192,132,252,.10)' : '';
-    const badge     = isMvp  ? '<span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:1px 5px;border-radius:4px;background:rgba(251,146,60,.15);color:#fb923c;border:1px solid rgba(251,146,60,.3);margin-left:6px;">MVP</span>'
-                    : isMini ? '<span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:1px 5px;border-radius:4px;background:rgba(192,132,252,.15);color:#c084fc;border:1px solid rgba(192,132,252,.3);margin-left:6px;">MINI</span>'
-                    : '';
+    const idColor  = isMvp  ? '#fb923c' : isMini ? '#c084fc' : '';
+    const idBorder = isMvp  ? 'rgba(251,146,60,.35)'  : isMini ? 'rgba(192,132,252,.35)' : '';
+    const idBg     = isMvp  ? 'rgba(251,146,60,.10)'  : isMini ? 'rgba(192,132,252,.10)' : '';
+    const badge    = isMvp  ? '<span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:1px 5px;border-radius:4px;background:rgba(251,146,60,.15);color:#fb923c;border:1px solid rgba(251,146,60,.3);margin-left:6px;">MVP</span>'
+                   : isMini ? '<span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:1px 5px;border-radius:4px;background:rgba(192,132,252,.15);color:#c084fc;border:1px solid rgba(192,132,252,.3);margin-left:6px;">MINI</span>'
+                   : '';
     const lvLabel = m.level ? `<span style="font-size:10px;color:var(--text3);margin-left:6px;font-family:monospace;">Lv${m.level}</span>` : '';
     return `<div class="item-row" onclick="copyModalId('${escAttr(m.id)}',this)" title="Click to copy ID">
       <span class="item-id" style="color:${idColor};border-color:${idBorder};background:${idBg}">${m.id}</span>
