@@ -52,9 +52,8 @@ function renderFeatured(games) {
 
   // Triplicate items so the seamless loop never shows a gap
   const items = popular.map(g => {
-    const dot = g.status === 'online' ? '🟢' : '⚫';
     const tag = g.tag ? ' · ' + esc(g.tag) : '';
-    return `<span class="mq-item" onclick='handleGameClick(${JSON.stringify(g).replace(/'/g, "&#39;")})'>${dot} ${esc(g.name)}${tag}</span><span class="mq-sep">✦</span>`;
+    return `<span class="mq-item" onclick='handleGameClick(${JSON.stringify(g).replace(/'/g, "&#39;")})'>${esc(g.name)}${tag}</span><span class="mq-sep">✦</span>`;
   }).join('');
 
   track.innerHTML = items + items + items;
