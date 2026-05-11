@@ -476,6 +476,7 @@
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
   }
 
+
   /* ── MONSTER MODAL (reuses item-modal styles) ── */
   #monster-modal-overlay {
     display: none; position: fixed; inset: 0; z-index: 1000;
@@ -501,7 +502,7 @@
 <!-- ── LOCK SCREEN ── -->
 <div id="lock-screen">
   <div class="lock-card">
-    <div class="lock-icon">🔐</div>
+    <div class="lock-icon"><i class="fa-solid fa-lock"></i></div>
     <div class="lock-title">GM Command List</div>
     <div class="lock-sub">Enter the access password to continue</div>
     <div class="lock-field">
@@ -521,7 +522,7 @@
     <div class="cmd-nav-logo">Piererra</div>
     <div class="cmd-nav-tag">GM Commands</div>
     <div style="display:flex;gap:8px;align-items:center;">
-      <button class="cmd-lock-btn" onclick="lockPage()">🔒 Lock</button>
+      <button class="cmd-lock-btn" onclick="lockPage()"><i class="fa-solid fa-lock"></i> Lock</button>
     </div>
   </nav>
 
@@ -533,13 +534,13 @@
     </div>
 
     <div class="cmd-search-wrap">
-      <span class="cmd-search-icon">🔍</span>
+      <span class="cmd-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
       <input class="cmd-search" id="cmd-search" placeholder="Search commands..." autocomplete="off"/>
     </div>
 
     <div id="cmd-list"></div>
     <div class="cmd-empty" id="cmd-empty">
-      <div class="cmd-empty-icon">🔎</div>
+      <div class="cmd-empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
       No commands match your search.
     </div>
   </div>
@@ -554,12 +555,12 @@
 <div id="monster-modal-overlay" role="dialog" aria-modal="true" aria-label="Monster ID List">
   <div class="item-modal">
     <div class="item-modal-head">
-      <div class="item-modal-title">👾 Monster ID Reference</div>
+      <div class="item-modal-title"><i class="fa-solid fa-skull"></i> Monster ID Reference</div>
       <div class="item-modal-count" id="monster-modal-count">0 monsters</div>
-      <button class="item-modal-close" id="monster-modal-close" title="Close">✕</button>
+      <button class="item-modal-close" id="monster-modal-close" title="Close"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="item-modal-search-wrap">
-      <span class="item-modal-search-icon">🔍</span>
+      <span class="item-modal-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
       <input class="item-modal-search" id="monster-modal-search" placeholder="Search by ID or monster name..." autocomplete="off"/>
     </div>
     <div class="item-modal-legend">
@@ -576,12 +577,12 @@
 <div id="item-modal-overlay" role="dialog" aria-modal="true" aria-label="Item ID List">
   <div class="item-modal">
     <div class="item-modal-head">
-      <div class="item-modal-title">📦 Item ID Reference</div>
+      <div class="item-modal-title"><i class="fa-solid fa-box"></i> Item ID Reference</div>
       <div class="item-modal-count" id="item-modal-count">4690 items</div>
-      <button class="item-modal-close" id="item-modal-close" title="Close">✕</button>
+      <button class="item-modal-close" id="item-modal-close" title="Close"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="item-modal-search-wrap">
-      <span class="item-modal-search-icon">🔍</span>
+      <span class="item-modal-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
       <input class="item-modal-search" id="item-modal-search"
              placeholder="Search by ID or item name..." autocomplete="off"/>
     </div>
@@ -590,10 +591,20 @@
 </div>
 
 <script>
-// ── DATA — loaded from items.json + monsters.json ──
+// ── AUTH & DATA — loaded from data.json + items.json + monsters.json ──
+// Passwords stored as salted SHA-256 hash — never reversible from client side.
 
-let CMD_DATA    = null;
-let GM_ITEMS    = [];
+let CMD_DATA = null;
+let GM_ITEMS = [];
+let GM_MONSTERS = [];
+
+async function sha256hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+let CMD_DATA = null;
+let GM_ITEMS = [];
 let GM_MONSTERS = [];
 
 async function loadAll() {
@@ -609,7 +620,7 @@ async function loadAll() {
 loadAll();
 
 // ── LOCK / UNLOCK ─────────────────────────────────────────
-let attempts    = 0;
+let attempts = 0;
 const MAX_ATTEMPTS = 5;
 let lockoutUntil = 0;
 
@@ -651,7 +662,7 @@ async function tryUnlock() {
       sessionStorage.setItem('cmd_token', result.token);
 
       if (result.daysLeft !== undefined && result.daysLeft <= 2) {
-        showError(`⚡ Password expires in ${result.daysLeft} day${result.daysLeft !== 1 ? 's' : ''}.`);
+        showError(`<i class='fa-solid fa-bolt'></i> Password expires in ${result.daysLeft} day${result.daysLeft !== 1 ? 's' : ''}.`);
       }
 
       btn.textContent = 'Loading...';
@@ -670,7 +681,7 @@ async function tryUnlock() {
       document.getElementById('main-content').style.display = 'block';
       if (!CMD_DATA || !CMD_DATA.categories || !CMD_DATA.categories.length) {
         document.getElementById('cmd-list').innerHTML =
-          '<div class="cmd-empty" style="display:block;"><div class="cmd-empty-icon">📭</div>No commands available.</div>';
+          '<div class="cmd-empty" style="display:block;"><div class="cmd-empty-icon"><i class="fa-solid fa-box-open"></i></div>No commands available.</div>';
       } else {
         renderCommands(CMD_DATA);
       }
@@ -726,7 +737,7 @@ function renderCommands(data) {
     sec.className = 'cmd-category';
     sec.style.animationDelay = `${ci * 0.07}s`;
     sec.dataset.catid = cat.id;
-    const isUnknown     = cat.id === 'unknown';
+    const isUnknown = cat.id === 'unknown';
     const showItemBtn   = ITEM_CAT_IDS.includes(cat.id);
     const showMonsterBtn = MONSTER_CAT_IDS.includes(cat.id);
 
@@ -738,12 +749,12 @@ function renderCommands(data) {
       </div>
       ${cat.commands.map(cmd => `
         <div class="cmd-card" data-search="${(cmd.syntax + cmd.desc + cmd.example).toLowerCase()}">
-          ${isUnknown ? '<span class="unknown-badge">⚠ Unknown Usage</span>' : ''}
+          ${isUnknown ? '<span class="unknown-badge"><i class="fa-solid fa-triangle-exclamation"></i> Unknown Usage</span>' : ''}
           <div class="cmd-syntax-row">
             <code class="cmd-syntax">${escHtml(cmd.syntax)}</code>
             <button class="cmd-copy" onclick="copyCmd(this, '${escAttr(cmd.syntax)}')">Copy</button>
-            ${showItemBtn    ? '<button class="item-list-btn" onclick="openItemModal()">📦 Item IDs</button>' : ''}
-            ${showMonsterBtn ? '<button class="item-list-btn" style="background:rgba(248,113,113,.10);border-color:rgba(248,113,113,.25);color:#fca5a5;" onclick="openMonsterModal()">👾 Monster IDs</button>' : ''}
+            ${showItemBtn    ? '<button class="item-list-btn" onclick="openItemModal()"><i class="fa-solid fa-box"></i> Item IDs</button>' : ''}
+            ${showMonsterBtn ? '<button class="item-list-btn" style="background:rgba(248,113,113,.10);border-color:rgba(248,113,113,.25);color:#fca5a5;" onclick="openMonsterModal()"><i class="fa-solid fa-skull"></i> Monster IDs</button>' : ''}
           </div>
           <div class="cmd-desc">${escHtml(cmd.desc)}</div>
           <div class="cmd-example-row">
@@ -776,9 +787,9 @@ function renderCommands(data) {
 
 function copyCmd(btn, text) {
   navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '✓ Copied!';
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
     btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    setTimeout(() => { btn.innerHTML = 'Copy'; btn.classList.remove('copied'); }, 2000);
   });
 }
 function escHtml(s) {
@@ -863,12 +874,12 @@ function renderMonsterList() {
     const safeName = String(m.name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const isMvp  = m.type === 'mvp';
     const isMini = m.type === 'mini';
-    const idColor  = isMvp  ? '#fb923c' : isMini ? '#c084fc' : '';
-    const idBorder = isMvp  ? 'rgba(251,146,60,.35)'  : isMini ? 'rgba(192,132,252,.35)' : '';
-    const idBg     = isMvp  ? 'rgba(251,146,60,.10)'  : isMini ? 'rgba(192,132,252,.10)' : '';
-    const badge    = isMvp  ? '<span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:1px 5px;border-radius:4px;background:rgba(251,146,60,.15);color:#fb923c;border:1px solid rgba(251,146,60,.3);margin-left:6px;">MVP</span>'
-                   : isMini ? '<span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:1px 5px;border-radius:4px;background:rgba(192,132,252,.15);color:#c084fc;border:1px solid rgba(192,132,252,.3);margin-left:6px;">MINI</span>'
-                   : '';
+    const idColor   = isMvp  ? '#fb923c' : isMini ? '#c084fc' : '';
+    const idBorder  = isMvp  ? 'rgba(251,146,60,.35)'  : isMini ? 'rgba(192,132,252,.35)' : '';
+    const idBg      = isMvp  ? 'rgba(251,146,60,.10)'  : isMini ? 'rgba(192,132,252,.10)' : '';
+    const badge     = isMvp  ? '<span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:1px 5px;border-radius:4px;background:rgba(251,146,60,.15);color:#fb923c;border:1px solid rgba(251,146,60,.3);margin-left:6px;">MVP</span>'
+                    : isMini ? '<span style="font-size:9px;font-weight:700;letter-spacing:.5px;padding:1px 5px;border-radius:4px;background:rgba(192,132,252,.15);color:#c084fc;border:1px solid rgba(192,132,252,.3);margin-left:6px;">MINI</span>'
+                    : '';
     const lvLabel = m.level ? `<span style="font-size:10px;color:var(--text3);margin-left:6px;font-family:monospace;">Lv${m.level}</span>` : '';
     return `<div class="item-row" onclick="copyModalId('${escAttr(m.id)}',this)" title="Click to copy ID">
       <span class="item-id" style="color:${idColor};border-color:${idBorder};background:${idBg}">${m.id}</span>
@@ -899,7 +910,7 @@ function copyModalId(id, rowEl) {
   navigator.clipboard.writeText(id).then(() => {
     const hint = rowEl.querySelector('.item-copy-hint');
     const idEl  = rowEl.querySelector('.item-id');
-    if (hint) hint.textContent = '✓ copied';
+    if (hint) hint.innerHTML = '<i class="fa-solid fa-check"></i> copied';
     if (idEl)  { idEl.style.color = '#4ade80'; idEl.style.borderColor = 'rgba(74,222,128,.4)'; }
     setTimeout(() => {
       if (hint) hint.textContent = 'copy';
