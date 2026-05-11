@@ -631,6 +631,7 @@ document.getElementById('eye-btn').addEventListener('click', () => {
   const show = inp.type === 'password';
   inp.type = show ? 'text' : 'password';
   if (icon) icon.className = show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+  inp.focus();
 });
 document.getElementById('pw-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') tryUnlock();
@@ -709,7 +710,7 @@ async function tryUnlock() {
 
 function showError(msg) {
   const el = document.getElementById('lock-error');
-  el.textContent = msg;
+  el.innerHTML = msg;
   el.classList.remove('show');
   void el.offsetWidth;
   el.classList.add('show');
