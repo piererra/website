@@ -277,6 +277,51 @@
       .editor-toolbar { gap:3px; padding:8px; }
       .tb-btn { font-size:11px; padding:5px 7px; }
     }
+    /* ── EXPIRY BUTTONS ── */
+    #pw-expiry-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .expiry-btn {
+      font-family: 'Sora', sans-serif;
+      font-size: 11px; font-weight: 600; letter-spacing: .3px;
+      padding: 9px 6px;
+      border-radius: 10px;
+      background: rgba(73,117,254,.06);
+      border: 1px solid rgba(73,117,254,.12);
+      color: var(--text3);
+      cursor: pointer;
+      transition: all .2s;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .expiry-btn:hover {
+      background: rgba(73,117,254,.12);
+      border-color: rgba(73,117,254,.3);
+      color: var(--text);
+    }
+    .expiry-btn.active {
+      background: linear-gradient(135deg, rgba(73,117,254,.25), rgba(124,58,237,.25));
+      border-color: rgba(73,117,254,.5);
+      color: #a0c4ff;
+      box-shadow: 0 0 0 1px rgba(73,117,254,.2) inset;
+    }
+    .expiry-btn[data-days="0"].active {
+      background: rgba(74,222,128,.1);
+      border-color: rgba(74,222,128,.3);
+      color: #4ade80;
+      box-shadow: 0 0 0 1px rgba(74,222,128,.15) inset;
+    }
+    .expiry-btn[data-days="1"].active,
+    .expiry-btn[data-days="3"].active {
+      background: rgba(251,146,60,.1);
+      border-color: rgba(251,146,60,.3);
+      color: #fb923c;
+      box-shadow: 0 0 0 1px rgba(251,146,60,.15) inset;
+    }
+    .expiry-btn[data-days="custom"].active {
+      background: rgba(192,132,252,.1);
+      border-color: rgba(192,132,252,.3);
+      color: #c084fc;
+      box-shadow: 0 0 0 1px rgba(192,132,252,.15) inset;
+    }
   </style>
   <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </head>
@@ -450,7 +495,7 @@
           </div>
           <div style="margin-bottom:20px;">
             <label class="ef-label">Expiry</label>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;" id="pw-expiry-btns">
+            <div id="pw-expiry-btns">
               <button type="button" class="expiry-btn active" data-days="0">No Expiry</button>
               <button type="button" class="expiry-btn" data-days="1">1 Day</button>
               <button type="button" class="expiry-btn" data-days="3">3 Days</button>
