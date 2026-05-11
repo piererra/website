@@ -307,9 +307,9 @@
   </div>
 
   <div class="admin-tabs">
-    <button class="tab-btn active" data-tab="posts">📝 Posts</button>
-    <button class="tab-btn" data-tab="editor">✏️ Editor</button>
-    <button class="tab-btn" data-tab="passwords">🔐 Passwords</button>
+    <button class="tab-btn active" data-tab="posts"><i class="fa-solid fa-file-pen"></i> Posts</button>
+    <button class="tab-btn" data-tab="editor"><i class="fa-solid fa-pencil"></i> Editor</button>
+    <button class="tab-btn" data-tab="passwords"><i class="fa-solid fa-lock"></i> Passwords</button>
 
   </div>
 
@@ -328,7 +328,7 @@
         <tbody id="posts-tbody"></tbody>
       </table>
       <div class="empty-state" id="posts-empty" style="display:none;">
-        <div class="ei">📭</div>
+        <div class="ei"><i class="fa-solid fa-box-open"></i></div>
         No posts yet. Click <strong>+ New Post</strong> to write one.
       </div>
     </div>
@@ -362,7 +362,7 @@
           <div>
             <label class="ef-label">Post Content *</label>
             <div class="editor-mode-bar">
-              <button class="mode-btn active" id="btn-mode-visual">👁 Visual</button>
+              <button class="mode-btn active" id="btn-mode-visual"><i class="fa-solid fa-eye"></i> Visual</button>
               <button class="mode-btn" id="btn-mode-code">&lt;/&gt; HTML</button>
             </div>
             <div class="editor-toolbar" id="toolbar">
@@ -399,7 +399,7 @@
             <div class="editor-body" id="editor-body" contenteditable="true"
               data-placeholder="Write your full post content here. Add headings, bullet points, download links, install steps — everything your readers need..."></div>
             <textarea class="editor-code" id="editor-code" spellcheck="false" placeholder="Raw HTML goes here..."></textarea>
-            <div class="editor-hint">Tip: Use <strong>👁 Visual</strong> to write normally, <strong>&lt;/&gt; HTML</strong> to edit raw code or clean up pasted content.</div>
+            <div class="editor-hint">Tip: Use <strong><i class="fa-solid fa-eye"></i> Visual</strong> to write normally, <strong>&lt;/&gt; HTML</strong> to edit raw code or clean up pasted content.</div>
           </div>
         </div>
         <div class="editor-actions">
@@ -441,7 +441,7 @@
             <label class="ef-label">Password</label>
             <div style="position:relative;">
               <input class="ef-input" id="pw-new" type="password" placeholder="Enter password" autocomplete="new-password" style="padding-right:48px;"/>
-              <button type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;" onclick="const i=document.getElementById('pw-new');i.type=i.type==='password'?'text':'password'">👁</button>
+              <button type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;" onclick="const i=document.getElementById('pw-new');i.type=i.type==='password'?'text':'password'"><i class="fa-solid fa-eye"></i></button>
             </div>
           </div>
           <div style="margin-bottom:14px;">
@@ -505,7 +505,7 @@
       </div>
     </label>
     <div class="lm-footer">
-      <button class="lm-remove" id="lm-remove">🗑 Remove Link</button>
+      <button class="lm-remove" id="lm-remove"><i class="fa-solid fa-trash"></i> Remove Link</button>
       <button class="btn-cancel" id="lm-cancel">Cancel</button>
       <button class="btn-save" id="lm-insert">Insert Link</button>
     </div>
@@ -672,7 +672,7 @@ function toggleFeatured(idx, val) {
     data.posts.map((p,i)=>({...p,_i:i})).sort((a,b)=>new Date(b.date)-new Date(a.date)).findIndex(p=>p._i===idx)
   ];
   if (row) row.querySelector('.toggle-label').textContent = val ? 'On' : 'Off';
-  toast(val ? '⭐ Post added to Featured marquee!' : 'Post removed from Featured.', 'success');
+  toast(val ? '<i class="fa-solid fa-star"></i> Post added to Featured marquee!' : 'Post removed from Featured.', 'success');
 }
 
 function delPost(idx) {
@@ -962,7 +962,7 @@ async function pushToGitHub() {
     });
     const result = await res.json();
     if (res.ok && result.ok) {
-      toast('🚀 Pushed to GitHub! Site updates in ~30 seconds.', 'success');
+      toast('<i class="fa-solid fa-rocket"></i> Pushed to GitHub! Site updates in ~30 seconds.', 'success');
       hasUnsaved = false;
       document.getElementById('btn-push').disabled = true;
     } else { toast(result.error || 'Push failed.', 'error'); }
@@ -1022,7 +1022,7 @@ function renderPasswordList(passwords) {
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
         <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;background:${statusColor}18;color:${statusColor};border:1px solid ${statusColor}33;">${statusText}</span>
-        <button onclick="deletePassword('${pw.id}','${escA(pw.label)}')" style="font-size:11px;font-weight:600;font-family:'Sora',sans-serif;color:var(--red);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:5px 10px;cursor:pointer;">🗑</button>
+        <button onclick="deletePassword('${pw.id}','${escA(pw.label)}')" style="font-size:11px;font-weight:600;font-family:'Sora',sans-serif;color:var(--red);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:5px 10px;cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
       </div>
     </div>`;
   }).join('');
@@ -1119,7 +1119,7 @@ function esc(s) {
 function toast(msg, type='success') {
   const el = document.createElement('div');
   el.className = `toast ${type}`;
-  el.textContent = (type==='success'?'✅ ':'❌ ') + msg;
+  el.innerHTML = (type==='success'?'<i class="fa-solid fa-circle-check"></i> ':'<i class="fa-solid fa-circle-xmark"></i> ') + msg;
   document.getElementById('toast-wrap').appendChild(el);
   setTimeout(() => el.remove(), 4500);
 }
