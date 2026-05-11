@@ -143,6 +143,23 @@
     font-size: 11px; color: var(--text3); text-align: center;
   }
 
+  /* ── EXPIRY BANNER ── */
+  #expiry-banner {
+    display: none;
+    align-items: center; gap: 10px;
+    margin: 0 32px 0;
+    padding: 10px 16px;
+    background: rgba(251,146,60,.08);
+    border: 1px solid rgba(251,146,60,.25);
+    border-radius: 12px;
+    font-size: 12px; color: #fdba74;
+    position: relative; z-index: 2;
+  }
+  #expiry-banner.show { display: flex; }
+  #expiry-banner i { color: #fb923c; font-size: 14px; flex-shrink: 0; }
+  .expiry-label { font-weight: 600; }
+  .expiry-date  { color: #fb923c; font-family: 'JetBrains Mono', monospace; font-size: 11px; margin-left: 4px; }
+
   /* ── MAIN CONTENT ── */
   #main-content { display: none; min-height: 100vh; position: relative; z-index: 1; }
 
@@ -526,6 +543,11 @@
     </div>
   </nav>
 
+  <div id="expiry-banner">
+    <i class="fa-solid fa-clock"></i>
+    <span><span class="expiry-label">Password expires:</span><span class="expiry-date" id="expiry-date-text"></span></span>
+  </div>
+
   <div class="cmd-wrap">
     <div class="cmd-header">
       <div class="cmd-header-eyebrow">Private Server</div>
@@ -598,15 +620,6 @@ let CMD_DATA = null;
 let GM_ITEMS = [];
 let GM_MONSTERS = [];
 
-async function sha256hex(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-let CMD_DATA = null;
-let GM_ITEMS = [];
-let GM_MONSTERS = [];
-
 async function loadAll() {
   try {
     const r2 = await fetch('json/items.json?v=' + Date.now());
@@ -662,10 +675,6 @@ async function tryUnlock() {
       attempts = 0;
       sessionStorage.setItem('cmd_token', result.token);
 
-      if (result.daysLeft !== undefined && result.daysLeft <= 2) {
-        showError(`<i class='fa-solid fa-bolt'></i> Password expires in ${result.daysLeft} day${result.daysLeft !== 1 ? 's' : ''}.`);
-      }
-
       btn.textContent = 'Loading...';
       try {
         const cmdRes = await fetch('/api/commands', {
@@ -680,6 +689,7 @@ async function tryUnlock() {
       btn.textContent = 'Unlock Access'; btn.disabled = false;
       document.getElementById('lock-screen').style.display = 'none';
       document.getElementById('main-content').style.display = 'block';
+      if (result.expiresAt) showExpiryBanner(result.expiresAt);
       if (!CMD_DATA || !CMD_DATA.categories || !CMD_DATA.categories.length) {
         document.getElementById('cmd-list').innerHTML =
           '<div class="cmd-empty" style="display:block;"><div class="cmd-empty-icon"><i class="fa-solid fa-box-open"></i></div>No commands available.</div>';
@@ -716,11 +726,23 @@ function showError(msg) {
   el.classList.add('show');
 }
 
+function showExpiryBanner(expiresAt) {
+  const banner = document.getElementById('expiry-banner');
+  const dateEl = document.getElementById('expiry-date-text');
+  if (!banner || !dateEl || !expiresAt) return;
+  const d = new Date(expiresAt);
+  const formatted = d.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })
+    + ' ' + d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+  dateEl.textContent = ' ' + formatted;
+  banner.classList.add('show');
+}
+
 function lockPage() {
   document.getElementById('main-content').style.display = 'none';
   document.getElementById('lock-screen').style.display = 'flex';
   document.getElementById('pw-input').value = '';
   document.getElementById('cmd-list').innerHTML = '';
+  document.getElementById('expiry-banner').classList.remove('show');
 }
 
 // ── RENDER COMMANDS ───────────────────────────────────────
