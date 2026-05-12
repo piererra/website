@@ -60,7 +60,7 @@ piererra/
 │   ├── passwords.js            ← Serverless: GM password verify/add/delete via Upstash KV
 │   └── commands.js             ← Serverless: serves GM command data after token verification
 │
-├── vercel.json                 ← Vercel config: cache-control headers for HTML + JSON files
+├── vercel.json                 ← Vercel config: smart cache-control headers per file type
 └── README.md                   ← This file
 ```
 
@@ -73,32 +73,32 @@ piererra/
 | File | Description |
 |------|-------------|
 | `index.html` | The main public-facing page. Renders posts, featured marquee, hero section, and game cards. Fetches `json/data.json` on load. |
-| `command-list.html` | A password-protected page showing all GM commands. Unlocks via `/api/passwords`, then fetches command data from `/api/commands` using a short-lived HMAC token. Includes searchable Item ID and Monster ID modals. |
-| `admin-passage.html` | The hidden admin panel. Requires username + password (verified via `/api/save`). Lets you write/edit/delete posts with a rich-text editor, manage featured posts, and manage GM command list passwords. Publishes changes by pushing `data.json` to GitHub via the API. |
+| `command-list.html` | A password-protected page showing all GM commands. Unlocks via `/api/passwords`, then fetches command data from `/api/commands` using a short-lived HMAC token. Includes searchable Item ID and Monster ID modals. Shows password expiry banner after unlock. |
+| `admin-passage.html` | The hidden admin panel. Requires username + password (verified via `/api/save`). Lets you write/edit/delete posts with a rich-text editor, manage featured posts, and manage GM command list passwords. Auto-logs out after 30 minutes of inactivity. |
 | `css/style.css` | All styling for `index.html` — variables, layout, hero, post cards, marquee, modals, and responsive breakpoints. |
-| `js/main.js` | All client-side JavaScript for `index.html` — fetches data, renders posts, handles the featured marquee, post modal, search, and Vanta.js background. |
+| `js/main.js` | All client-side JavaScript for `index.html` — fetches data, renders posts, handles the featured marquee, post modal, and Vanta.js background. |
 
 ### Data
 
 | File | Description |
 |------|-------------|
-| `json/data.json` | Flat-file database for the public site. Contains `posts` (title, content, date, slug, featured, draft) and `games` arrays. Written by the admin panel via GitHub API. |
-| `json/items.json` | Array of `{ id, name }` objects for every in-game item. Loaded by `command-list.html` for the Item ID reference modal. |
-| `json/monsters.json` | Array of `{ id, name, type, level }` objects for monsters (including MVP and Mini-boss flags). Loaded by `command-list.html` for the Monster ID reference modal. |
+| `json/data.json` | Flat-file database for the public site. Contains `posts` (title, content, date, slug, featured, draft) and `games` arrays. Written by the admin panel via GitHub API. CDN-cached for 30 seconds. |
+| `json/items.json` | Array of `{ id, name }` objects for every in-game item. Loaded by `command-list.html` for the Item ID reference modal. CDN-cached for 24 hours. |
+| `json/monsters.json` | Array of `{ id, name, type, level }` objects for monsters (including MVP and Mini-boss flags). Loaded by `command-list.html` for the Monster ID reference modal. CDN-cached for 24 hours. |
 
 ### API (Vercel Serverless Functions)
 
 | File | Description |
 |------|-------------|
-| `api/save.js` | Handles admin `login` and `save` actions. Verifies admin credentials from Vercel env vars (`ADMIN_USERNAME`, `ADMIN_PASSWORD`). On save, uses the GitHub API to commit `data.json` directly to the repo. Requires `GITHUB_TOKEN`, `GITHUB_REPO`, and `GITHUB_FILE_PATH` env vars. |
-| `api/passwords.js` | Manages GM command list passwords stored in Upstash KV. Supports `verify` (public — checks a password and returns a session token), `list`, `add`, and `delete` (admin-only). Passwords are salted SHA-256 hashed. Requires `STORAGE_KV_REST_API_URL` and `STORAGE_KV_REST_API_TOKEN` env vars. |
-| `api/commands.js` | Serves the GM command JSON data (`CMD_DATA`) only after validating the HMAC session token issued by `/api/passwords`. Token is valid for ~2 hours. Requires `TOKEN_SECRET` and `CMD_DATA` env vars. |
+| `api/save.js` | Handles admin `login` and `save` actions. Verifies admin credentials from Vercel env vars. On save, uses the GitHub API to commit `data.json` directly to the repo. |
+| `api/passwords.js` | Manages GM command list passwords stored in Upstash KV. Supports `verify` (public — checks a password, enforces IP rate limiting, and returns a 30-min HMAC token), `list`, `add`, and `delete` (admin-only). Passwords are salted SHA-256 hashed. |
+| `api/commands.js` | Serves the GM command JSON data only after validating the HMAC session token issued by `/api/passwords`. Token is valid for 30 minutes. |
 
 ### Config
 
 | File | Description |
 |------|-------------|
-| `vercel.json` | Sets `no-cache` headers on all `.html` and `json/*.json` files so browsers and Vercel's CDN always serve the latest version after a deploy. |
+| `vercel.json` | Smart cache-control per file type: HTML always `no-store`, `data.json` cached 30s on CDN, `items.json` and `monsters.json` cached 24h on CDN, API routes always `no-store`. |
 
 ---
 
@@ -116,7 +116,7 @@ Set these in your Vercel project dashboard under **Settings → Environment Vari
 | `STORAGE_KV_REST_API_URL` | `api/passwords.js` | Upstash KV REST URL |
 | `STORAGE_KV_REST_API_TOKEN` | `api/passwords.js` | Upstash KV REST token |
 | `TOKEN_SECRET` | `api/passwords.js`, `api/commands.js` | Secret for signing HMAC session tokens |
-| `CMD_DATA` | `api/commands.js` | JSON string of GM command categories and commands |
+| `COMMANDS_DATA` | `api/commands.js` | JSON string of GM command categories and commands |
 
 ---
 
@@ -133,9 +133,10 @@ Write a post in admin-passage.html
 ```
 Visit command-list.html
   → Enter GM password
-    → api/passwords.js verifies + issues HMAC token
-      → api/commands.js validates token + returns CMD_DATA
-        → Commands render in the browser 🔐
+    → api/passwords.js checks IP rate limit + verifies password
+      → Issues a 30-min HMAC token
+        → api/commands.js validates token + returns COMMANDS_DATA
+          → Commands render in the browser 🔐
 ```
 
 ---
@@ -171,8 +172,43 @@ Visit command-list.html
 
 ## 📋 Changelog
 
-### v1.3 — Bug Fixes & Code Cleanup
-> Current version
+> Click any version to expand its changes.
+
+---
+
+<details>
+<summary><strong>v1.4 — Security & Performance</strong> &nbsp;✦&nbsp; <em>Current version</em></summary>
+<br>
+
+**🔒 Security**
+- Added IP-based rate limiting on `/api/passwords` verify — max 10 attempts per IP per 5 minutes, counter stored in Upstash KV with hashed IP (raw IP never stored)
+- Tightened HMAC session token window from ~2 hours → **30 minutes** in both `api/passwords.js` and `api/commands.js`
+- Added **admin auto-logout** after 30 minutes of inactivity in `admin-passage.html` — shows a sliding countdown warning with 30 seconds to cancel before signing out
+- Lockout state on `command-list.html` lock screen now persists across page refreshes via `sessionStorage` (previously reset on refresh)
+
+**⚡ Performance**
+- Tuned `vercel.json` cache headers per file type:
+  - `*.html` → `no-store` (always fresh, unchanged)
+  - `json/data.json` → `s-maxage=30` (30s CDN cache, posts still live in ~30s after deploy)
+  - `json/items.json` + `json/monsters.json` → `s-maxage=86400` (24h CDN cache, static reference data)
+  - `/api/*` → `no-store` (explicitly blocked from any caching)
+
+**🎨 UI**
+- Replaced all emoji in `command-list.html` and `admin-passage.html` with Font Awesome icons for sharper, consistent rendering across all devices
+- Removed online/offline status dot from featured marquee in `main.js` (no toggle UI existed anywhere)
+- Styled expiry duration buttons in admin panel — now a 4-column grid with color-coded active states (green = no expiry, orange = short, blue = normal, purple = custom)
+- Added password expiry banner on `command-list.html` after unlock — shows expiry date + days remaining pill that turns red when ≤1 day left
+
+**🧹 Cleanup**
+- Removed `"status"` field from `json/data.json` game objects (unused after marquee status dot removal)
+
+</details>
+
+---
+
+<details>
+<summary><strong>v1.3 — Bug Fixes & Code Cleanup</strong></summary>
+<br>
 
 - **Fixed** duplicate `let CMD_DATA`, `let GM_ITEMS`, `let GM_MONSTERS` declarations in `command-list.html` that caused a JavaScript crash in strict mode
 - **Removed** dead `sha256hex()` function in `command-list.html` (leftover from old client-side password system, never called)
@@ -181,9 +217,14 @@ Visit command-list.html
 - **Removed** stale `data.cmdPassword` guard in `loadLocal()` inside the admin panel (legacy code from old client-side password architecture)
 - **Renamed** admin panel from `73hjx82hzj2ihs2.html` → `admin-passage.html`
 
+</details>
+
 ---
 
-### v1.2 — GM Command List + Password System
+<details>
+<summary><strong>v1.2 — GM Command List + Password System</strong></summary>
+<br>
+
 - Added `command-list.html` — password-protected page for GM commands
 - Added `api/passwords.js` — full password management via Upstash KV (add, delete, list, verify with expiry support)
 - Added `api/commands.js` — token-gated endpoint that serves GM command data
@@ -193,9 +234,14 @@ Visit command-list.html
 - Added HMAC session token system — token valid for ~2 hours after unlock
 - Password lock screen with attempt limiting and 30-second lockout after 5 failures
 
+</details>
+
 ---
 
-### v1.1 — Admin Panel
+<details>
+<summary><strong>v1.1 — Admin Panel</strong></summary>
+<br>
+
 - Added hidden admin panel (`admin-passage.html`) for managing posts without touching code
 - Added `api/save.js` — serverless function for admin login and GitHub file push
 - Added rich-text post editor with toolbar (bold, italic, headings, lists, links, images, blockquote, code)
@@ -206,9 +252,14 @@ Visit command-list.html
 - Added toast notification system in admin panel
 - Added mobile-responsive admin layout (table → card view on small screens)
 
+</details>
+
 ---
 
-### v1.0 — Initial Release
+<details>
+<summary><strong>v1.0 — Initial Release</strong></summary>
+<br>
+
 - Launched **Piererra** — static site for Android private server gaming community
 - Built `index.html` as a single-page site with hero section, post cards, and featured marquee
 - Built `css/style.css` — full custom styling with CSS variables, dark theme, and responsive breakpoints
@@ -217,6 +268,8 @@ Visit command-list.html
 - Added `json/data.json` as flat-file database for posts and games
 - Deployed on Vercel with GitHub as source — auto-deploys on every push
 - Added `vercel.json` with no-cache headers for HTML and JSON files
+
+</details>
 
 ---
 

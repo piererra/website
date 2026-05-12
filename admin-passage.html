@@ -277,51 +277,49 @@
       .editor-toolbar { gap:3px; padding:8px; }
       .tb-btn { font-size:11px; padding:5px 7px; }
     }
-    /* ── EXPIRY BUTTONS ── */
-    #pw-expiry-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .expiry-btn {
-      font-family: 'Sora', sans-serif;
-      font-size: 11px; font-weight: 600; letter-spacing: .3px;
-      padding: 9px 6px;
-      border-radius: 10px;
-      background: rgba(73,117,254,.06);
-      border: 1px solid rgba(73,117,254,.12);
-      color: var(--text3);
-      cursor: pointer;
-      transition: all .2s;
-      text-align: center;
-      white-space: nowrap;
-    }
-    .expiry-btn:hover {
-      background: rgba(73,117,254,.12);
-      border-color: rgba(73,117,254,.3);
-      color: var(--text);
-    }
-    .expiry-btn.active {
-      background: linear-gradient(135deg, rgba(73,117,254,.25), rgba(124,58,237,.25));
-      border-color: rgba(73,117,254,.5);
-      color: #a0c4ff;
-      box-shadow: 0 0 0 1px rgba(73,117,254,.2) inset;
-    }
-    .expiry-btn[data-days="0"].active {
-      background: rgba(74,222,128,.1);
-      border-color: rgba(74,222,128,.3);
-      color: #4ade80;
-      box-shadow: 0 0 0 1px rgba(74,222,128,.15) inset;
-    }
-    .expiry-btn[data-days="1"].active,
-    .expiry-btn[data-days="3"].active {
-      background: rgba(251,146,60,.1);
-      border-color: rgba(251,146,60,.3);
-      color: #fb923c;
-      box-shadow: 0 0 0 1px rgba(251,146,60,.15) inset;
-    }
-    .expiry-btn[data-days="custom"].active {
-      background: rgba(192,132,252,.1);
-      border-color: rgba(192,132,252,.3);
-      color: #c084fc;
-      box-shadow: 0 0 0 1px rgba(192,132,252,.15) inset;
-    }
+  /* ── AUTO-LOGOUT WARNING ── */
+  #inactivity-warning {
+    display: none;
+    position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+    background: rgba(10,15,60,.97);
+    border: 1px solid rgba(251,146,60,.4);
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5), 0 0 0 1px rgba(251,146,60,.1) inset;
+    backdrop-filter: blur(16px);
+    min-width: 280px; max-width: 320px;
+    animation: slideInWarning .3s cubic-bezier(.22,1,.36,1);
+  }
+  #inactivity-warning.show { display: block; }
+  @keyframes slideInWarning {
+    from { opacity:0; transform: translateY(16px); }
+    to   { opacity:1; transform: none; }
+  }
+  .iw-title {
+    font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700;
+    color: #fb923c; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .iw-sub {
+    font-size: 12px; color: var(--text2); margin-bottom: 14px; line-height: 1.5;
+  }
+  .iw-countdown {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px; font-weight: 700; color: #fb923c;
+    text-align: center; margin-bottom: 14px;
+    letter-spacing: 2px;
+  }
+  .iw-countdown.urgent { color: #f87171; animation: pulse .6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  .iw-btn {
+    width: 100%; padding: 10px;
+    background: linear-gradient(135deg, rgba(73,117,254,.3), rgba(124,58,237,.3));
+    border: 1px solid rgba(73,117,254,.4);
+    border-radius: 10px; color: #a0c4ff;
+    font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .2s;
+  }
+  .iw-btn:hover { background: linear-gradient(135deg, rgba(73,117,254,.45), rgba(124,58,237,.45)); }
   </style>
   <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </head>
@@ -352,9 +350,9 @@
   </div>
 
   <div class="admin-tabs">
-    <button class="tab-btn active" data-tab="posts"><i class="fa-solid fa-file-pen"></i> Posts</button>
-    <button class="tab-btn" data-tab="editor"><i class="fa-solid fa-pencil"></i> Editor</button>
-    <button class="tab-btn" data-tab="passwords"><i class="fa-solid fa-lock"></i> Passwords</button>
+    <button class="tab-btn active" data-tab="posts">📝 Posts</button>
+    <button class="tab-btn" data-tab="editor">✏️ Editor</button>
+    <button class="tab-btn" data-tab="passwords">🔐 Passwords</button>
 
   </div>
 
@@ -373,7 +371,7 @@
         <tbody id="posts-tbody"></tbody>
       </table>
       <div class="empty-state" id="posts-empty" style="display:none;">
-        <div class="ei"><i class="fa-solid fa-box-open"></i></div>
+        <div class="ei">📭</div>
         No posts yet. Click <strong>+ New Post</strong> to write one.
       </div>
     </div>
@@ -407,7 +405,7 @@
           <div>
             <label class="ef-label">Post Content *</label>
             <div class="editor-mode-bar">
-              <button class="mode-btn active" id="btn-mode-visual"><i class="fa-solid fa-eye"></i> Visual</button>
+              <button class="mode-btn active" id="btn-mode-visual">👁 Visual</button>
               <button class="mode-btn" id="btn-mode-code">&lt;/&gt; HTML</button>
             </div>
             <div class="editor-toolbar" id="toolbar">
@@ -444,7 +442,7 @@
             <div class="editor-body" id="editor-body" contenteditable="true"
               data-placeholder="Write your full post content here. Add headings, bullet points, download links, install steps — everything your readers need..."></div>
             <textarea class="editor-code" id="editor-code" spellcheck="false" placeholder="Raw HTML goes here..."></textarea>
-            <div class="editor-hint">Tip: Use <strong><i class="fa-solid fa-eye"></i> Visual</strong> to write normally, <strong>&lt;/&gt; HTML</strong> to edit raw code or clean up pasted content.</div>
+            <div class="editor-hint">Tip: Use <strong>👁 Visual</strong> to write normally, <strong>&lt;/&gt; HTML</strong> to edit raw code or clean up pasted content.</div>
           </div>
         </div>
         <div class="editor-actions">
@@ -486,7 +484,7 @@
             <label class="ef-label">Password</label>
             <div style="position:relative;">
               <input class="ef-input" id="pw-new" type="password" placeholder="Enter password" autocomplete="new-password" style="padding-right:48px;"/>
-              <button type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;" onclick="const i=document.getElementById('pw-new');i.type=i.type==='password'?'text':'password'"><i class="fa-solid fa-eye"></i></button>
+              <button type="button" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;" onclick="const i=document.getElementById('pw-new');i.type=i.type==='password'?'text':'password'">👁</button>
             </div>
           </div>
           <div style="margin-bottom:14px;">
@@ -495,7 +493,7 @@
           </div>
           <div style="margin-bottom:20px;">
             <label class="ef-label">Expiry</label>
-            <div id="pw-expiry-btns">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;" id="pw-expiry-btns">
               <button type="button" class="expiry-btn active" data-days="0">No Expiry</button>
               <button type="button" class="expiry-btn" data-days="1">1 Day</button>
               <button type="button" class="expiry-btn" data-days="3">3 Days</button>
@@ -550,7 +548,7 @@
       </div>
     </label>
     <div class="lm-footer">
-      <button class="lm-remove" id="lm-remove"><i class="fa-solid fa-trash"></i> Remove Link</button>
+      <button class="lm-remove" id="lm-remove">🗑 Remove Link</button>
       <button class="btn-cancel" id="lm-cancel">Cancel</button>
       <button class="btn-save" id="lm-insert">Insert Link</button>
     </div>
@@ -641,6 +639,7 @@ function setupLogin() {
         document.getElementById('login-page').style.display = 'none';
         document.getElementById('admin-page').style.display = 'block';
         renderPosts();
+        startInactivityWatch();
       } else {
         showLoginErr(d.error || 'Invalid credentials.');
         document.getElementById('inp-pass').value = '';
@@ -658,11 +657,74 @@ function setupLogin() {
 }
 
 function logout() {
+  clearInactivityTimers();
   document.getElementById('admin-page').style.display = 'none';
   document.getElementById('login-page').style.display = 'flex';
   document.getElementById('inp-user').value = '';
   document.getElementById('inp-pass').value = '';
   document.getElementById('login-err').style.display = 'none';
+  hideInactivityWarning();
+}
+
+// ── AUTO-LOGOUT ────────────────────────────────────────────
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 min before warning
+const WARNING_DURATION   = 30;              // seconds to show warning before logout
+
+let inactivityTimer  = null;
+let countdownTimer   = null;
+let countdownSeconds = WARNING_DURATION;
+
+function resetInactivityTimer() {
+  clearInactivityTimers();
+  hideInactivityWarning();
+  inactivityTimer = setTimeout(showInactivityWarning, INACTIVITY_TIMEOUT);
+}
+
+function clearInactivityTimers() {
+  if (inactivityTimer) { clearTimeout(inactivityTimer);  inactivityTimer  = null; }
+  if (countdownTimer)  { clearInterval(countdownTimer); countdownTimer   = null; }
+}
+
+function showInactivityWarning() {
+  countdownSeconds = WARNING_DURATION;
+  const warning    = document.getElementById('inactivity-warning');
+  const countdown  = document.getElementById('iw-countdown');
+  if (!warning || !countdown) return;
+  warning.classList.add('show');
+  updateCountdown(countdown);
+  countdownTimer = setInterval(() => {
+    countdownSeconds--;
+    updateCountdown(countdown);
+    if (countdownSeconds <= 0) {
+      clearInactivityTimers();
+      hideInactivityWarning();
+      logout();
+    }
+  }, 1000);
+}
+
+function updateCountdown(el) {
+  const m = String(Math.floor(countdownSeconds / 60)).padStart(2, '0');
+  const s = String(countdownSeconds % 60).padStart(2, '0');
+  el.textContent = m + ':' + s;
+  el.classList.toggle('urgent', countdownSeconds <= 10);
+}
+
+function hideInactivityWarning() {
+  const warning = document.getElementById('inactivity-warning');
+  if (warning) warning.classList.remove('show');
+}
+
+function startInactivityWatch() {
+  ['mousemove','mousedown','keydown','touchstart','scroll','click'].forEach(evt => {
+    document.addEventListener(evt, resetInactivityTimer, { passive: true });
+  });
+  document.getElementById('iw-stay-btn').addEventListener('click', () => {
+    clearInactivityTimers();
+    hideInactivityWarning();
+    resetInactivityTimer();
+  });
+  resetInactivityTimer();
 }
 
 // ── TABS ──
@@ -717,7 +779,7 @@ function toggleFeatured(idx, val) {
     data.posts.map((p,i)=>({...p,_i:i})).sort((a,b)=>new Date(b.date)-new Date(a.date)).findIndex(p=>p._i===idx)
   ];
   if (row) row.querySelector('.toggle-label').textContent = val ? 'On' : 'Off';
-  toast(val ? '<i class="fa-solid fa-star"></i> Post added to Featured marquee!' : 'Post removed from Featured.', 'success');
+  toast(val ? '⭐ Post added to Featured marquee!' : 'Post removed from Featured.', 'success');
 }
 
 function delPost(idx) {
@@ -1007,7 +1069,7 @@ async function pushToGitHub() {
     });
     const result = await res.json();
     if (res.ok && result.ok) {
-      toast('<i class="fa-solid fa-rocket"></i> Pushed to GitHub! Site updates in ~30 seconds.', 'success');
+      toast('🚀 Pushed to GitHub! Site updates in ~30 seconds.', 'success');
       hasUnsaved = false;
       document.getElementById('btn-push').disabled = true;
     } else { toast(result.error || 'Push failed.', 'error'); }
@@ -1067,7 +1129,7 @@ function renderPasswordList(passwords) {
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
         <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;background:${statusColor}18;color:${statusColor};border:1px solid ${statusColor}33;">${statusText}</span>
-        <button onclick="deletePassword('${pw.id}','${escA(pw.label)}')" style="font-size:11px;font-weight:600;font-family:'Sora',sans-serif;color:var(--red);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:5px 10px;cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+        <button onclick="deletePassword('${pw.id}','${escA(pw.label)}')" style="font-size:11px;font-weight:600;font-family:'Sora',sans-serif;color:var(--red);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:5px 10px;cursor:pointer;">🗑</button>
       </div>
     </div>`;
   }).join('');
@@ -1164,10 +1226,18 @@ function esc(s) {
 function toast(msg, type='success') {
   const el = document.createElement('div');
   el.className = `toast ${type}`;
-  el.innerHTML = (type==='success'?'<i class="fa-solid fa-circle-check"></i> ':'<i class="fa-solid fa-circle-xmark"></i> ') + msg;
+  el.textContent = (type==='success'?'✅ ':'❌ ') + msg;
   document.getElementById('toast-wrap').appendChild(el);
   setTimeout(() => el.remove(), 4500);
 }
 </script>
+  <!-- AUTO-LOGOUT WARNING -->
+  <div id="inactivity-warning">
+    <div class="iw-title"><i class="fa-solid fa-clock"></i> Session Expiring</div>
+    <div class="iw-sub">You've been inactive. You'll be signed out in:</div>
+    <div class="iw-countdown" id="iw-countdown">00:30</div>
+    <button class="iw-btn" id="iw-stay-btn">Stay Signed In</button>
+  </div>
+
 </body>
 </html>
