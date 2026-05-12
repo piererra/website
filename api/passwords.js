@@ -44,7 +44,6 @@ async function kvGet(key) {
 
 async function kvSet(key, value, ttlSeconds = null) {
   const { url, token } = getKV();
-  // Use pipeline for atomic SET + EXPIRE
   const cmds = [['SET', key, JSON.stringify(value)]];
   if (ttlSeconds) cmds.push(['EXPIRE', key, ttlSeconds]);
   const res = await fetch(`${url}/pipeline`, {
@@ -63,7 +62,21 @@ async function kvDel(key) {
   });
 }
 
-// Use SCAN to find all cmdpw:* keys (safer than KEYS in production)
+async function kvIncr(key, ttlSeconds) {
+  const { url, token } = getKV();
+  const cmds = [
+    ['INCR', key],
+    ['EXPIRE', key, ttlSeconds]
+  ];
+  const res = await fetch(`${url}/pipeline`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(cmds)
+  });
+  const data = await res.json();
+  return Array.isArray(data) && data[0] ? (data[0].result || 1) : 1;
+}
+
 async function kvScan(pattern) {
   const { url, token } = getKV();
   let keys = [];
@@ -86,6 +99,32 @@ function verifyAdmin(username, password) {
   if (!envUser || !envPass) return false;
   return safeEqual(sha256(username || ''), sha256(envUser)) &&
          safeEqual(sha256(password || ''), sha256(envPass));
+}
+
+// ── Rate limiting ──────────────────────────────────────────
+// Max 10 verify attempts per IP per 5 minutes
+const RATE_LIMIT_MAX    = 10;
+const RATE_LIMIT_WINDOW = 5 * 60; // seconds
+
+function getClientIP(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return req.socket?.remoteAddress || 'unknown';
+}
+
+async function checkRateLimit(ip) {
+  const key   = `ratelimit:verify:${sha256(ip)}`; // hash IP so it's not stored raw
+  const count = await kvIncr(key, RATE_LIMIT_WINDOW);
+  return { limited: count > RATE_LIMIT_MAX, count, max: RATE_LIMIT_MAX };
+}
+
+// ── Token helpers ──────────────────────────────────────────
+// Token valid for 30-minute slot instead of 1-hour slot
+const TOKEN_WINDOW_MS = 30 * 60 * 1000;
+
+function makeToken(secret) {
+  const slot = Math.floor(Date.now() / TOKEN_WINDOW_MS).toString();
+  return crypto.createHmac('sha256', secret).update('unlock:' + slot).digest('hex');
 }
 
 // ── Handler ───────────────────────────────────────────────
@@ -113,6 +152,19 @@ module.exports = async function handler(req, res) {
     const { password } = body;
     if (!password) return res.status(400).json({ error: 'No password provided' });
 
+    // ── IP rate limit check ──
+    const ip = getClientIP(req);
+    let rateCheck;
+    try { rateCheck = await checkRateLimit(ip); }
+    catch { rateCheck = { limited: false }; } // fail open if KV is down
+
+    if (rateCheck.limited) {
+      await new Promise(r => setTimeout(r, 1000));
+      return res.status(429).json({
+        error: `Too many attempts. Try again in ${RATE_LIMIT_WINDOW / 60} minutes.`
+      });
+    }
+
     let keys;
     try { keys = await kvScan('cmdpw:*'); }
     catch (e) { return res.status(500).json({ error: 'KV scan failed: ' + e.message }); }
@@ -127,10 +179,9 @@ module.exports = async function handler(req, res) {
 
       const attempt = sha256(pw.salt + password);
       if (safeEqual(attempt, pw.hash)) {
-        const secret   = process.env.TOKEN_SECRET || 'fallback';
-        const hourSlot = Math.floor(Date.now() / (1000 * 60 * 60)).toString();
-        const token    = crypto.createHmac('sha256', secret).update('unlock:' + hourSlot).digest('hex');
-        const resp     = { ok: true, token, label: pw.label || 'Password' };
+        const secret = process.env.TOKEN_SECRET || 'fallback';
+        const token  = makeToken(secret);
+        const resp   = { ok: true, token, label: pw.label || 'Password' };
         if (pw.expiresAt) {
           resp.daysLeft  = Math.ceil((new Date(pw.expiresAt) - Date.now()) / (1000 * 60 * 60 * 24));
           resp.expiresAt = pw.expiresAt;

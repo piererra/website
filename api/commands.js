@@ -10,8 +10,12 @@ function cors(res) {
   res.setHeader('Cache-Control', 'no-store');
 }
 
+// Must match TOKEN_WINDOW_MS in api/passwords.js
+const TOKEN_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
+
 function isValidToken(token, secret) {
-  const now = Math.floor(Date.now() / (1000 * 60 * 60));
+  const now = Math.floor(Date.now() / TOKEN_WINDOW_MS);
+  // Accept current slot and previous slot (handles edge case at slot boundary)
   for (const slot of [now, now - 1]) {
     const expected = crypto
       .createHmac('sha256', secret)
@@ -39,7 +43,7 @@ module.exports = async function handler(req, res) {
   const { token } = body;
   const tokenSecret = process.env.TOKEN_SECRET;
   if (!tokenSecret) return res.status(500).json({ error: 'TOKEN_SECRET not configured' });
-  if (!token) return res.status(400).json({ error: 'No token provided' });
+  if (!token)       return res.status(400).json({ error: 'No token provided' });
 
   if (!isValidToken(token, tokenSecret)) {
     return res.status(401).json({ error: 'Session expired. Please unlock again.' });
